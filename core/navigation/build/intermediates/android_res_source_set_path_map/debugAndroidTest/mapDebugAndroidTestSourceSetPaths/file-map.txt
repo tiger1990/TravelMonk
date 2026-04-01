@@ -1,0 +1,4 @@
+com.travelmonk.core.navigation.test.navigation-updated_navigation_xml-0 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/navigation/build/generated/updated_navigation_xml/debugAndroidTest
+com.travelmonk.core.navigation.test.navigation-packageDebugAndroidTestResources-1 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/navigation/build/intermediates/incremental/debugAndroidTest/packageDebugAndroidTestResources/merged.dir
+com.travelmonk.core.navigation.test.navigation-packageDebugAndroidTestResources-2 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/navigation/build/intermediates/incremental/debugAndroidTest/packageDebugAndroidTestResources/stripped.dir
+com.travelmonk.core.navigation.test.navigation-debugAndroidTest-3 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/navigation/build/intermediates/merged_res/debugAndroidTest/mergeDebugAndroidTestResources

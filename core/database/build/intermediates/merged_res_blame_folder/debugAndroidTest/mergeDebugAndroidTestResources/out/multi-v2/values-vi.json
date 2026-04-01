@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.travelmonk.core.database.test.database-mergeDebugAndroidTestResources-11:/values-vi/values-vi.xml",
+            "map": [
+                {
+                    "source": "/Users/deepakpanwar/.gradle/caches/9.3.1/transforms/1114bc70285a45b50c7c365672a765c3/transformed/core-1.8.0/res/values-vi/values-vi.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "100",
+                        "endOffsets": "151"
+                    }
+                }
+            ]
+        }
+    ]
+}

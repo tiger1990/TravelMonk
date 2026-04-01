@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:blog.jetbrains.com)",
+      "WebFetch(domain:mvnrepository.com)",
+      "Bash(./gradlew :feature:flights:kspDebugKotlin :feature:transport:kspDebugKotlin)",
+      "Bash(./gradlew :app:kspDebugKotlin)",
+      "Bash(./gradlew :core:designsystem:compileDebugKotlin)",
+      "Bash(./gradlew :app:compileDebugKotlin)"
+    ]
+  }
+}

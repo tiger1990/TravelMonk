@@ -1,0 +1,1 @@
+com.travelmonk.core.common.test

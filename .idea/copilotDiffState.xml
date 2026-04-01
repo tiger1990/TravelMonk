@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="/build.gradle (snapshot).kts">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="/build.gradle (snapshot).kts" />
+              <option name="originalContent" value="plugins {&#10;    alias(libs.plugins.android.library)&#10;    alias(libs.plugins.kotlin.compose)&#10;    alias(libs.plugins.hilt)&#10;    alias(libs.plugins.ksp)&#10;}&#10;&#10;android {&#10;    namespace = &quot;com.travelmonk.feature.bookings&quot;&#10;    compileSdk = 35&#10;&#10;    defaultConfig {&#10;        minSdk = 28&#10;    }&#10;&#10;    buildFeatures {&#10;        compose = true&#10;    }&#10;}&#10;&#10;dependencies {&#10;    implementation(project(&quot;:core:navigation&quot;))&#10;    implementation(project(&quot;:core:designsystem&quot;))&#10;    implementation(project(&quot;:core:ui&quot;))&#10;    implementation(project(&quot;:core:common&quot;))&#10;    &#10;    implementation(platform(libs.androidx.compose.bom))&#10;    implementation(libs.androidx.ui)&#10;    implementation(libs.androidx.material3)&#10;    implementation(libs.hilt.android)&#10;    ksp(libs.hilt.compiler)&#10;    implementation(libs.hilt.navigation.compose)&#10;}&#10;" />
+              <option name="updatedContent" value="plugins {&#10;    alias(libs.plugins.android.library)&#10;    alias(libs.plugins.kotlin.android)&#10;    alias(libs.plugins.kotlin.compose)&#10;    alias(libs.plugins.hilt)&#10;    alias(libs.plugins.ksp)&#10;}&#10;&#10;android {&#10;    namespace = &quot;com.travelmonk.feature.bookings&quot;&#10;    compileSdk = 35&#10;&#10;    defaultConfig {&#10;        minSdk = 28&#10;    }&#10;&#10;    buildFeatures {&#10;        compose = true&#10;    }&#10;}&#10;&#10;dependencies {&#10;    implementation(project(&quot;:core:navigation&quot;))&#10;    implementation(project(&quot;:core:designsystem&quot;))&#10;    implementation(project(&quot;:core:ui&quot;))&#10;    implementation(project(&quot;:core:common&quot;))&#10;    &#10;    implementation(platform(libs.androidx.compose.bom))&#10;    implementation(libs.androidx.ui)&#10;    implementation(libs.androidx.material3)&#10;    implementation(libs.hilt.android)&#10;    ksp(libs.hilt.compiler)&#10;    implementation(libs.hilt.navigation.compose)&#10;}&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

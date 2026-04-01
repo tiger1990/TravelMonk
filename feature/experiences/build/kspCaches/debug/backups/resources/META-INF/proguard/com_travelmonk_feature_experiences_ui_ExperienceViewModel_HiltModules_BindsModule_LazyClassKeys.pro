@@ -1,0 +1,1 @@
+-keep,allowobfuscation,allowshrinking class com.travelmonk.feature.experiences.ui.ExperienceViewModel

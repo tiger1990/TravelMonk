@@ -1,0 +1,1 @@
+int drawable ic_swap_vert 0x0

@@ -1,0 +1,8 @@
+com.travelmonk.feature.experiences-pngs-0 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/experiences/build/generated/res/pngs/debug
+com.travelmonk.feature.experiences-updated_navigation_xml-1 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/experiences/build/generated/updated_navigation_xml/debug
+com.travelmonk.feature.experiences-mergeDebugResources-2 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/experiences/build/intermediates/incremental/debug/mergeDebugResources/merged.dir
+com.travelmonk.feature.experiences-mergeDebugResources-3 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/experiences/build/intermediates/incremental/debug/mergeDebugResources/stripped.dir
+com.travelmonk.feature.experiences-debug-4 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/experiences/build/intermediates/merged_res/debug/mergeDebugResources
+com.travelmonk.feature.experiences-debug-5 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/experiences/build/intermediates/packaged_res/debug/packageDebugResources
+com.travelmonk.feature.experiences-debug-6 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/experiences/src/debug/res
+com.travelmonk.feature.experiences-main-7 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/experiences/src/main/res

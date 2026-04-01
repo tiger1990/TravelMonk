@@ -1,0 +1,1 @@
+-keep,allowobfuscation,allowshrinking class com.travelmonk.feature.services.ui.ServicesViewModel

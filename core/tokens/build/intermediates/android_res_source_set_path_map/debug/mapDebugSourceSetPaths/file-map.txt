@@ -1,0 +1,8 @@
+com.travelmonk.core.tokens-pngs-0 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/tokens/build/generated/res/pngs/debug
+com.travelmonk.core.tokens-updated_navigation_xml-1 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/tokens/build/generated/updated_navigation_xml/debug
+com.travelmonk.core.tokens-mergeDebugResources-2 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/tokens/build/intermediates/incremental/debug/mergeDebugResources/merged.dir
+com.travelmonk.core.tokens-mergeDebugResources-3 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/tokens/build/intermediates/incremental/debug/mergeDebugResources/stripped.dir
+com.travelmonk.core.tokens-debug-4 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/tokens/build/intermediates/merged_res/debug/mergeDebugResources
+com.travelmonk.core.tokens-debug-5 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/tokens/build/intermediates/packaged_res/debug/packageDebugResources
+com.travelmonk.core.tokens-debug-6 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/tokens/src/debug/res
+com.travelmonk.core.tokens-main-7 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/tokens/src/main/res

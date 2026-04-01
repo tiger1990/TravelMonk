@@ -1,0 +1,8 @@
+com.travelmonk.feature.stays-pngs-0 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/stays/build/generated/res/pngs/debug
+com.travelmonk.feature.stays-updated_navigation_xml-1 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/stays/build/generated/updated_navigation_xml/debug
+com.travelmonk.feature.stays-mergeDebugResources-2 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/stays/build/intermediates/incremental/debug/mergeDebugResources/merged.dir
+com.travelmonk.feature.stays-mergeDebugResources-3 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/stays/build/intermediates/incremental/debug/mergeDebugResources/stripped.dir
+com.travelmonk.feature.stays-debug-4 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/stays/build/intermediates/merged_res/debug/mergeDebugResources
+com.travelmonk.feature.stays-debug-5 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/stays/build/intermediates/packaged_res/debug/packageDebugResources
+com.travelmonk.feature.stays-debug-6 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/stays/src/debug/res
+com.travelmonk.feature.stays-main-7 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/stays/src/main/res

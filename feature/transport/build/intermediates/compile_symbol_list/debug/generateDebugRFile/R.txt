@@ -1,0 +1,6 @@
+int drawable ic_bus 0x0
+int drawable ic_calendar_today 0x0
+int drawable ic_flight 0x0
+int drawable ic_location_off 0x0
+int drawable ic_location_on 0x0
+int drawable ic_transit 0x0
