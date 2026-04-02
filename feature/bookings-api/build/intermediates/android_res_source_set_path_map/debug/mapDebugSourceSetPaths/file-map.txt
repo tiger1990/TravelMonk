@@ -1,0 +1,8 @@
+com.travelmonk.feature.bookingsapi.bookings-api-pngs-0 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/bookings-api/build/generated/res/pngs/debug
+com.travelmonk.feature.bookingsapi.bookings-api-updated_navigation_xml-1 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/bookings-api/build/generated/updated_navigation_xml/debug
+com.travelmonk.feature.bookingsapi.bookings-api-mergeDebugResources-2 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/bookings-api/build/intermediates/incremental/debug/mergeDebugResources/merged.dir
+com.travelmonk.feature.bookingsapi.bookings-api-mergeDebugResources-3 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/bookings-api/build/intermediates/incremental/debug/mergeDebugResources/stripped.dir
+com.travelmonk.feature.bookingsapi.bookings-api-debug-4 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/bookings-api/build/intermediates/merged_res/debug/mergeDebugResources
+com.travelmonk.feature.bookingsapi.bookings-api-debug-5 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/bookings-api/build/intermediates/packaged_res/debug/packageDebugResources
+com.travelmonk.feature.bookingsapi.bookings-api-debug-6 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/bookings-api/src/debug/res
+com.travelmonk.feature.bookingsapi.bookings-api-main-7 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/bookings-api/src/main/res

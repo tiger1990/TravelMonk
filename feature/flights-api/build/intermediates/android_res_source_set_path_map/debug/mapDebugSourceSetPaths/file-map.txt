@@ -1,0 +1,8 @@
+com.travelmonk.feature.flightsapi.flights-api-pngs-0 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/flights-api/build/generated/res/pngs/debug
+com.travelmonk.feature.flightsapi.flights-api-updated_navigation_xml-1 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/flights-api/build/generated/updated_navigation_xml/debug
+com.travelmonk.feature.flightsapi.flights-api-mergeDebugResources-2 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/flights-api/build/intermediates/incremental/debug/mergeDebugResources/merged.dir
+com.travelmonk.feature.flightsapi.flights-api-mergeDebugResources-3 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/flights-api/build/intermediates/incremental/debug/mergeDebugResources/stripped.dir
+com.travelmonk.feature.flightsapi.flights-api-debug-4 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/flights-api/build/intermediates/merged_res/debug/mergeDebugResources
+com.travelmonk.feature.flightsapi.flights-api-debug-5 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/flights-api/build/intermediates/packaged_res/debug/packageDebugResources
+com.travelmonk.feature.flightsapi.flights-api-debug-6 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/flights-api/src/debug/res
+com.travelmonk.feature.flightsapi.flights-api-main-7 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/flights-api/src/main/res

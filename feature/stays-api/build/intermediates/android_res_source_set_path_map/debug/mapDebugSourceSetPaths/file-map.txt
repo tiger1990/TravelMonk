@@ -1,0 +1,8 @@
+com.travelmonk.feature.staysapi.stays-api-pngs-0 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/stays-api/build/generated/res/pngs/debug
+com.travelmonk.feature.staysapi.stays-api-updated_navigation_xml-1 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/stays-api/build/generated/updated_navigation_xml/debug
+com.travelmonk.feature.staysapi.stays-api-mergeDebugResources-2 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/stays-api/build/intermediates/incremental/debug/mergeDebugResources/merged.dir
+com.travelmonk.feature.staysapi.stays-api-mergeDebugResources-3 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/stays-api/build/intermediates/incremental/debug/mergeDebugResources/stripped.dir
+com.travelmonk.feature.staysapi.stays-api-debug-4 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/stays-api/build/intermediates/merged_res/debug/mergeDebugResources
+com.travelmonk.feature.staysapi.stays-api-debug-5 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/stays-api/build/intermediates/packaged_res/debug/packageDebugResources
+com.travelmonk.feature.staysapi.stays-api-debug-6 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/stays-api/src/debug/res
+com.travelmonk.feature.staysapi.stays-api-main-7 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/stays-api/src/main/res
