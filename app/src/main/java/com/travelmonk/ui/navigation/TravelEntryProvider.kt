@@ -1,18 +1,8 @@
 package com.travelmonk.ui.navigation
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.entryProvider
-import com.travelmonk.core.designsystem.theme.TravelMonkTheme
 import com.travelmonk.core.navigation.TravelNavKey
-import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.feature.bookingsapi.navigation.BookingNavKey
 import com.travelmonk.feature.experiencesapi.navigation.ExperienceNavKey
 import com.travelmonk.feature.experiencesapi.navigator.ExperienceNavigator

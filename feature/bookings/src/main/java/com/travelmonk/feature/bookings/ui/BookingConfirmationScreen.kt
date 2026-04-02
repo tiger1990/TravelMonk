@@ -12,7 +12,11 @@ import com.travelmonk.core.designsystem.theme.TravelMonkTheme
 import com.travelmonk.core.tokens.TravelMonkIcons
 
 @Composable
-fun BookingConfirmationScreen(type: String, title: String, onDone: () -> Unit) {
+fun BookingConfirmationScreen(
+    type: String,
+    title: String,
+    onDone: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()

@@ -2,6 +2,7 @@ package com.travelmonk.navigation
 
 import com.travelmonk.core.navigation.NavigationBus
 import com.travelmonk.core.navigation.TravelNavKey
+import androidx.compose.runtime.Stable
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -18,6 +19,7 @@ sealed interface NavCommand {
  * Uses a SharedFlow to buffer navigation events, preventing "Event Loss" 
  * during configuration changes or when the app is in the background.
  */
+@Stable // Singleton — navEvents SharedFlow reference never changes; safe to skip recomposition
 @Singleton
 class GlobalNavigator @Inject constructor() : NavigationBus {
 

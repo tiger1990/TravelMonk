@@ -163,7 +163,7 @@ fun TripTypeSelector(selectedType: TripType, onTypeSelected: (TripType) -> Unit)
             .background(Color(0xFFF1F4F8)),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        TripType.values().forEach { type ->
+        TripType.entries.forEach { type ->
             val isSelected = selectedType == type
             Box(
                 modifier = Modifier

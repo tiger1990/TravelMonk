@@ -19,18 +19,20 @@ import com.travelmonk.feature.servicesapi.navigator.ServiceNavigator
 import com.travelmonk.feature.staysapi.navigator.StayNavigator
 import com.travelmonk.navigation.GlobalNavigator
 import com.travelmonk.navigation.NavCommand
+import com.travelmonk.navigation.NavigationRegistry
 import com.travelmonk.ui.navigation.*
 
 @Composable
 fun TravelMonkApp(
     globalNavigator: GlobalNavigator,
+    registry: NavigationRegistry,
     homeNavigator: HomeNavigator,
     flightNavigator: FlightNavigator,
     stayNavigator: StayNavigator,
     serviceNavigator: ServiceNavigator,
     experienceNavigator: ExperienceNavigator
 ) {
-    val navigationState = rememberNavigationState()
+    val navigationState = rememberNavigationState(registry)
 
     // Listen to navigation events from the GlobalNavigator
     LaunchedEffect(navigationState, globalNavigator) {
@@ -91,9 +93,9 @@ fun TravelMonkApp(
     ) { innerPadding ->
         NavDisplay(
             backStack = navigationState.backStack,
+            modifier = Modifier.padding(innerPadding),
             onBack = { navigationState.pop() },
             entryProvider = entryProvider,
-            modifier = Modifier.padding(innerPadding),
             transitionSpec = {
                 (slideInHorizontally(tween(300)) { it / 4 } + fadeIn(tween(300))) togetherWith
                         (slideOutHorizontally(tween(300)) { -it / 4 } + fadeOut(tween(300)))

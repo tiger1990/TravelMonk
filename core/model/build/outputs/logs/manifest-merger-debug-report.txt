@@ -1,16 +1,16 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest4913626070040298244.xml:2:13-83
-INJECTED from /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest4913626070040298244.xml:2:13-83
+ADDED from /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest11399998243008929908.xml:2:13-83
+INJECTED from /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest11399998243008929908.xml:2:13-83
 	package
-		INJECTED from /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest4913626070040298244.xml
+		INJECTED from /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest11399998243008929908.xml
 	xmlns:android
-		ADDED from /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest4913626070040298244.xml:2:23-81
+		ADDED from /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest11399998243008929908.xml:2:23-81
 uses-sdk
-INJECTED from /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest4913626070040298244.xml reason: use-sdk injection requested
-INJECTED from /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest4913626070040298244.xml
-INJECTED from /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest4913626070040298244.xml
+INJECTED from /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest11399998243008929908.xml reason: use-sdk injection requested
+INJECTED from /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest11399998243008929908.xml
+INJECTED from /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest11399998243008929908.xml
 	android:targetSdkVersion
-		INJECTED from /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest4913626070040298244.xml
+		INJECTED from /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest11399998243008929908.xml
 	android:minSdkVersion
-		INJECTED from /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest4913626070040298244.xml
+		INJECTED from /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest11399998243008929908.xml

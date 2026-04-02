@@ -1,15 +1,44 @@
-*.iml
-.gradle
+# Project-wide ignore rules
+.gradle/
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+/.idea/
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+
+# Build artifacts (covers all modules)
+build/
+bin/
+gen/
+out/
+
+# Android Studio / IntelliJ specific
+*.iml
+*.ipr
+*.iws
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+.idea/deploymentTargetDropDown.xml
+captures/
+
+# External native builds
+.externalNativeBuild/
+.cxx/
+cmake-build-*/
+
+# Kotlin/JVM
+.kotlin/
+*.class
+
+# Log files
+*.log
+
+# Secrets (Production Ready Rule: NEVER commit these)
 local.properties
+*.jks
+*.keystore
+google-services.json
+# If you use flavor-specific secrets
+src/*/google-services.json

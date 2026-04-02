@@ -8,7 +8,6 @@ android {
 
 dependencies {
     implementation(project(":feature:flights-api"))
-    implementation(project(":feature:transport-api"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 }

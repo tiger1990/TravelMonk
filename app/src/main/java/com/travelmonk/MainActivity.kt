@@ -11,6 +11,7 @@ import com.travelmonk.feature.homeapi.navigator.HomeNavigator
 import com.travelmonk.feature.servicesapi.navigator.ServiceNavigator
 import com.travelmonk.feature.staysapi.navigator.StayNavigator
 import com.travelmonk.navigation.GlobalNavigator
+import com.travelmonk.navigation.NavigationRegistry
 import com.travelmonk.ui.TravelMonkApp
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -20,6 +21,7 @@ class MainActivity : ComponentActivity() {
 
     // GlobalNavigator is the NavigationBus — needed to bind/unbind the composition-scoped NavigationState
     @Inject lateinit var globalNavigator: GlobalNavigator
+    @Inject lateinit var navigationRegistry: NavigationRegistry
 
     // Feature navigators — injected as interfaces, backed by NavigationBus adapters from NavigationModule
     @Inject lateinit var homeNavigator: HomeNavigator
@@ -35,6 +37,7 @@ class MainActivity : ComponentActivity() {
             TravelMonkTheme {
                 TravelMonkApp(
                     globalNavigator = globalNavigator,
+                    registry = navigationRegistry,
                     homeNavigator = homeNavigator,
                     flightNavigator = flightNavigator,
                     stayNavigator = stayNavigator,
