@@ -8,4 +8,5 @@ android {
 
 dependencies {
     implementation(project(":feature:transport-api"))
+    // TransportNavKey is now in :feature:transport-api (via api() transitive)
 }

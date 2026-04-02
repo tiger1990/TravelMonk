@@ -3,12 +3,12 @@ package com.travelmonk.ui.navigation
 import androidx.annotation.DrawableRes
 import com.travelmonk.core.navigation.TravelNavKey
 import com.travelmonk.core.tokens.TravelMonkIcons
-import com.travelmonk.feature.home.navigation.HomeNavKey
-import com.travelmonk.feature.transport.navigation.TransportNavKey
-import com.travelmonk.feature.stays.navigation.StayNavKey
-import com.travelmonk.feature.experiences.navigation.ExperienceNavKey
-import com.travelmonk.feature.bookings.navigation.BookingNavKey
-import com.travelmonk.feature.services.navigation.ServiceNavKey
+import com.travelmonk.feature.homeapi.navigation.HomeNavKey
+import com.travelmonk.feature.transportapi.navigation.TransportNavKey
+import com.travelmonk.feature.staysapi.navigation.StayNavKey
+import com.travelmonk.feature.experiencesapi.navigation.ExperienceNavKey
+import com.travelmonk.feature.bookingsapi.navigation.BookingNavKey
+import com.travelmonk.feature.servicesapi.navigation.ServiceNavKey
 
 sealed class BottomBarItem(
     val route: TravelNavKey,

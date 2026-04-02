@@ -7,6 +7,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":feature:home-api"))
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 }

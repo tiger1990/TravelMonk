@@ -1,17 +1,24 @@
 package com.travelmonk.ui
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.navigation3.ui.NavDisplay
-import com.travelmonk.feature.flights.navigator.FlightNavigator
-import com.travelmonk.feature.stays.navigator.StayNavigator
-import com.travelmonk.feature.services.navigator.ServiceNavigator
-import com.travelmonk.feature.experiences.navigator.ExperienceNavigator
-import com.travelmonk.feature.home.navigator.HomeNavigator
+import com.travelmonk.feature.experiencesapi.navigator.ExperienceNavigator
+import com.travelmonk.feature.flightsapi.navigator.FlightNavigator
+import com.travelmonk.feature.homeapi.navigator.HomeNavigator
+import com.travelmonk.feature.servicesapi.navigator.ServiceNavigator
+import com.travelmonk.feature.staysapi.navigator.StayNavigator
 import com.travelmonk.navigation.GlobalNavigator
+import com.travelmonk.navigation.NavCommand
 import com.travelmonk.ui.navigation.*
 
 @Composable
@@ -25,32 +32,14 @@ fun TravelMonkApp(
 ) {
     val navigationState = rememberNavigationState()
 
-    /**
-     * UseCase:
-     * Register/unregister listeners
-     * Subscribe/unsubscribe to streams
-     * Add/remove observers
-     * Attach/detach callbacks
-     * Work with external APIs that need cleanup
-     *
-     * DisposableEffect(lifecycleOwner) {
-     *     val observer = LifecycleEventObserver { _, event ->
-     *         // handle lifecycle events
-     *     }
-     *
-     *     lifecycleOwner.lifecycle.addObserver(observer)
-     *
-     *     onDispose {
-     *         lifecycleOwner.lifecycle.removeObserver(observer)
-     *     }
-     * }
-     * Whenever navigationState changes(key should represent what the effect depends on),
-     * the DisposableEffect block will be executed (restart the side effect).
-     * But before restarting, clean up the old one.
-     */
-    DisposableEffect(navigationState) {
-        globalNavigator.bind(navigationState)
-        onDispose { globalNavigator.unbind() }
+    // Listen to navigation events from the GlobalNavigator
+    LaunchedEffect(navigationState, globalNavigator) {
+        globalNavigator.navEvents.collect { command ->
+            when (command) {
+                is NavCommand.Navigate -> navigationState.navigateTo(command.key)
+                is NavCommand.Back -> navigationState.pop()
+            }
+        }
     }
 
     val entryProvider = remember {
@@ -105,6 +94,14 @@ fun TravelMonkApp(
             onBack = { navigationState.pop() },
             entryProvider = entryProvider,
             modifier = Modifier.padding(innerPadding),
+            transitionSpec = {
+                (slideInHorizontally(tween(300)) { it / 4 } + fadeIn(tween(300))) togetherWith
+                        (slideOutHorizontally(tween(300)) { -it / 4 } + fadeOut(tween(300)))
+            },
+            popTransitionSpec = {
+                (slideInHorizontally(tween(300)) { -it / 4 } + fadeIn(tween(300))) togetherWith
+                        (slideOutHorizontally(tween(300)) { it / 4 } + fadeOut(tween(300)))
+            }
         )
     }
 }

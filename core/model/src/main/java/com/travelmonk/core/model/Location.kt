@@ -1,13 +1,21 @@
 package com.travelmonk.core.model
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Location(
-    val id: String,
-    val name: String,
-    val code: String? = null,
-    val country: String,
-    val type: LocationType
+    @SerialName("id") val id: String,
+    @SerialName("name") val name: String,
+    @SerialName("code") val code: String? = null,
+    @SerialName("country") val country: String,
+    @SerialName("type") val type: LocationType
 )
 
+@Serializable
 enum class LocationType {
-    CITY, AIRPORT, STATION, HOTEL
+    @SerialName("city") CITY,
+    @SerialName("airport") AIRPORT,
+    @SerialName("station") STATION,
+    @SerialName("hotel") HOTEL
 }

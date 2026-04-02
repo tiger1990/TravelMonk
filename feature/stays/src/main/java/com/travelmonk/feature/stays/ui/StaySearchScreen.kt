@@ -27,8 +27,8 @@ import coil3.compose.AsyncImage
 import com.travelmonk.core.designsystem.theme.TravelMonkTheme
 import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.feature.stays.mvi.*
-import com.travelmonk.feature.stays.navigation.StayNavKey
-import com.travelmonk.feature.stays.navigator.StayNavigator
+import com.travelmonk.feature.staysapi.navigation.StayNavKey
+import com.travelmonk.feature.staysapi.navigator.StayNavigator
 
 // Stateful entry point
 @Composable

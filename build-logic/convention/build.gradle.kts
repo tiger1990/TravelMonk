@@ -20,6 +20,7 @@ kotlin {
 dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
+    implementation(libs.kotlin.serialization.gradlePlugin)
     compileOnly(libs.ksp.gradlePlugin)
 }
 

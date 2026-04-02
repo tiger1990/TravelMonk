@@ -25,7 +25,7 @@ import com.travelmonk.core.designsystem.theme.TravelMonkTheme
 import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.feature.home.domain.model.HomeBanner
 import com.travelmonk.feature.home.mvi.*
-import com.travelmonk.feature.home.navigator.HomeNavigator
+import com.travelmonk.feature.homeapi.navigator.HomeNavigator
 
 // Stateful entry point — only this touches hiltViewModel()
 @Composable

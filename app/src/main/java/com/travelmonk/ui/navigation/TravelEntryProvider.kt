@@ -13,25 +13,26 @@ import androidx.navigation3.runtime.entryProvider
 import com.travelmonk.core.designsystem.theme.TravelMonkTheme
 import com.travelmonk.core.navigation.TravelNavKey
 import com.travelmonk.core.tokens.TravelMonkIcons
-import com.travelmonk.feature.home.navigation.HomeNavKey
-import com.travelmonk.feature.home.ui.HomeScreen
-import com.travelmonk.feature.home.navigator.HomeNavigator
-import com.travelmonk.feature.transport.navigation.TransportNavKey
-import com.travelmonk.feature.transport.ui.TransportScreen
-import com.travelmonk.feature.stays.navigation.StayNavKey
-import com.travelmonk.feature.stays.ui.StaySearchScreen
-import com.travelmonk.feature.experiences.navigation.ExperienceNavKey
-import com.travelmonk.feature.experiences.ui.ExperiencesScreen
-import com.travelmonk.feature.services.navigation.ServiceNavKey
-import com.travelmonk.feature.services.ui.ServicesScreen
-import com.travelmonk.feature.bookings.navigation.BookingNavKey
+import com.travelmonk.feature.bookingsapi.navigation.BookingNavKey
+import com.travelmonk.feature.experiencesapi.navigation.ExperienceNavKey
+import com.travelmonk.feature.experiencesapi.navigator.ExperienceNavigator
+import com.travelmonk.feature.flightsapi.navigation.FlightNavKey
+import com.travelmonk.feature.flightsapi.navigator.FlightNavigator
+import com.travelmonk.feature.homeapi.navigation.HomeNavKey
+import com.travelmonk.feature.homeapi.navigator.HomeNavigator
+import com.travelmonk.feature.servicesapi.navigation.ServiceNavKey
+import com.travelmonk.feature.servicesapi.navigator.ServiceNavigator
+import com.travelmonk.feature.staysapi.navigation.StayNavKey
+import com.travelmonk.feature.staysapi.navigator.StayNavigator
+import com.travelmonk.feature.transportapi.navigation.TransportNavKey
+import com.travelmonk.feature.bookings.ui.BookingConfirmationScreen
 import com.travelmonk.feature.bookings.ui.MyBookingsScreen
-import com.travelmonk.feature.flights.navigation.FlightNavKey
+import com.travelmonk.feature.experiences.ui.ExperiencesScreen
 import com.travelmonk.feature.flights.ui.FlightResultsScreen
-import com.travelmonk.feature.flights.navigator.FlightNavigator
-import com.travelmonk.feature.stays.navigator.StayNavigator
-import com.travelmonk.feature.services.navigator.ServiceNavigator
-import com.travelmonk.feature.experiences.navigator.ExperienceNavigator
+import com.travelmonk.feature.home.ui.HomeScreen
+import com.travelmonk.feature.services.ui.ServicesScreen
+import com.travelmonk.feature.stays.ui.StaySearchScreen
+import com.travelmonk.feature.transport.ui.TransportScreen
 
 fun provideTravelEntryProvider(
     homeNavigator: HomeNavigator,
@@ -70,35 +71,15 @@ fun provideTravelEntryProvider(
             from = key.from,
             to = key.to,
             navigator = flightNavigator,
-            onBook = { airline -> stayNavigator.back() /* Placeholder for booking flow */ }
+            onBook = { stayNavigator.back() /* Placeholder for booking flow */ }
         )
     }
 
     entry<BookingNavKey.Confirmation> { key ->
-        BookingConfirmationScreen(type = key.type, title = key.title, onDone = { /* Navigate to bookings */ })
-    }
-}
-
-@Composable
-fun BookingConfirmationScreen(type: String, title: String, onDone: () -> Unit) {
-    Box(modifier = Modifier.fillMaxSize().background(TravelMonkTheme.colors.background), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                painter = painterResource(TravelMonkIcons.CheckCircle),
-                contentDescription = null,
-                modifier = Modifier.size(TravelMonkTheme.dimensions.iconExtraLarge),
-                tint = Color(0xFF4CAF50)
-            )
-            Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
-            Text(text = "$type Booked Successfully!", style = TravelMonkTheme.typography.titleLarge)
-            Text(text = "Confirmed with $title", style = TravelMonkTheme.typography.bodyLarge, color = TravelMonkTheme.colors.grayText)
-            Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.extraLarge))
-            Button(
-                onClick = onDone,
-                colors = ButtonDefaults.buttonColors(containerColor = TravelMonkTheme.colors.primary)
-            ) {
-                Text("View My Bookings", color = TravelMonkTheme.colors.onPrimary)
-            }
-        }
+        BookingConfirmationScreen(
+            type = key.type,
+            title = key.title,
+            onDone = { /* Navigate to bookings */ }
+        )
     }
 }

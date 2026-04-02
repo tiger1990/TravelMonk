@@ -36,8 +36,16 @@ include(":core:model")
 include(":core:network")
 include(":core:database")
 
-// Feature Modules
+// Feature API Modules (contracts: nav keys + navigator interfaces)
 include(":feature:transport-api")
+include(":feature:flights-api")
+include(":feature:stays-api")
+include(":feature:experiences-api")
+include(":feature:services-api")
+include(":feature:bookings-api")
+include(":feature:home-api")
+
+// Feature Implementation Modules
 include(":feature:transport")
 include(":feature:flights")
 include(":feature:stays")

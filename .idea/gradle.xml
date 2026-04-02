@@ -35,11 +35,17 @@
             <option value="$PROJECT_DIR$/core/ui" />
             <option value="$PROJECT_DIR$/feature" />
             <option value="$PROJECT_DIR$/feature/bookings" />
+            <option value="$PROJECT_DIR$/feature/bookings-api" />
             <option value="$PROJECT_DIR$/feature/experiences" />
+            <option value="$PROJECT_DIR$/feature/experiences-api" />
             <option value="$PROJECT_DIR$/feature/flights" />
+            <option value="$PROJECT_DIR$/feature/flights-api" />
             <option value="$PROJECT_DIR$/feature/home" />
+            <option value="$PROJECT_DIR$/feature/home-api" />
             <option value="$PROJECT_DIR$/feature/services" />
+            <option value="$PROJECT_DIR$/feature/services-api" />
             <option value="$PROJECT_DIR$/feature/stays" />
+            <option value="$PROJECT_DIR$/feature/stays-api" />
             <option value="$PROJECT_DIR$/feature/transport" />
             <option value="$PROJECT_DIR$/feature/transport-api" />
           </set>

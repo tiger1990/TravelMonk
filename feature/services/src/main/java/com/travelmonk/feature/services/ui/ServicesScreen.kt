@@ -21,7 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.travelmonk.core.designsystem.theme.TravelMonkTheme
 import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.feature.services.mvi.*
-import com.travelmonk.feature.services.navigator.ServiceNavigator
+import com.travelmonk.feature.servicesapi.navigator.ServiceNavigator
 
 private val defaultServices = listOf(
     TravelService("1", "Maid & Helper",  "cleaning_services",    "Daily cleaning & domestic help"),

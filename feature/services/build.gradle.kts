@@ -5,3 +5,7 @@ plugins {
 android {
     namespace = "com.travelmonk.feature.services"
 }
+
+dependencies {
+    implementation(project(":feature:services-api"))
+}

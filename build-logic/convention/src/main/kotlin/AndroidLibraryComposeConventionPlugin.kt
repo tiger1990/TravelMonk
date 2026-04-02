@@ -6,6 +6,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 
+@Suppress("unused") // Registered by name in build-logic/convention/build.gradle.kts gradlePlugin block
 class AndroidLibraryComposeConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {

@@ -17,7 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.travelmonk.core.designsystem.theme.TravelMonkTheme
 import com.travelmonk.core.tokens.TravelMonkIcons
-import com.travelmonk.feature.flights.navigator.FlightNavigator
+import com.travelmonk.feature.flightsapi.navigator.FlightNavigator
 
 private val previewFlights = listOf(
     FlightResultItem("Air Indigo",    "08:30", "11:45", "3h 15m", "$120"),

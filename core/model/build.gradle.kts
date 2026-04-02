@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.travelmonk.android.library)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
 android {
@@ -7,5 +8,6 @@ android {
 }
 
 dependencies {
-    // ...existing code...
+    // Serialization for shared data models consumed across features and network layer
+    implementation(libs.kotlinx.serialization.core)
 }

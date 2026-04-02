@@ -20,7 +20,7 @@ import coil3.compose.AsyncImage
 import com.travelmonk.core.designsystem.theme.TravelMonkTheme
 import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.feature.experiences.mvi.*
-import com.travelmonk.feature.experiences.navigator.ExperienceNavigator
+import com.travelmonk.feature.experiencesapi.navigator.ExperienceNavigator
 
 // Stateful entry point
 @Composable

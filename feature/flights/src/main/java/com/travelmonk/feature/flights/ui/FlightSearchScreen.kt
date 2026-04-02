@@ -23,8 +23,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.travelmonk.core.designsystem.theme.TravelMonkTheme
 import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.feature.flights.mvi.*
-import com.travelmonk.feature.flights.navigation.FlightNavKey
-import com.travelmonk.feature.flights.navigator.FlightNavigator
+import com.travelmonk.feature.flightsapi.navigation.FlightNavKey
+import com.travelmonk.feature.flightsapi.navigator.FlightNavigator
 
 // Stateful entry point
 @Composable

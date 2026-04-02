@@ -1,6 +1,6 @@
 package com.travelmonk.feature.flights.provider;
 
-import com.travelmonk.feature.flights.navigator.FlightNavigator;
+import com.travelmonk.feature.flightsapi.navigator.FlightNavigator;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
 import dagger.internal.Provider;

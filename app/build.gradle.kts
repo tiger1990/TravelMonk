@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
 android {
@@ -31,6 +32,16 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:tokens"))
 
+    // Feature API modules (nav keys + navigator interfaces for wiring)
+    implementation(project(":feature:transport-api"))
+    implementation(project(":feature:flights-api"))
+    implementation(project(":feature:stays-api"))
+    implementation(project(":feature:experiences-api"))
+    implementation(project(":feature:services-api"))
+    implementation(project(":feature:bookings-api"))
+    implementation(project(":feature:home-api"))
+
+    // Feature implementation modules (composables for TravelEntryProvider)
     implementation(project(":feature:transport"))
     implementation(project(":feature:flights"))
     implementation(project(":feature:stays"))
@@ -57,6 +68,9 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
+
+    // Serialization (JSON-based back-stack Saver)
+    implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.coil.compose)
     implementation(libs.retrofit)
