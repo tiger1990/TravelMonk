@@ -1,8 +1,0 @@
-R_DEF: Internal format may change without notice
-local
-drawable ic_bus
-drawable ic_calendar_today
-drawable ic_flight
-drawable ic_location_off
-drawable ic_location_on
-drawable ic_transit

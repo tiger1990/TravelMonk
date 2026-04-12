@@ -1,8 +1,0 @@
-com.travelmonk.core.model-pngs-0 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/generated/res/pngs/debug
-com.travelmonk.core.model-updated_navigation_xml-1 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/generated/updated_navigation_xml/debug
-com.travelmonk.core.model-mergeDebugResources-2 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/incremental/debug/mergeDebugResources/merged.dir
-com.travelmonk.core.model-mergeDebugResources-3 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/incremental/debug/mergeDebugResources/stripped.dir
-com.travelmonk.core.model-debug-4 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/merged_res/debug/mergeDebugResources
-com.travelmonk.core.model-debug-5 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/build/intermediates/packaged_res/debug/packageDebugResources
-com.travelmonk.core.model-debug-6 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/src/debug/res
-com.travelmonk.core.model-main-7 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/model/src/main/res

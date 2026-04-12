@@ -1,1 +1,0 @@
--keep,allowobfuscation,allowshrinking class com.travelmonk.feature.home.ui.HomeViewModel

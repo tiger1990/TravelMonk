@@ -1,8 +1,0 @@
-com.travelmonk.feature.homeapi.home-api-pngs-0 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/home-api/build/generated/res/pngs/debug
-com.travelmonk.feature.homeapi.home-api-updated_navigation_xml-1 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/home-api/build/generated/updated_navigation_xml/debug
-com.travelmonk.feature.homeapi.home-api-mergeDebugResources-2 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/home-api/build/intermediates/incremental/debug/mergeDebugResources/merged.dir
-com.travelmonk.feature.homeapi.home-api-mergeDebugResources-3 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/home-api/build/intermediates/incremental/debug/mergeDebugResources/stripped.dir
-com.travelmonk.feature.homeapi.home-api-debug-4 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/home-api/build/intermediates/merged_res/debug/mergeDebugResources
-com.travelmonk.feature.homeapi.home-api-debug-5 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/home-api/build/intermediates/packaged_res/debug/packageDebugResources
-com.travelmonk.feature.homeapi.home-api-debug-6 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/home-api/src/debug/res
-com.travelmonk.feature.homeapi.home-api-main-7 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/feature/home-api/src/main/res

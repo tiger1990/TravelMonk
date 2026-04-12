@@ -1,8 +1,0 @@
-com.travelmonk.core.designsystem-pngs-0 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/designsystem/build/generated/res/pngs/debug
-com.travelmonk.core.designsystem-updated_navigation_xml-1 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/designsystem/build/generated/updated_navigation_xml/debug
-com.travelmonk.core.designsystem-mergeDebugResources-2 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/designsystem/build/intermediates/incremental/debug/mergeDebugResources/merged.dir
-com.travelmonk.core.designsystem-mergeDebugResources-3 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/designsystem/build/intermediates/incremental/debug/mergeDebugResources/stripped.dir
-com.travelmonk.core.designsystem-debug-4 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/designsystem/build/intermediates/merged_res/debug/mergeDebugResources
-com.travelmonk.core.designsystem-debug-5 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/designsystem/build/intermediates/packaged_res/debug/packageDebugResources
-com.travelmonk.core.designsystem-debug-6 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/designsystem/src/debug/res
-com.travelmonk.core.designsystem-main-7 /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/designsystem/src/main/res
