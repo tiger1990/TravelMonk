@@ -1,4 +1,5 @@
 pluginManagement {
+    // Convention plugins live here
     includeBuild("build-logic")
     repositories {
         google {
@@ -10,6 +11,15 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+        // Uncomment and change the build ID if you need to use snapshot artifacts.
+        // See androidx.dev for full instructions.
+        /*maven {
+            url = uri("https://androidx.dev/snapshots/builds/<build_id>/artifacts/repository")
+            eg:  url = uri("https://androidx.dev/snapshots/builds/13508953/artifacts/repository")
+        }*/
+        // for absolute latest alpha or rc
+        // Only needed if using bleeding-edge dev builds:
+        // maven { url = uri("https://androidx.dev/storage/compose-staging/repository") }
     }
 }
 plugins {
@@ -20,16 +30,25 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // Uncomment and change the build ID if you need to use snapshot artifacts.
+        // See androidx.dev for full instructions.
+        /*maven {
+            url = uri("https://androidx.dev/snapshots/builds/<build_id>/artifacts/repository")
+        }*/
+
+        // Add any other custom repositories here, e.g.:
+        // maven { url "https://jitpack.io" }
     }
 }
 
 rootProject.name = "TravelMonk"
+// App Shell
 include(":app")
 
 // Core Modules
 include(":core:tokens")
 include(":core:navigation")
-include(":core:designsystem")
+include(":core:design-system")
 include(":core:ui")
 include(":core:common")
 include(":core:model")

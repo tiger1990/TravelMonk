@@ -17,8 +17,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.travelmonk.core.designsystem.theme.TravelMonkTheme
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.travelmonk.core.design.system.theme.TravelMonkTheme
+import com.travelmonk.core.model.BookingType
 import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.feature.services.mvi.*
 import com.travelmonk.feature.servicesapi.navigator.ServiceNavigator
@@ -44,7 +45,7 @@ fun ServicesScreen(
         viewModel.effect.collect { effect ->
             when (effect) {
                 is ServicesEffect.NavigateToBooking ->
-                    navigator.navigateToBookingConfirmation("Service", effect.service.name)
+                    navigator.navigateToBookingConfirmation(BookingType.SERVICE, effect.service.name)
             }
         }
     }

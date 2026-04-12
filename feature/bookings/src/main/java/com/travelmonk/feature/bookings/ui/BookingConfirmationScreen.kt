@@ -8,12 +8,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import com.travelmonk.core.designsystem.theme.TravelMonkTheme
+import com.travelmonk.core.design.system.theme.TravelMonkTheme
+import com.travelmonk.core.model.BookingType
 import com.travelmonk.core.tokens.TravelMonkIcons
 
 @Composable
 fun BookingConfirmationScreen(
-    type: String,
+    type: BookingType,
     title: String,
     onDone: () -> Unit
 ) {
@@ -31,7 +32,7 @@ fun BookingConfirmationScreen(
                 tint = Color(0xFF4CAF50)
             )
             Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
-            Text(text = "$type Booked Successfully!", style = TravelMonkTheme.typography.titleLarge)
+            Text(text = "${type.name.lowercase().replaceFirstChar { it.uppercase() }} Booked Successfully!", style = TravelMonkTheme.typography.titleLarge)
             Text(
                 text = "Confirmed with $title",
                 style = TravelMonkTheme.typography.bodyLarge,

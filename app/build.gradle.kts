@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.travelmonk.android.library.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.jetbrains.kotlin.serialization)
@@ -28,7 +28,7 @@ android {
 
 dependencies {
     implementation(project(":core:navigation"))
-    implementation(project(":core:designsystem"))
+    implementation(project(":core:design-system"))
     implementation(project(":core:ui"))
     implementation(project(":core:common"))
     implementation(project(":core:tokens"))
@@ -57,8 +57,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.material3)
+
     
     // Navigation 3
     implementation(libs.androidx.navigation3.runtime)

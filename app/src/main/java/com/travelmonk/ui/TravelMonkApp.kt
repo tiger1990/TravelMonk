@@ -10,15 +10,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.travelmonk.feature.experiencesapi.navigator.ExperienceNavigator
-import com.travelmonk.feature.flightsapi.navigator.FlightNavigator
-import com.travelmonk.feature.homeapi.navigator.HomeNavigator
-import com.travelmonk.feature.servicesapi.navigator.ServiceNavigator
-import com.travelmonk.feature.staysapi.navigator.StayNavigator
+import com.travelmonk.core.navigation.NavEntryInstallerSet
 import com.travelmonk.navigation.GlobalNavigator
-import com.travelmonk.navigation.NavCommand
 import com.travelmonk.navigation.NavigationRegistry
 import com.travelmonk.ui.navigation.*
 
@@ -26,32 +21,18 @@ import com.travelmonk.ui.navigation.*
 fun TravelMonkApp(
     globalNavigator: GlobalNavigator,
     registry: NavigationRegistry,
-    homeNavigator: HomeNavigator,
-    flightNavigator: FlightNavigator,
-    stayNavigator: StayNavigator,
-    serviceNavigator: ServiceNavigator,
-    experienceNavigator: ExperienceNavigator
+    navEntryInstallers: NavEntryInstallerSet
 ) {
-    val navigationState = rememberNavigationState(registry)
+    val navigationState = rememberNavigationState(registry, globalNavigator)
 
-    // Listen to navigation events from the GlobalNavigator
-    LaunchedEffect(navigationState, globalNavigator) {
-        globalNavigator.navEvents.collect { command ->
-            when (command) {
-                is NavCommand.Navigate -> navigationState.navigateTo(command.key)
-                is NavCommand.Back -> navigationState.pop()
+    val entryProvider = remember(navEntryInstallers) {
+        entryProvider {
+            navEntryInstallers.installers.forEach { installer ->
+                with(installer) {
+                    install()
+                }
             }
         }
-    }
-
-    val entryProvider = remember {
-        provideTravelEntryProvider(
-            homeNavigator = homeNavigator,
-            flightNavigator = flightNavigator,
-            stayNavigator = stayNavigator,
-            serviceNavigator = serviceNavigator,
-            experienceNavigator = experienceNavigator
-        )
     }
 
     val bottomBarItems = listOf(
@@ -65,37 +46,23 @@ fun TravelMonkApp(
 
     Scaffold(
         bottomBar = {
-            val currentStack = navigationState.backStack
-            val currentKey = currentStack.lastOrNull()
+            val currentKey = navigationState.activeBackStack.lastOrNull()
             // Show bottom bar only when on a root tab destination
             val isTopLevel = bottomBarItems.any { it.route == currentKey }
 
             if (isTopLevel) {
-                NavigationBar {
-                    bottomBarItems.forEach { item ->
-                        NavigationBarItem(
-                            icon = {
-                                Icon(
-                                    painter = painterResource(item.icon),
-                                    contentDescription = item.title
-                                )
-                            },
-                            label = { Text(item.title) },
-                            selected = navigationState.currentTab == item,
-                            onClick = {
-                                navigationState.selectTab(item)
-                            }
-                        )
-                    }
-                }
+                TravelMonkBottomBar(
+                    items = bottomBarItems,
+                    selectedItem = navigationState.currentTab,
+                    onItemSelected = navigationState::selectTab
+                )
             }
         }
     ) { innerPadding ->
         NavDisplay(
-            backStack = navigationState.backStack,
+            entries = navigationState.toDecoratedEntries(entryProvider),
             modifier = Modifier.padding(innerPadding),
             onBack = { navigationState.pop() },
-            entryProvider = entryProvider,
             transitionSpec = {
                 (slideInHorizontally(tween(300)) { it / 4 } + fadeIn(tween(300))) togetherWith
                         (slideOutHorizontally(tween(300)) { -it / 4 } + fadeOut(tween(300)))
@@ -103,7 +70,12 @@ fun TravelMonkApp(
             popTransitionSpec = {
                 (slideInHorizontally(tween(300)) { -it / 4 } + fadeIn(tween(300))) togetherWith
                         (slideOutHorizontally(tween(300)) { it / 4 } + fadeOut(tween(300)))
+            },
+            predictivePopTransitionSpec = {
+                (slideInHorizontally(tween(300)) { -it / 4 } + fadeIn(tween(300))) togetherWith
+                        (slideOutHorizontally(tween(300)) { it / 4 } + fadeOut(tween(300)))
             }
+            // try this: https://proandroiddev.com/nested-routes-with-navigation-3-af0cd8223986
         )
     }
 }

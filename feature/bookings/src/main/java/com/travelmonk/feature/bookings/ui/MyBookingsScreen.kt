@@ -14,16 +14,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.travelmonk.core.designsystem.theme.TravelMonkTheme
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.travelmonk.core.design.system.theme.TravelMonkTheme
+import com.travelmonk.core.model.BookingType
 import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.feature.bookings.mvi.BookingItem
 import com.travelmonk.feature.bookings.mvi.BookingState
-import com.travelmonk.feature.bookings.mvi.BookingType
+import com.travelmonk.feature.bookingsapi.navigator.BookingNavigator
 
 // Stateful entry point
 @Composable
 fun MyBookingsScreen(
+    navigator: BookingNavigator,
     viewModel: BookingViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -76,11 +78,12 @@ fun BookingCard(booking: BookingItem) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             @DrawableRes val icon = when (booking.type) {
-                BookingType.FLIGHT  -> TravelMonkIcons.Flight
-                BookingType.HOTEL   -> TravelMonkIcons.Hotel
-                BookingType.SERVICE -> TravelMonkIcons.CleaningServices
-                BookingType.PACKAGE -> TravelMonkIcons.Inventory
-                else                -> TravelMonkIcons.ConfirmationNumber
+                BookingType.FLIGHT   -> TravelMonkIcons.Flight
+                BookingType.HOTEL    -> TravelMonkIcons.Hotel
+                BookingType.SERVICE  -> TravelMonkIcons.CleaningServices
+                BookingType.PACKAGE  -> TravelMonkIcons.Inventory
+                BookingType.BUS,
+                BookingType.TRAIN    -> TravelMonkIcons.DirectionsTransit
             }
 
             Box(

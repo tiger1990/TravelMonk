@@ -8,4 +8,5 @@ android {
 
 dependencies {
     implementation(project(":feature:services-api"))
+    implementation(project(":feature:bookings-api"))  // ServiceNavigator navigates to BookingNavKey.Confirmation
 }

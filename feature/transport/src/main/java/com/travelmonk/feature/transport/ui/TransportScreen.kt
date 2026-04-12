@@ -8,10 +8,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.travelmonk.core.designsystem.theme.TravelMonkTheme
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.feature.transport.mvi.*
 import com.travelmonk.feature.transportapi.TransportTabContentProvider
+import com.travelmonk.feature.transportapi.navigator.TransportNavigator
 import dagger.hilt.android.EntryPointAccessors
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -28,6 +29,7 @@ interface TransportTabProviderEntryPoint {
 
 @Composable
 fun TransportScreen(
+    navigator: TransportNavigator,
     viewModel: TransportViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current

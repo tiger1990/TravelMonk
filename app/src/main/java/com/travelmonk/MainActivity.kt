@@ -4,12 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.travelmonk.core.designsystem.theme.TravelMonkTheme
-import com.travelmonk.feature.experiencesapi.navigator.ExperienceNavigator
-import com.travelmonk.feature.flightsapi.navigator.FlightNavigator
-import com.travelmonk.feature.homeapi.navigator.HomeNavigator
-import com.travelmonk.feature.servicesapi.navigator.ServiceNavigator
-import com.travelmonk.feature.staysapi.navigator.StayNavigator
+import com.travelmonk.core.design.system.theme.TravelMonkTheme
+import com.travelmonk.core.navigation.NavEntryInstaller
+import com.travelmonk.core.navigation.NavEntryInstallerSet
 import com.travelmonk.navigation.GlobalNavigator
 import com.travelmonk.navigation.NavigationRegistry
 import com.travelmonk.ui.TravelMonkApp
@@ -23,12 +20,8 @@ class MainActivity : ComponentActivity() {
     @Inject lateinit var globalNavigator: GlobalNavigator
     @Inject lateinit var navigationRegistry: NavigationRegistry
 
-    // Feature navigators — injected as interfaces, backed by NavigationBus adapters from NavigationModule
-    @Inject lateinit var homeNavigator: HomeNavigator
-    @Inject lateinit var flightNavigator: FlightNavigator
-    @Inject lateinit var stayNavigator: StayNavigator
-    @Inject lateinit var serviceNavigator: ServiceNavigator
-    @Inject lateinit var experienceNavigator: ExperienceNavigator
+    // Each feature module contributes its own NavEntryInstaller via @IntoSet into ActivityRetainedComponent
+    @Inject lateinit var navEntryInstallers: Set<@JvmSuppressWildcards NavEntryInstaller>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,11 +31,7 @@ class MainActivity : ComponentActivity() {
                 TravelMonkApp(
                     globalNavigator = globalNavigator,
                     registry = navigationRegistry,
-                    homeNavigator = homeNavigator,
-                    flightNavigator = flightNavigator,
-                    stayNavigator = stayNavigator,
-                    serviceNavigator = serviceNavigator,
-                    experienceNavigator = experienceNavigator
+                    navEntryInstallers = NavEntryInstallerSet(navEntryInstallers)
                 )
             }
         }

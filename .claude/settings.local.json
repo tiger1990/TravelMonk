@@ -6,8 +6,15 @@
       "WebFetch(domain:mvnrepository.com)",
       "Bash(./gradlew :feature:flights:kspDebugKotlin :feature:transport:kspDebugKotlin)",
       "Bash(./gradlew :app:kspDebugKotlin)",
-      "Bash(./gradlew :core:designsystem:compileDebugKotlin)",
-      "Bash(./gradlew :app:compileDebugKotlin)"
+      "Bash(./gradlew :core:design-system:compileDebugKotlin)",
+      "Bash(./gradlew :app:compileDebugKotlin)",
+      "WebFetch(domain:medium.com)",
+      "WebFetch(domain:android-developers.googleblog.com)",
+      "WebFetch(domain:proandroiddev.com)",
+      "Read(//private/tmp/**)",
+      "Bash(jar tf:*)",
+      "Bash(rm -rf commonMain androidMain)",
+      "Bash(jar xf:*)"
     ]
   }
 }

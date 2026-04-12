@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.travelmonk.core.designsystem.theme.TravelMonkTheme
+import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.feature.transportapi.TransportTab
 import com.travelmonk.feature.transportapi.TransportTabContentProvider
 import com.travelmonk.feature.transport.ui.TransportSearchCard

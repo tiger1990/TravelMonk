@@ -7,12 +7,12 @@ import com.travelmonk.feature.bookings.mvi.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.collections.map
 
 @HiltViewModel
 class BookingViewModel @Inject constructor(
     private val bookingRepository: BookingRepository
 ) : BaseViewModel<BookingState, BookingIntent, BookingEffect>() {
+
     override fun createInitialState(): BookingState = BookingState()
 
     init {
@@ -41,13 +41,13 @@ class BookingViewModel @Inject constructor(
             setState { copy(isLoading = true) }
             try {
                 val domainBookings = bookingRepository.getBookings()
-                val uiBookings = domainBookings.map { 
+                val uiBookings = domainBookings.map {
                     BookingItem(
                         it.id,
-                        BookingType.valueOf(it.type.name), 
-                        it.title, 
-                        it.date, 
-                        it.status.name.lowercase().replaceFirstChar { it.uppercase() }, 
+                        it.type,
+                        it.title,
+                        it.date,
+                        it.status.name.lowercase().replaceFirstChar { it.uppercase() },
                         it.price
                     )
                 }

@@ -16,11 +16,13 @@ data class Booking(
 @Serializable
 enum class BookingType {
     @SerialName("flight") FLIGHT,
+
     @SerialName("bus") BUS,
+
     @SerialName("train") TRAIN,
     @SerialName("hotel") HOTEL,
     @SerialName("package") PACKAGE,
-    @SerialName("service") SERVICE
+    @SerialName("service") SERVICE,
 }
 
 @Serializable

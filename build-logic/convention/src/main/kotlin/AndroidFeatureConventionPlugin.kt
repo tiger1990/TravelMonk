@@ -25,17 +25,17 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 apply("org.jetbrains.kotlin.plugin.serialization")
             }
             dependencies {
-                add("implementation", project(":core:model"))
-                add("implementation", project(":core:navigation"))
-                add("implementation", project(":core:designsystem"))
-                add("implementation", project(":core:tokens"))
                 add("implementation", project(":core:ui"))
+                add("implementation", project(":core:navigation"))
                 add("implementation", project(":core:common"))
+                add("implementation", project(":core:model"))
+                add("implementation", project(":core:design-system"))
+                add("implementation", project(":core:tokens"))
                 add("implementation", project(":core:network"))
 
                 // Compose UI primitives — every feature screen needs basic Compose + Material3
-                add("implementation", libs.findLibrary("androidx-ui").get())
-                add("implementation", libs.findLibrary("androidx-material3").get())
+                add("implementation", libs.findLibrary("androidx-compose-ui").get())
+                add("implementation", libs.findLibrary("androidx-compose-material3").get())
 
                 // ViewModel scoped to a Compose NavEntry; provides viewModel() in Composables
                 add("implementation", libs.findLibrary("androidx-lifecycle-viewmodel-compose").get())
@@ -58,11 +58,22 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 // hiltViewModel() scoped to Nav3 entries; bridges Hilt DI with Navigation3
                 add("implementation", libs.findLibrary("hilt-navigation-compose").get())
 
+                // hilt-lifecycle-viewmodel-compose — new home for hiltViewModel() with Assisted Injection
+                add("implementation", libs.findLibrary("hilt-lifecycle-viewmodel-compose").get())
+
+                // Navigation3 Adaptive — adaptive layout support for Navigation 3
+                add("implementation", libs.findLibrary("androidx-compose-material3-adaptive-navigation3").get())
+
                 // Android-specific coroutine dispatcher (Main); needed for ViewModel + Flow work
                 add("implementation", libs.findLibrary("kotlinx-coroutines-android").get())
 
                 // kotlinx.serialization JSON — for serializing data models and nav-key back-stack persistence
                 add("implementation", libs.findLibrary("kotlinx-serialization-json").get())
+
+                // Feature test dependencies
+                add("testImplementation", libs.findLibrary("turbine").get())
+                add("testImplementation", libs.findLibrary("mockk").get())
+                add("testImplementation", libs.findLibrary("kotlinx-coroutines-test").get())
             }
         }
     }

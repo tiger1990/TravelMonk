@@ -8,6 +8,5 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.material3)
+    // dependencies to add
 }

@@ -19,8 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.travelmonk.core.designsystem.theme.TravelMonkTheme
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.feature.flights.mvi.*
 import com.travelmonk.feature.flightsapi.navigation.FlightNavKey

@@ -16,9 +16,16 @@ sealed class BottomBarItem(
     @param:DrawableRes val icon: Int
 ) {
     data object Home : BottomBarItem(HomeNavKey.Root, "Home", TravelMonkIcons.Home)
-    data object Transport : BottomBarItem(TransportNavKey.Root, "Transport", TravelMonkIcons.DirectionsTransit)
+    data object Transport :
+        BottomBarItem(TransportNavKey.Root, "Transport", TravelMonkIcons.DirectionsTransit)
+
     data object Stays : BottomBarItem(StayNavKey.Search, "Stays", TravelMonkIcons.Hotel)
-    data object Experiences : BottomBarItem(ExperienceNavKey.Root, "Experiences", TravelMonkIcons.Explore)
-    data object Services : BottomBarItem(ServiceNavKey.Root, "Services", TravelMonkIcons.CleaningServices)
-    data object Bookings : BottomBarItem(BookingNavKey.Root, "Bookings", TravelMonkIcons.ConfirmationNumber)
+    data object Experiences :
+        BottomBarItem(ExperienceNavKey.Root, "Experiences", TravelMonkIcons.Explore)
+
+    data object Services :
+        BottomBarItem(ServiceNavKey.Root, "Services", TravelMonkIcons.CleaningServices)
+
+    data object Bookings :
+        BottomBarItem(BookingNavKey.Root, "Bookings", TravelMonkIcons.ConfirmationNumber)
 }

@@ -15,9 +15,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
-import com.travelmonk.core.designsystem.theme.TravelMonkTheme
+import com.travelmonk.core.design.system.theme.TravelMonkTheme
+import com.travelmonk.core.model.BookingType
 import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.feature.experiences.mvi.*
 import com.travelmonk.feature.experiencesapi.navigator.ExperienceNavigator
@@ -34,7 +35,10 @@ fun ExperiencesScreen(
         viewModel.effect.collect { effect ->
             when (effect) {
                 is ExperienceEffect.NavigateToBooking ->
-                    navigator.navigateToBookingConfirmation("Experience", effect.item.title)
+                    navigator.navigateToBookingConfirmation(
+                        BookingType.PACKAGE,
+                        effect.item.title
+                    )
             }
         }
     }
@@ -51,16 +55,28 @@ fun ExperiencesContent(
     state: ExperienceState,
     onIntent: (ExperienceIntent) -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxSize().background(TravelMonkTheme.colors.background)) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .background(TravelMonkTheme.colors.background)) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(TravelMonkTheme.dimensions.headerHeight)
-                .background(TravelMonkTheme.colors.tertiary, RoundedCornerShape(bottomStart = TravelMonkTheme.radius.large, bottomEnd = TravelMonkTheme.radius.large))
+                .background(
+                    TravelMonkTheme.colors.tertiary,
+                    RoundedCornerShape(
+                        bottomStart = TravelMonkTheme.radius.large,
+                        bottomEnd = TravelMonkTheme.radius.large
+                    )
+                )
                 .padding(TravelMonkTheme.spacing.large),
             contentAlignment = Alignment.BottomStart
         ) {
-            Text(text = "Experiences", color = TravelMonkTheme.colors.onPrimary, style = TravelMonkTheme.typography.titleLarge)
+            Text(
+                text = "Experiences",
+                color = TravelMonkTheme.colors.onPrimary,
+                style = TravelMonkTheme.typography.titleLarge
+            )
         }
 
         SecondaryScrollableTabRow(
@@ -119,7 +135,12 @@ fun ExperienceCard(item: ExperienceItem, onBook: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(TravelMonkTheme.dimensions.imageCardHeight)
-                    .clip(RoundedCornerShape(topStart = TravelMonkTheme.radius.medium, topEnd = TravelMonkTheme.radius.medium)),
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = TravelMonkTheme.radius.medium,
+                            topEnd = TravelMonkTheme.radius.medium
+                        )
+                    ),
                 contentScale = ContentScale.Crop
             )
 
@@ -131,12 +152,25 @@ fun ExperienceCard(item: ExperienceItem, onBook: () -> Unit) {
                 ) {
                     Text(text = item.title, style = TravelMonkTheme.typography.titleLarge)
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(painter = painterResource(TravelMonkIcons.Star), contentDescription = null, tint = Color(0xFFFFC107), modifier = Modifier.size(TravelMonkTheme.dimensions.iconSmall))
-                        Text(text = item.rating.toString(), style = TravelMonkTheme.typography.labelMedium, fontWeight = FontWeight.Medium)
+                        Icon(
+                            painter = painterResource(TravelMonkIcons.Star),
+                            contentDescription = null,
+                            tint = Color(0xFFFFC107),
+                            modifier = Modifier.size(TravelMonkTheme.dimensions.iconSmall)
+                        )
+                        Text(
+                            text = item.rating.toString(),
+                            style = TravelMonkTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Medium
+                        )
                     }
                 }
 
-                Text(text = item.description, style = TravelMonkTheme.typography.bodyLarge, color = TravelMonkTheme.colors.grayText)
+                Text(
+                    text = item.description,
+                    style = TravelMonkTheme.typography.bodyLarge,
+                    color = TravelMonkTheme.colors.grayText
+                )
 
                 Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
 
@@ -145,7 +179,11 @@ fun ExperienceCard(item: ExperienceItem, onBook: () -> Unit) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = item.price, style = TravelMonkTheme.typography.headlineMedium, color = TravelMonkTheme.colors.tertiary)
+                    Text(
+                        text = item.price,
+                        style = TravelMonkTheme.typography.headlineMedium,
+                        color = TravelMonkTheme.colors.tertiary
+                    )
                     Button(
                         onClick = onBook,
                         colors = ButtonDefaults.buttonColors(containerColor = TravelMonkTheme.colors.tertiary),
@@ -160,14 +198,25 @@ fun ExperienceCard(item: ExperienceItem, onBook: () -> Unit) {
 }
 
 @Preview(name = "Experiences – Light", showBackground = true)
-@Preview(name = "Experiences – Dark", showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Preview(
+    name = "Experiences – Dark",
+    showBackground = true,
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 private fun ExperiencesContentPreview() {
     TravelMonkTheme {
         ExperiencesContent(
             state = ExperienceState(
                 items = listOf(
-                    ExperienceItem("1", "Bali Yoga Retreat", "7-day immersive yoga experience", "$299", 4.8, ""),
+                    ExperienceItem(
+                        "1",
+                        "Bali Yoga Retreat",
+                        "7-day immersive yoga experience",
+                        "$299",
+                        4.8,
+                        ""
+                    ),
                     ExperienceItem("2", "City Walking Tour", "Explore hidden gems", "$49", 4.6, "")
                 )
             ),

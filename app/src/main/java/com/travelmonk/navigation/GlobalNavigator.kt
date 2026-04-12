@@ -24,7 +24,7 @@ sealed interface NavCommand {
 class GlobalNavigator @Inject constructor() : NavigationBus {
 
     private val _navEvents = MutableSharedFlow<NavCommand>(
-        extraBufferCapacity = 8,
+        extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     val navEvents = _navEvents.asSharedFlow()
