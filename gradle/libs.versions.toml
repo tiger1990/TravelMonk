@@ -3,14 +3,14 @@
 # Single source of truth for all dependency versions.
 # Update a version here and it propagates to every module automatically.
 # ══════════════════════════════════════════════════════════════════════════════
-
+# noinspection UnusedVersionCatalogEntry
 [versions]
 
 # ── SDK & Build Tools ─────────────────────────────────────────────────────────
 compileSdk = "36"
 targetSdk  = "36"
 minSdk     = "28"
-agp        = "9.1.0"   # Android Gradle Plugin
+agp        = "9.1.1"   # Android Gradle Plugin
 ksp        = "2.3.6"   # Kotlin Symbol Processing — must match kotlin version
 
 # ── Kotlin ────────────────────────────────────────────────────────────────────
@@ -64,7 +64,7 @@ robolectric             = "4.16.1"
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-
+# noinspection UnusedVersionCatalogEntry
 [libraries]
 
 # ── AndroidX Core ─────────────────────────────────────────────────────────────
@@ -178,11 +178,12 @@ androidx-ui-test-junit4   = { group = "androidx.compose.ui",     name = "ui-test
 # ── Build Logic (used inside build-logic/convention only) ─────────────────────
 android-gradlePlugin             = { group = "com.android.tools.build",  name = "gradle",                          version.ref = "agp" }
 kotlin-gradlePlugin              = { group = "org.jetbrains.kotlin",      name = "kotlin-gradle-plugin",            version.ref = "kotlin" }
+kotlin-compose-compiler-gradlePlugin = { group = "org.jetbrains.kotlin",  name = "compose-compiler-gradle-plugin", version.ref = "kotlin" }
 kotlin-serialization-gradlePlugin = { group = "org.jetbrains.kotlin",     name = "kotlin-serialization",            version.ref = "kotlin" }
 ksp-gradlePlugin                 = { group = "com.google.devtools.ksp",   name = "symbol-processing-gradle-plugin", version.ref = "ksp" }
 
 # ══════════════════════════════════════════════════════════════════════════════
-
+# noinspection UnusedVersionCatalogEntry
 [plugins]
 
 # ── Android Gradle Plugin ─────────────────────────────────────────────────────

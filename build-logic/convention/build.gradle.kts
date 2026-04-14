@@ -17,15 +17,26 @@ kotlin {
     }
 }
 
+// Extension to convert PluginDependency to dependency notation
+fun Provider<PluginDependency>.toDep() = map {
+    "${it.pluginId}:${it.pluginId}.gradle.plugin:${it.version}"
+}
+
 dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
-    implementation(libs.kotlin.serialization.gradlePlugin)
     compileOnly(libs.ksp.gradlePlugin)
+    compileOnly(libs.plugins.kotlin.compose.toDep())
+    implementation(libs.kotlin.serialization.gradlePlugin)
+
 }
 
 gradlePlugin {
     plugins {
+        register("androidApplication") {
+            id = "travelmonk.android.application"
+            implementationClass = "com.travelmonk.buildlogic.AndroidApplicationConventionPlugin"
+        }
         register("androidLibrary") {
             id = "travelmonk.android.library"
             implementationClass = "com.travelmonk.buildlogic.AndroidLibraryConventionPlugin"

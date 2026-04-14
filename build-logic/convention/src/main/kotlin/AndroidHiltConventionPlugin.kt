@@ -14,9 +14,13 @@ class AndroidHiltConventionPlugin : Plugin<Project> {
             apply("com.google.devtools.ksp")
         }
 
-        // Inside your apply block
+        // Register the generated sources for all variants
         val androidComponents = extensions.findByType<AndroidComponentsExtension<*, *, *>>()
         androidComponents?.onVariants { variant ->
+            // KSP usually registers its generated sources automatically.
+            // If you encounter issues with "built-in Kotlin" in AGP 9.x,
+            // you might need to remove manual registration or use android.sourceSets.
+
             // 1. Define the path where KSP puts its generated files for this variant
             val kspGeneratedDir = layout.buildDirectory.dir("generated/ksp/${variant.name}/kotlin")
 

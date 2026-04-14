@@ -59,8 +59,10 @@ internal fun Project.configureLibraryModule(extension: LibraryExtension) {
         defaultConfig {
             minSdk = libs.findVersion("minSdk").get().requiredVersion.toInt()
             // Each library module ships its own R8 rules to the consuming app.
-            // The file is optional — modules that need rules create consumer-rules.pro.
-            consumerProguardFiles("consumer-rules.pro")
+            val proguardFile = "consumer-rules.pro"
+            if (file(proguardFile).exists()) {
+                consumerProguardFiles(proguardFile)
+            }
         }
         compileOptions {
             sourceCompatibility = JavaVersion.VERSION_17
