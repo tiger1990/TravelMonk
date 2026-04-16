@@ -1,4 +1,4 @@
-package com.travelmonk.feature.experiences.data.remote
+package com.travelmonk.feature.experiences.data.api
 
 import com.travelmonk.feature.experiences.domain.model.Experience
 import retrofit2.http.GET
@@ -8,5 +8,5 @@ interface ExperiencesApi {
     @GET("experiences")
     suspend fun getExperiences(
         @Query("category") category: String
-    ): List<Experience>
+    ): List<Experience>  // TODO: replace with ExperienceDto when real API is integrated
 }

@@ -1,4 +1,4 @@
-package com.travelmonk.feature.flights.data.remote
+package com.travelmonk.feature.flights.data.api
 
 import com.travelmonk.feature.flights.domain.model.Flight
 import retrofit2.http.GET
@@ -9,5 +9,5 @@ interface FlightsApi {
     suspend fun searchFlights(
         @Query("from") from: String,
         @Query("to") to: String
-    ): List<Flight>
+    ): List<Flight>  // TODO: replace with FlightDto when real API is integrated
 }

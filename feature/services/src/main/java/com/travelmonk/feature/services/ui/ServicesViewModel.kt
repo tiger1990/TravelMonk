@@ -2,15 +2,17 @@ package com.travelmonk.feature.services.ui
 
 import androidx.lifecycle.viewModelScope
 import com.travelmonk.core.common.mvi.BaseViewModel
-import com.travelmonk.feature.services.domain.repository.ServiceRepository
-import com.travelmonk.feature.services.mvi.*
+import com.travelmonk.feature.services.domain.usecase.GetServicesUseCase
+import com.travelmonk.feature.services.mvi.ServicesEffect
+import com.travelmonk.feature.services.mvi.ServicesIntent
+import com.travelmonk.feature.services.mvi.ServicesState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ServicesViewModel @Inject constructor(
-    private val serviceRepository: ServiceRepository
+    private val getServicesUseCase: GetServicesUseCase
 ) : BaseViewModel<ServicesState, ServicesIntent, ServicesEffect>() {
     override fun createInitialState(): ServicesState = ServicesState()
 
@@ -33,10 +35,8 @@ class ServicesViewModel @Inject constructor(
         viewModelScope.launch {
             setState { copy(isLoading = true) }
             try {
-                val domainServices = serviceRepository.getServices()
-                // In a more complex app, we'd map domain to UI models here if they differ
-                // For now, the UI uses its own TravelService which we'll keep for simplicity
-                // but usually, we'd sync them.
+                val domainServices = getServicesUseCase()
+                setState { copy(services = domainServices) }
             } catch (e: Exception) {
                 // Handle error
             } finally {

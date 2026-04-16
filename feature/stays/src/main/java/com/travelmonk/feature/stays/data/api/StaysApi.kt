@@ -1,4 +1,4 @@
-package com.travelmonk.feature.stays.data.remote
+package com.travelmonk.feature.stays.data.api
 
 import com.travelmonk.feature.stays.domain.model.Stay
 import retrofit2.http.GET
@@ -8,5 +8,5 @@ interface StaysApi {
     @GET("stays/search")
     suspend fun searchStays(
         @Query("location") location: String
-    ): List<Stay>
+    ): List<Stay>  // TODO: replace with StayDto when real API is integrated
 }

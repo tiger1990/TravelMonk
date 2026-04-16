@@ -16,11 +16,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.model.BookingType
 import com.travelmonk.core.tokens.TravelMonkIcons
-import com.travelmonk.feature.experiences.mvi.*
+import com.travelmonk.feature.experiences.domain.model.Experience
+import com.travelmonk.feature.experiences.domain.model.ExperienceCategory
+import com.travelmonk.feature.experiences.mvi.ExperienceEffect
+import com.travelmonk.feature.experiences.mvi.ExperienceIntent
+import com.travelmonk.feature.experiences.mvi.ExperienceState
 import com.travelmonk.feature.experiencesapi.navigator.ExperienceNavigator
 
 // Stateful entry point
@@ -29,7 +34,7 @@ fun ExperiencesScreen(
     navigator: ExperienceNavigator,
     viewModel: ExperienceViewModel = hiltViewModel()
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -121,7 +126,7 @@ fun ExperiencesContent(
 }
 
 @Composable
-fun ExperienceCard(item: ExperienceItem, onBook: () -> Unit) {
+fun ExperienceCard(item: Experience, onBook: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(TravelMonkTheme.radius.medium),
@@ -209,15 +214,24 @@ private fun ExperiencesContentPreview() {
         ExperiencesContent(
             state = ExperienceState(
                 items = listOf(
-                    ExperienceItem(
-                        "1",
-                        "Bali Yoga Retreat",
-                        "7-day immersive yoga experience",
-                        "$299",
-                        4.8,
-                        ""
+                    Experience(
+                        id = "1",
+                        title = "Bali Yoga Retreat",
+                        description = "7-day immersive yoga experience",
+                        price = "$299",
+                        rating = 4.8,
+                        imageUrl = "",
+                        category = ExperienceCategory.YOGA
                     ),
-                    ExperienceItem("2", "City Walking Tour", "Explore hidden gems", "$49", 4.6, "")
+                    Experience(
+                        id = "2",
+                        title = "City Walking Tour",
+                        description = "Explore hidden gems",
+                        price = "$49",
+                        rating = 4.6,
+                        imageUrl = "",
+                        category = ExperienceCategory.GUIDES
+                    )
                 )
             ),
             onIntent = {}

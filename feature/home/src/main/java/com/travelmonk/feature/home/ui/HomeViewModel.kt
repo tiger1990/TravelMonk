@@ -2,7 +2,7 @@ package com.travelmonk.feature.home.ui
 
 import androidx.lifecycle.viewModelScope
 import com.travelmonk.core.common.mvi.BaseViewModel
-import com.travelmonk.feature.home.domain.repository.HomeRepository
+import com.travelmonk.feature.home.domain.usecase.GetHomeBannersUseCase
 import com.travelmonk.feature.home.mvi.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val homeRepository: HomeRepository
+    private val getHomeBannersUseCase: GetHomeBannersUseCase
 ) : BaseViewModel<HomeState, HomeIntent, HomeEffect>() {
 
     override fun createInitialState(): HomeState = HomeState()
@@ -39,7 +39,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             setState { copy(isLoading = true) }
             try {
-                val banners = homeRepository.getHomeBanners()
+                val banners = getHomeBannersUseCase()
                 setState { copy(banners = banners, isLoading = false) }
             } catch (e: Exception) {
                 setState { copy(isLoading = false, error = e.message) }

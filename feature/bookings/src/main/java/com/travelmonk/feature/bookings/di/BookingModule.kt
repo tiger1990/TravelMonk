@@ -1,11 +1,14 @@
 package com.travelmonk.feature.bookings.di
 
+import com.travelmonk.feature.bookings.data.api.BookingsApi
 import com.travelmonk.feature.bookings.data.repository.BookingRepositoryImpl
 import com.travelmonk.feature.bookings.domain.repository.BookingRepository
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import retrofit2.Retrofit
 import javax.inject.Singleton
 
 @Module
@@ -17,4 +20,12 @@ abstract class BookingModule {
     abstract fun bindBookingRepository(
         bookingRepositoryImpl: BookingRepositoryImpl
     ): BookingRepository
+
+    companion object {
+        @Provides
+        @Singleton
+        fun provideBookingsApi(retrofit: Retrofit): BookingsApi {
+            return retrofit.create(BookingsApi::class.java)
+        }
+    }
 }

@@ -1,6 +1,6 @@
 package com.travelmonk.feature.services.di
 
-import com.travelmonk.feature.services.data.remote.ServicesApi
+import com.travelmonk.feature.services.data.api.ServicesApi
 import com.travelmonk.feature.services.data.repository.ServiceRepositoryImpl
 import com.travelmonk.feature.services.domain.repository.ServiceRepository
 import dagger.Binds

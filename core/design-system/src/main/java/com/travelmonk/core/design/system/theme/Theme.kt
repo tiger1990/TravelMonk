@@ -99,6 +99,8 @@ fun TravelMonkTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
+            // With edgeToEdge enabled in MainActivity, we just need to control icon contrast.
+            // The status bar color itself is handled by the window background/Surface.
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }

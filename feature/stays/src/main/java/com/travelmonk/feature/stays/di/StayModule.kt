@@ -1,6 +1,6 @@
 package com.travelmonk.feature.stays.di
 
-import com.travelmonk.feature.stays.data.remote.StaysApi
+import com.travelmonk.feature.stays.data.api.StaysApi
 import com.travelmonk.feature.stays.data.repository.StayRepositoryImpl
 import com.travelmonk.feature.stays.domain.repository.StayRepository
 import dagger.Binds

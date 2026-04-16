@@ -4,6 +4,7 @@ import com.travelmonk.core.navigation.TravelNavKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@Serializable
 sealed interface ExperienceNavKey : TravelNavKey {
     @Serializable
     @SerialName("experience.root")

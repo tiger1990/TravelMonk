@@ -15,6 +15,7 @@ import androidx.navigation3.ui.NavDisplay
 import com.travelmonk.core.navigation.NavEntryInstallerSet
 import com.travelmonk.navigation.GlobalNavigator
 import com.travelmonk.navigation.NavigationRegistry
+import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.ui.navigation.*
 
 @Composable
@@ -44,38 +45,42 @@ fun TravelMonkApp(
         BottomBarItem.Bookings
     )
 
-    Scaffold(
-        bottomBar = {
-            val currentKey = navigationState.activeBackStack.lastOrNull()
-            // Show bottom bar only when on a root tab destination
-            val isTopLevel = bottomBarItems.any { it.route == currentKey }
+    Surface(
+        color = TravelMonkTheme.colors.primary
+    ) {
+        Scaffold(
+            bottomBar = {
+                val currentKey = navigationState.activeBackStack.lastOrNull()
+                // Show bottom bar only when on a root tab destination
+                val isTopLevel = bottomBarItems.any { it.route == currentKey }
 
-            if (isTopLevel) {
-                TravelMonkBottomBar(
-                    items = bottomBarItems,
-                    selectedItem = navigationState.currentTab,
-                    onItemSelected = navigationState::selectTab
-                )
+                if (isTopLevel) {
+                    TravelMonkBottomBar(
+                        items = bottomBarItems,
+                        selectedItem = navigationState.currentTab,
+                        onItemSelected = navigationState::selectTab
+                    )
+                }
             }
+        ) { innerPadding ->
+            NavDisplay(
+                entries = navigationState.toDecoratedEntries(entryProvider),
+                modifier = Modifier.padding(innerPadding),
+                onBack = { navigationState.pop() },
+                transitionSpec = {
+                    (slideInHorizontally(tween(300)) { it / 4 } + fadeIn(tween(300))) togetherWith
+                            (slideOutHorizontally(tween(300)) { -it / 4 } + fadeOut(tween(300)))
+                },
+                popTransitionSpec = {
+                    (slideInHorizontally(tween(300)) { -it / 4 } + fadeIn(tween(300))) togetherWith
+                            (slideOutHorizontally(tween(300)) { it / 4 } + fadeOut(tween(300)))
+                },
+                predictivePopTransitionSpec = {
+                    (slideInHorizontally(tween(300)) { -it / 4 } + fadeIn(tween(300))) togetherWith
+                            (slideOutHorizontally(tween(300)) { it / 4 } + fadeOut(tween(300)))
+                }
+                // try this: https://proandroiddev.com/nested-routes-with-navigation-3-af0cd8223986
+            )
         }
-    ) { innerPadding ->
-        NavDisplay(
-            entries = navigationState.toDecoratedEntries(entryProvider),
-            modifier = Modifier.padding(innerPadding),
-            onBack = { navigationState.pop() },
-            transitionSpec = {
-                (slideInHorizontally(tween(300)) { it / 4 } + fadeIn(tween(300))) togetherWith
-                        (slideOutHorizontally(tween(300)) { -it / 4 } + fadeOut(tween(300)))
-            },
-            popTransitionSpec = {
-                (slideInHorizontally(tween(300)) { -it / 4 } + fadeIn(tween(300))) togetherWith
-                        (slideOutHorizontally(tween(300)) { it / 4 } + fadeOut(tween(300)))
-            },
-            predictivePopTransitionSpec = {
-                (slideInHorizontally(tween(300)) { -it / 4 } + fadeIn(tween(300))) togetherWith
-                        (slideOutHorizontally(tween(300)) { it / 4 } + fadeOut(tween(300)))
-            }
-            // try this: https://proandroiddev.com/nested-routes-with-navigation-3-af0cd8223986
-        )
     }
 }

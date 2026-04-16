@@ -2,7 +2,9 @@ package com.travelmonk.feature.bookings.ui
 
 import androidx.lifecycle.viewModelScope
 import com.travelmonk.core.common.mvi.BaseViewModel
-import com.travelmonk.feature.bookings.domain.repository.BookingRepository
+import com.travelmonk.feature.bookings.domain.model.BookingItem
+import com.travelmonk.feature.bookings.domain.usecase.CancelBookingUseCase
+import com.travelmonk.feature.bookings.domain.usecase.GetBookingsUseCase
 import com.travelmonk.feature.bookings.mvi.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -10,7 +12,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BookingViewModel @Inject constructor(
-    private val bookingRepository: BookingRepository
+    private val getBookingsUseCase: GetBookingsUseCase,
+    private val cancelBookingUseCase: CancelBookingUseCase
 ) : BaseViewModel<BookingState, BookingIntent, BookingEffect>() {
 
     override fun createInitialState(): BookingState = BookingState()
@@ -25,7 +28,7 @@ class BookingViewModel @Inject constructor(
             is BookingIntent.CancelBooking -> {
                 viewModelScope.launch {
                     try {
-                        bookingRepository.cancelBooking(intent.id)
+                        cancelBookingUseCase(intent.id)
                         setEffect(BookingEffect.ShowMessage("Booking cancelled"))
                         loadBookings()
                     } catch (e: Exception) {
@@ -40,7 +43,7 @@ class BookingViewModel @Inject constructor(
         viewModelScope.launch {
             setState { copy(isLoading = true) }
             try {
-                val domainBookings = bookingRepository.getBookings()
+                val domainBookings = getBookingsUseCase()
                 val uiBookings = domainBookings.map {
                     BookingItem(
                         it.id,

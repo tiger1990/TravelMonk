@@ -1,6 +1,6 @@
 package com.travelmonk.feature.home.di
 
-import com.travelmonk.feature.home.data.remote.HomeApi
+import com.travelmonk.feature.home.data.api.HomeApi
 import com.travelmonk.feature.home.data.repository.HomeRepositoryImpl
 import com.travelmonk.feature.home.domain.repository.HomeRepository
 import dagger.Binds

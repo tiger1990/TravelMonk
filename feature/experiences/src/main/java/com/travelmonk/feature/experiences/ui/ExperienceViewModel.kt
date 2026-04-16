@@ -2,16 +2,18 @@ package com.travelmonk.feature.experiences.ui
 
 import androidx.lifecycle.viewModelScope
 import com.travelmonk.core.common.mvi.BaseViewModel
-import com.travelmonk.feature.experiences.domain.model.ExperienceCategory as DomainCategory
-import com.travelmonk.feature.experiences.domain.repository.ExperienceRepository
-import com.travelmonk.feature.experiences.mvi.*
+import com.travelmonk.feature.experiences.domain.model.ExperienceCategory
+import com.travelmonk.feature.experiences.domain.usecase.GetExperiencesUseCase
+import com.travelmonk.feature.experiences.mvi.ExperienceEffect
+import com.travelmonk.feature.experiences.mvi.ExperienceIntent
+import com.travelmonk.feature.experiences.mvi.ExperienceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ExperienceViewModel @Inject constructor(
-    private val experienceRepository: ExperienceRepository
+    private val getExperiencesUseCase: GetExperiencesUseCase
 ) : BaseViewModel<ExperienceState, ExperienceIntent, ExperienceEffect>() {
     override fun createInitialState(): ExperienceState = ExperienceState()
 
@@ -37,16 +39,8 @@ class ExperienceViewModel @Inject constructor(
         viewModelScope.launch {
             setState { copy(isLoading = true) }
             try {
-                val domainCategory = when(category) {
-                    ExperienceCategory.PACKAGES -> DomainCategory.PACKAGES
-                    ExperienceCategory.GUIDES -> DomainCategory.GUIDES
-                    ExperienceCategory.YOGA -> DomainCategory.YOGA
-                }
-                val domainItems = experienceRepository.getExperiences(domainCategory)
-                val uiItems = domainItems.map { 
-                    ExperienceItem(it.id, it.title, it.description, it.price, it.rating, it.imageUrl)
-                }
-                setState { copy(items = uiItems) }
+                val items = getExperiencesUseCase(category)
+                setState { copy(items = items) }
             } catch (e: Exception) {
                 // Handle error
             } finally {

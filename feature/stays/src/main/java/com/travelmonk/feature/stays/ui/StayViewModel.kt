@@ -2,7 +2,7 @@ package com.travelmonk.feature.stays.ui
 
 import androidx.lifecycle.viewModelScope
 import com.travelmonk.core.common.mvi.BaseViewModel
-import com.travelmonk.feature.stays.domain.repository.StayRepository
+import com.travelmonk.feature.stays.domain.usecase.SearchStaysUseCase
 import com.travelmonk.feature.stays.mvi.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class StayViewModel @Inject constructor(
-    private val stayRepository: StayRepository
+    private val searchStaysUseCase: SearchStaysUseCase
 ) : BaseViewModel<StaySearchState, StayIntent, StayEffect>() {
     override fun createInitialState(): StaySearchState = StaySearchState()
 
@@ -22,7 +22,7 @@ class StayViewModel @Inject constructor(
                 viewModelScope.launch {
                     setState { copy(isLoading = true) }
                     try {
-                        val results = stayRepository.searchStays(currentState.location)
+                        val results = searchStaysUseCase(currentState.location)
                         setEffect(StayEffect.NavigateToResults(currentState.location))
                     } catch (e: Exception) {
                         // Handle error

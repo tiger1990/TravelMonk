@@ -1,6 +1,6 @@
 package com.travelmonk.feature.flights.di
 
-import com.travelmonk.feature.flights.data.remote.FlightsApi
+import com.travelmonk.feature.flights.data.api.FlightsApi
 import com.travelmonk.feature.flights.data.repository.FlightRepositoryImpl
 import com.travelmonk.feature.flights.domain.repository.FlightRepository
 import dagger.Binds

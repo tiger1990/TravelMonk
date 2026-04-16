@@ -28,6 +28,30 @@
     @com.squareup.moshi.Json <fields>;
 }
 
+# ── Moshi: KotlinJsonAdapterFactory (reflection adapter) ──────────────────────
+# KotlinJsonAdapterFactory reads constructor parameter names via kotlin.reflect.
+# R8 must preserve Kotlin metadata and constructor signatures on all model classes
+# that Moshi deserializes — i.e. any class returned by a Retrofit @GET/@POST etc.
+
+# Preserve Kotlin metadata annotation (carries parameter names post-compile)
+-keep class kotlin.Metadata { *; }
+-keepattributes Signature, InnerClasses, EnclosingMethod
+
+# Keep all feature model data classes Moshi deserializes via reflection
+# (plain data classes with no @Json / @JsonClass annotations)
+-keepclassmembers class com.travelmonk.feature.**.domain.model.** {
+    <init>(...);
+    <fields>;
+}
+-keepnames class com.travelmonk.feature.**.domain.model.**
+
+# Keep enum entries used in model classes (Moshi calls values()/valueOf() at runtime)
+-keepclassmembers enum com.travelmonk.** {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+    <fields>;
+}
+
 # ── OkHttp ────────────────────────────────────────────────────────────────────
 # Suppress warnings for optional platform integrations OkHttp probes at runtime.
 -dontwarn okhttp3.internal.platform.**

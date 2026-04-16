@@ -1,6 +1,6 @@
 package com.travelmonk.feature.experiences.di
 
-import com.travelmonk.feature.experiences.data.remote.ExperiencesApi
+import com.travelmonk.feature.experiences.data.api.ExperiencesApi
 import com.travelmonk.feature.experiences.data.repository.ExperienceRepositoryImpl
 import com.travelmonk.feature.experiences.domain.repository.ExperienceRepository
 import dagger.Binds

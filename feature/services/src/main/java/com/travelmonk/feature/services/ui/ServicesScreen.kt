@@ -18,10 +18,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.model.BookingType
 import com.travelmonk.core.tokens.TravelMonkIcons
-import com.travelmonk.feature.services.mvi.*
+import com.travelmonk.feature.services.domain.model.TravelService
+import com.travelmonk.feature.services.mvi.ServicesEffect
+import com.travelmonk.feature.services.mvi.ServicesIntent
+import com.travelmonk.feature.services.mvi.ServicesState
 import com.travelmonk.feature.servicesapi.navigator.ServiceNavigator
 
 private val defaultServices = listOf(
@@ -39,7 +43,7 @@ fun ServicesScreen(
     navigator: ServiceNavigator,
     viewModel: ServicesViewModel = hiltViewModel()
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -52,7 +56,7 @@ fun ServicesScreen(
 
     ServicesContent(
         state = state,
-        services = defaultServices,
+        services = state.services.ifEmpty { defaultServices },
         onIntent = viewModel::onIntent
     )
 }

@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.travelmonk.android.library)
     alias(libs.plugins.travelmonk.android.library.compose)
+    alias(libs.plugins.travelmonk.android.hilt)
 }
 
 android {

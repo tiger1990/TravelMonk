@@ -15,10 +15,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.model.BookingType
 import com.travelmonk.core.tokens.TravelMonkIcons
-import com.travelmonk.feature.bookings.mvi.BookingItem
+import com.travelmonk.feature.bookings.domain.model.BookingItem
 import com.travelmonk.feature.bookings.mvi.BookingState
 import com.travelmonk.feature.bookingsapi.navigator.BookingNavigator
 
@@ -28,7 +29,7 @@ fun MyBookingsScreen(
     navigator: BookingNavigator,
     viewModel: BookingViewModel = hiltViewModel()
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     MyBookingsContent(state = state)
 }
 
