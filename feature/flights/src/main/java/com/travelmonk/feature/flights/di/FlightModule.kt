@@ -19,12 +19,22 @@ import javax.inject.Singleton
 abstract class FlightModule {
 
 
+    /**
+     * Binds [FlightRepositoryImpl] as the [FlightRepository] implementation.
+     * Resolved by Hilt/KSP at compile time — no direct call site exists in source.
+     */
+    @Suppress("unused")
     @Binds
     @Singleton
     abstract fun bindFlightRepository(
         flightRepositoryImpl: FlightRepositoryImpl
     ): FlightRepository
 
+    /**
+     * Contributes [FlightsTabContentProvider] to the [TransportTabContentProvider] multibinding set.
+     * Resolved by Hilt/KSP at compile time — no direct call site exists in source.
+     */
+    @Suppress("unused")
     @Binds
     @IntoSet
     abstract fun bindFlightsTabContentProvider(

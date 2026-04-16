@@ -15,6 +15,11 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 abstract class ExperienceModule {
 
+    /**
+     * Binds [ExperienceRepositoryImpl] as the [ExperienceRepository] implementation.
+     * Resolved by Hilt/KSP at compile time — no direct call site exists in source.
+     */
+    @Suppress("unused")
     @Binds
     @Singleton
     abstract fun bindExperienceRepository(

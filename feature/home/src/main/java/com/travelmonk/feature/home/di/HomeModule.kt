@@ -15,6 +15,11 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 abstract class HomeModule {
 
+    /**
+     * Binds [HomeRepositoryImpl] as the [HomeRepository] implementation.
+     * Resolved by Hilt/KSP at compile time — no direct call site exists in source.
+     */
+    @Suppress("unused")
     @Binds
     @Singleton
     abstract fun bindHomeRepository(

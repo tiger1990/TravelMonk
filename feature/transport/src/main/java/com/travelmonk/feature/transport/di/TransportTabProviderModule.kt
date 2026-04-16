@@ -12,12 +12,22 @@ import dagger.multibindings.IntoSet
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class TransportTabProviderModule {
+    /**
+     * Contributes [BusTabContentProvider] to the [TransportTabContentProvider] multibinding set.
+     * Resolved by Hilt/KSP at compile time — no direct call site exists in source.
+     */
+    @Suppress("unused")
     @Binds
     @IntoSet
     abstract fun bindBusTabContentProvider(
         provider: BusTabContentProvider
     ): TransportTabContentProvider
 
+    /**
+     * Contributes [TrainTabContentProvider] to the [TransportTabContentProvider] multibinding set.
+     * Resolved by Hilt/KSP at compile time — no direct call site exists in source.
+     */
+    @Suppress("unused")
     @Binds
     @IntoSet
     abstract fun bindTrainTabContentProvider(
