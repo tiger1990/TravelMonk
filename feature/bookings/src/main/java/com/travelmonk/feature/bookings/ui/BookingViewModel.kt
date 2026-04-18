@@ -2,6 +2,7 @@ package com.travelmonk.feature.bookings.ui
 
 import androidx.lifecycle.viewModelScope
 import com.travelmonk.core.common.mvi.BaseViewModel
+import com.travelmonk.core.common.result.DataResult
 import com.travelmonk.feature.bookings.domain.model.BookingItem
 import com.travelmonk.feature.bookings.domain.usecase.CancelBookingUseCase
 import com.travelmonk.feature.bookings.domain.usecase.GetBookingsUseCase
@@ -27,12 +28,13 @@ class BookingViewModel @Inject constructor(
             is BookingIntent.LoadBookings -> loadBookings()
             is BookingIntent.CancelBooking -> {
                 viewModelScope.launch {
-                    try {
-                        cancelBookingUseCase(intent.id)
-                        setEffect(BookingEffect.ShowMessage("Booking cancelled"))
-                        loadBookings()
-                    } catch (e: Exception) {
-                        setEffect(BookingEffect.ShowMessage("Failed to cancel booking"))
+                    when (cancelBookingUseCase(intent.id)) {
+                        is DataResult.Success -> {
+                            setEffect(BookingEffect.ShowMessage("Booking cancelled"))
+                            loadBookings()
+                        }
+                        is DataResult.Error -> setEffect(BookingEffect.ShowMessage("Failed to cancel booking"))
+                        is DataResult.Loading -> Unit
                     }
                 }
             }
@@ -42,23 +44,22 @@ class BookingViewModel @Inject constructor(
     private fun loadBookings() {
         viewModelScope.launch {
             setState { copy(isLoading = true) }
-            try {
-                val domainBookings = getBookingsUseCase()
-                val uiBookings = domainBookings.map {
-                    BookingItem(
-                        it.id,
-                        it.type,
-                        it.title,
-                        it.date,
-                        it.status.name.lowercase().replaceFirstChar { it.uppercase() },
-                        it.price
-                    )
+            when (val result = getBookingsUseCase()) {
+                is DataResult.Success -> {
+                    val uiBookings = result.data.map {
+                        BookingItem(
+                            it.id,
+                            it.type,
+                            it.title,
+                            it.date,
+                            it.status.name.lowercase().replaceFirstChar { c -> c.uppercase() },
+                            it.price
+                        )
+                    }
+                    setState { copy(bookings = uiBookings, isLoading = false) }
                 }
-                setState { copy(bookings = uiBookings) }
-            } catch (e: Exception) {
-                // Handle error
-            } finally {
-                setState { copy(isLoading = false) }
+                is DataResult.Error -> setState { copy(isLoading = false) }
+                is DataResult.Loading -> Unit
             }
         }
     }

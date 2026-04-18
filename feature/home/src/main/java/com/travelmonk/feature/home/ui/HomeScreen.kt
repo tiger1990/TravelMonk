@@ -74,7 +74,7 @@ fun HomeContent(
                     onIntent(HomeIntent.OnBannerClick(bannerId))
                 }
             }
-            item { CategorySection() }
+            item { CategorySection(categories = state.categories) }
             item { PromoSection() }
         }
     }
@@ -184,18 +184,12 @@ fun BannerSection(banners: List<HomeBanner>, onBannerClick: (String) -> Unit) {
 }
 
 @Composable
-fun CategorySection() {
-    val categories = listOf(
-        "Flights" to TravelMonkIcons.Flight,
-        "Hotels" to TravelMonkIcons.Hotel,
-        "Tours" to TravelMonkIcons.Explore,
-        "Yoga" to TravelMonkIcons.SelfImprovement
-    )
+fun CategorySection(categories: List<HomeCategory>) {
     Column(modifier = Modifier.padding(24.dp)) {
         Text(text = "Categories", style = TravelMonkTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(16.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            categories.forEach { (name, icon) ->
+            categories.forEach { category ->
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(
                         modifier = Modifier
@@ -203,10 +197,10 @@ fun CategorySection() {
                             .background(TravelMonkTheme.colors.primary.copy(alpha = 0.1f), RoundedCornerShape(16.dp)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(painter = painterResource(icon), contentDescription = null, tint = TravelMonkTheme.colors.primary)
+                        Icon(painter = painterResource(category.icon), contentDescription = null, tint = TravelMonkTheme.colors.primary)
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = name, style = TravelMonkTheme.typography.labelMedium)
+                    Text(text = category.label, style = TravelMonkTheme.typography.labelMedium)
                 }
             }
         }

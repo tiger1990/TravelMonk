@@ -2,6 +2,7 @@ package com.travelmonk.feature.stays.ui
 
 import androidx.lifecycle.viewModelScope
 import com.travelmonk.core.common.mvi.BaseViewModel
+import com.travelmonk.core.common.result.DataResult
 import com.travelmonk.feature.stays.domain.usecase.SearchStaysUseCase
 import com.travelmonk.feature.stays.mvi.*
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,13 +22,13 @@ class StayViewModel @Inject constructor(
             is StayIntent.SearchStays -> {
                 viewModelScope.launch {
                     setState { copy(isLoading = true) }
-                    try {
-                        val results = searchStaysUseCase(currentState.location)
-                        setEffect(StayEffect.NavigateToResults(currentState.location))
-                    } catch (e: Exception) {
-                        // Handle error
-                    } finally {
-                        setState { copy(isLoading = false) }
+                    when (searchStaysUseCase(currentState.location)) {
+                        is DataResult.Success -> {
+                            setState { copy(isLoading = false) }
+                            setEffect(StayEffect.NavigateToResults(currentState.location))
+                        }
+                        is DataResult.Error -> setState { copy(isLoading = false) }
+                        is DataResult.Loading -> Unit
                     }
                 }
             }

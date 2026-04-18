@@ -217,7 +217,7 @@ Room dependency declared in `build.gradle.kts` but no DAOs, entities, or databas
 
 | ID | Gap | File(s) | Status |
 |---|---|---|---|
-| G-01 | No `DataResult<T>` wrapper — errors silently swallowed | All `*RepositoryImpl`, `HomeViewModel`, `FlightSearchScreen` | `[ ]` |
+| G-01 | No `DataResult<T>` wrapper — errors silently swallowed | All `*RepositoryImpl`, `HomeViewModel`, `FlightSearchScreen` | `[x]` |
 | G-02 | Zero test coverage — no ViewModel or repository tests | All `feature/*/test/` | `[ ]` |
 
 ---
@@ -239,7 +239,7 @@ Room dependency declared in `build.gradle.kts` but no DAOs, entities, or databas
 | G-16 | Design tokens bypassed — hardcoded dp/sp/color values throughout | `HomeScreen.kt`, `FlightSearchScreen.kt`, others | `[ ]` |
 | G-17 | `core:tokens` orphaned — icons outside `core:designsystem` | `core/tokens/` | `[ ]` |
 | G-21 | `contentDescription = null` throughout — breaks accessibility | All screen composables | `[ ]` |
-| G-22 | Flight search results discarded — loaded twice | `FlightViewModel.kt`, `TravelEntryProvider.kt` | `[ ]` |
+| G-22 | Flight search results discarded — loaded twice | `FlightViewModel.kt`, `TravelEntryProvider.kt` | `[x]` |
 
 ---
 
@@ -261,8 +261,8 @@ Room dependency declared in `build.gradle.kts` but no DAOs, entities, or databas
 
 | Priority | Open |
 |---|---|
-| P0 — Critical | 2 |
+| P0 — Critical | 1 |
 | P1 — High | 2 |
-| P2 — Medium | 5 |
+| P2 — Medium | 4 |
 | P3 — Low | 7 |
-| **Total** | **16** |
+| **Total** | **14** |

@@ -2,6 +2,7 @@ package com.travelmonk.feature.services.ui
 
 import androidx.lifecycle.viewModelScope
 import com.travelmonk.core.common.mvi.BaseViewModel
+import com.travelmonk.core.common.result.DataResult
 import com.travelmonk.feature.services.domain.usecase.GetServicesUseCase
 import com.travelmonk.feature.services.mvi.ServicesEffect
 import com.travelmonk.feature.services.mvi.ServicesIntent
@@ -34,13 +35,10 @@ class ServicesViewModel @Inject constructor(
     private fun loadServices() {
         viewModelScope.launch {
             setState { copy(isLoading = true) }
-            try {
-                val domainServices = getServicesUseCase()
-                setState { copy(services = domainServices) }
-            } catch (e: Exception) {
-                // Handle error
-            } finally {
-                setState { copy(isLoading = false) }
+            when (val result = getServicesUseCase()) {
+                is DataResult.Success -> setState { copy(services = result.data, isLoading = false) }
+                is DataResult.Error -> setState { copy(isLoading = false) }
+                is DataResult.Loading -> Unit
             }
         }
     }

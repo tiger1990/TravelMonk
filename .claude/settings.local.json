@@ -1,4 +1,88 @@
 {
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:blog.jetbrains.com)",
+      "WebFetch(domain:mvnrepository.com)",
+      "Bash(./gradlew :feature:flights:kspDebugKotlin :feature:transport:kspDebugKotlin)",
+      "Bash(./gradlew :app:kspDebugKotlin)",
+      "Bash(./gradlew :core:design-system:compileDebugKotlin)",
+      "Bash(./gradlew :app:compileDebugKotlin)",
+      "WebFetch(domain:medium.com)",
+      "WebFetch(domain:android-developers.googleblog.com)",
+      "WebFetch(domain:proandroiddev.com)",
+      "Read(//private/tmp/**)",
+      "Bash(jar tf:*)",
+      "Bash(jar xf:*)",
+      "Bash(find /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk -name *.kt -type f)",
+      "Bash(unzip:*)",
+      "Bash(./gradlew :feature:flights:compileDebugKotlin :feature:stays:compileDebugKotlin :feature:experiences:compileDebugKotlin :feature:bookings:compileDebugKotlin :feature:services:compileDebugKotlin :feature:home:compileDebugKotlin)",
+      "Bash(./gradlew :feature:flights:compileDebugKotlin :feature:bookings:compileDebugKotlin)",
+      "Bash(./gradlew assembleDebug)",
+      "Bash(./gradlew :core:common:compileDebugKotlin --quiet)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(git push --force:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(chmod 777:*)",
+      "Bash(sudo:*)",
+      "Bash(curl * | bash:*)",
+      "Bash(wget * | bash:*)",
+      "Bash(ssh:*)",
+      "Bash(> /dev/:*)"
+    ],
+    "//deny": [
+      "Irreversible or privilege-escalating commands — blocked unconditionally.",
+      "deny takes precedence over allow; Claude cannot override these."
+    ],
+    "//allow": "Pre-approved Gradle tasks and trusted Android/Kotlin reference domains."
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/bash-security-check.sh",
+            "statusMessage": "Security check..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/file-sensitivity-check.sh",
+            "statusMessage": "Checking file sensitivity..."
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/file-sensitivity-check.sh",
+            "statusMessage": "Checking file sensitivity..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/session-end-check.sh",
+            "statusMessage": "Running session-end checks..."
+          }
+        ]
+      }
+    ]
+  },
   "//": [
     "settings.local.json — TravelMonk project-local Claude Code overrides.",
     "This file is gitignored (personal overrides only).",
@@ -21,92 +105,5 @@
     "  Stop             → .claude/hooks/session-end-check.sh",
     "    Session-end safety sweep: warns if sensitive files were modified or if",
     "    HttpLoggingInterceptor is enabled outside DEBUG (see ArchitectureGaps.md)."
-  ],
-  "permissions": {
-    "//deny": [
-      "Irreversible or privilege-escalating commands — blocked unconditionally.",
-      "deny takes precedence over allow; Claude cannot override these."
-    ],
-    "deny": [
-      "Bash(rm -rf:*)",
-      "Bash(git push --force:*)",
-      "Bash(git reset --hard:*)",
-      "Bash(chmod 777:*)",
-      "Bash(sudo:*)",
-      "Bash(curl * | bash:*)",
-      "Bash(wget * | bash:*)",
-      "Bash(ssh:*)",
-      "Bash(> /dev/:*)"
-    ],
-    "//allow": "Pre-approved Gradle tasks and trusted Android/Kotlin reference domains.",
-    "allow": [
-      "WebSearch",
-      "WebFetch(domain:blog.jetbrains.com)",
-      "WebFetch(domain:mvnrepository.com)",
-      "Bash(./gradlew :feature:flights:kspDebugKotlin :feature:transport:kspDebugKotlin)",
-      "Bash(./gradlew :app:kspDebugKotlin)",
-      "Bash(./gradlew :core:design-system:compileDebugKotlin)",
-      "Bash(./gradlew :app:compileDebugKotlin)",
-      "WebFetch(domain:medium.com)",
-      "WebFetch(domain:android-developers.googleblog.com)",
-      "WebFetch(domain:proandroiddev.com)",
-      "Read(//private/tmp/**)",
-      "Bash(jar tf:*)",
-      "Bash(jar xf:*)",
-      "Bash(find /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk -name *.kt -type f)",
-      "Bash(unzip:*)",
-      "Bash(./gradlew :feature:flights:compileDebugKotlin :feature:stays:compileDebugKotlin :feature:experiences:compileDebugKotlin :feature:bookings:compileDebugKotlin :feature:services:compileDebugKotlin :feature:home:compileDebugKotlin)",
-      "Bash(./gradlew :feature:flights:compileDebugKotlin :feature:bookings:compileDebugKotlin)",
-      "Bash(./gradlew assembleDebug)"
-    ]
-  },
-  "hooks": {
-    "PreToolUse": [
-      {
-        "//": "Bash guard — delegates to script to keep settings.json auditable and scannable.",
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/bash-security-check.sh",
-            "statusMessage": "Security check..."
-          }
-        ]
-      },
-      {
-        "//": "Write guard — blocks writes to credential and signing files.",
-        "matcher": "Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/file-sensitivity-check.sh",
-            "statusMessage": "Checking file sensitivity..."
-          }
-        ]
-      },
-      {
-        "//": "Edit guard — same protection as Write guard but for partial edits.",
-        "matcher": "Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/file-sensitivity-check.sh",
-            "statusMessage": "Checking file sensitivity..."
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "//": "Session-end sweep — warns on sensitive file changes and logging leaks.",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/session-end-check.sh",
-            "statusMessage": "Running session-end checks..."
-          }
-        ]
-      }
-    ]
-  }
+  ]
 }

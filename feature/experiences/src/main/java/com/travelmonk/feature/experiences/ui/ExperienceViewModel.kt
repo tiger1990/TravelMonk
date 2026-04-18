@@ -2,6 +2,7 @@ package com.travelmonk.feature.experiences.ui
 
 import androidx.lifecycle.viewModelScope
 import com.travelmonk.core.common.mvi.BaseViewModel
+import com.travelmonk.core.common.result.DataResult
 import com.travelmonk.feature.experiences.domain.model.ExperienceCategory
 import com.travelmonk.feature.experiences.domain.usecase.GetExperiencesUseCase
 import com.travelmonk.feature.experiences.mvi.ExperienceEffect
@@ -38,13 +39,10 @@ class ExperienceViewModel @Inject constructor(
     private fun loadItems(category: ExperienceCategory) {
         viewModelScope.launch {
             setState { copy(isLoading = true) }
-            try {
-                val items = getExperiencesUseCase(category)
-                setState { copy(items = items) }
-            } catch (e: Exception) {
-                // Handle error
-            } finally {
-                setState { copy(isLoading = false) }
+            when (val result = getExperiencesUseCase(category)) {
+                is DataResult.Success -> setState { copy(items = result.data, isLoading = false) }
+                is DataResult.Error -> setState { copy(isLoading = false) }
+                is DataResult.Loading -> Unit
             }
         }
     }

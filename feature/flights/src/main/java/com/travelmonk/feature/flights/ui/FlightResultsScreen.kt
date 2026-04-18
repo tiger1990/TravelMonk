@@ -8,14 +8,19 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.tokens.TravelMonkIcons
+import com.travelmonk.feature.flights.mvi.FlightIntent
 import com.travelmonk.feature.flightsapi.navigator.FlightNavigator
 
 private val previewFlights = listOf(
@@ -29,12 +34,23 @@ fun FlightResultsScreen(
     from: String,
     to: String,
     navigator: FlightNavigator,
-    onBook: (String) -> Unit
+    onBook: (String) -> Unit,
+    viewModel: FlightViewModel = hiltViewModel()
 ) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(from, to) {
+        viewModel.onIntent(FlightIntent.LoadResults(from, to))
+    }
+
+    val flights = state.flights.map { flight ->
+        FlightResultItem(flight.airline, flight.departureTime, flight.arrivalTime, flight.duration, flight.price)
+    }
+
     FlightResultsContent(
         from = from,
         to = to,
-        flights = previewFlights,
+        flights = flights.ifEmpty { previewFlights },
         onBack = navigator::back,
         onBook = onBook
     )
