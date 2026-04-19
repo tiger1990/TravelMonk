@@ -8,10 +8,7 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.travelmonk.core.logger.LogFileManager
 import com.travelmonk.core.logger.TravelMonkLogger
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import java.util.concurrent.TimeUnit
 
 /**
@@ -26,13 +23,18 @@ internal class LogUploadWorker(
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-        val fileManager = LogFileManager(applicationContext)
+        // Retrieve the singletons from TravelMonkLogger to ensure we use the same state/mutex.
+        // If null, it means the app hasn't initialized the logger yet (race condition on startup).
+        // Returning Result.retry() allows WorkManager to backoff and try again once initialized.
+        val fileManager = TravelMonkLogger.fileManager ?: return Result.retry()
         val sender = TravelMonkLogger.remoteSender ?: DummyHttpSender()
+
         LogUploadOrchestrator(
             fileManager = fileManager,
-            sender = sender,
-            scope = CoroutineScope(Dispatchers.IO)
+            sender = sender
+            // scope not needed for periodic upload
         ).uploadAllPending()
+
         return Result.success()
     }
 
@@ -48,9 +50,11 @@ internal class LogUploadWorker(
                 )
                 .build()
 
+            // Use UPDATE policy to ensure that if we change the interval or constraints in a 
+            // future version, the existing work is updated without resetting the timer.
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 WORK_NAME,
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 request
             )
         }

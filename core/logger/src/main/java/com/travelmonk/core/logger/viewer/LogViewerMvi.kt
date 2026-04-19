@@ -7,6 +7,8 @@ data class LogViewerState(
     val selectedLevel: LogLevel? = null,
     val query: String = "",
     val isLoading: Boolean = false,
+    val isNextPageLoading: Boolean = false,
+    val hasMore: Boolean = true,
     val error: String? = null
 )
 
@@ -26,5 +28,6 @@ sealed interface LogViewerIntent {
     data class Search(val query: String) : LogViewerIntent
     data class FilterByLevel(val level: LogLevel?) : LogViewerIntent
     data object Refresh : LogViewerIntent
+    data object LoadMore : LogViewerIntent
     data object ClearFilter : LogViewerIntent
 }

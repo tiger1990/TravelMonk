@@ -28,7 +28,11 @@
       "Bash(./gradlew :core:logger:test --no-daemon --tests \"com.travelmonk.core.logger.TravelMonkLoggerTest.ERROR log triggers sendCritical on remote sender\")",
       "Bash(./gradlew :core:logger:test --no-daemon --tests \"com.travelmonk.core.logger.TravelMonkLoggerTest.ERROR log triggers sendCritical on remote sender\" --no-configuration-cache)",
       "Bash(find /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/logger/build -name TEST-*.xml)",
-      "Bash(grep -r \"tests=\" /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/logger/build/test-results/testDebugUnitTest/*.xml)"
+      "Bash(grep -r \"tests=\" /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/logger/build/test-results/testDebugUnitTest/*.xml)",
+      "Bash(./gradlew :core:logger:test --no-daemon)",
+      "Bash(./gradlew :core:logger:test 2>&1)",
+      "Bash(find /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/logger/build/reports/tests -name *.xml)",
+      "Bash(./gradlew :core:logger:testDebugUnitTest --rerun-tasks)"
     ],
     "deny": [
       "Bash(rm -rf:*)",

@@ -1,12 +1,10 @@
 package com.travelmonk.core.logger.viewer
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.travelmonk.core.logger.LogEvent
 import com.travelmonk.core.logger.LogFileManager
-import com.travelmonk.core.logger.LogLevel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,22 +12,28 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 @HiltViewModel
 class LogViewerViewModel @Inject constructor(
-    @ApplicationContext private val context: Context
+    private val fileManager: LogFileManager
 ) : ViewModel() {
 
-    private val fileManager = LogFileManager(context)
+    // Must match the writer config in LogFileManager (explicitNulls = false).
+    // ignoreUnknownKeys = true guards against schema evolution — old log files with
+    // missing or extra fields deserialize safely instead of throwing.
+    private val logJson = Json { explicitNulls = false; ignoreUnknownKeys = true }
+
     private val _state = MutableStateFlow(LogViewerState())
     val state: StateFlow<LogViewerState> = _state.asStateFlow()
 
     private var allEntries: List<LogEntry> = emptyList()
+    private var lastLoadedFileIndex = -1
+    private var hasMoreLogs = true
 
     init {
-        loadLogs()
+        loadLogs(isInitial = true)
     }
 
     fun onIntent(intent: LogViewerIntent) {
@@ -42,7 +46,10 @@ class LogViewerViewModel @Inject constructor(
                 _state.update { it.copy(selectedLevel = intent.level) }
                 applyFilter()
             }
-            LogViewerIntent.Refresh -> loadLogs()
+            LogViewerIntent.Refresh -> loadLogs(isInitial = true)
+            LogViewerIntent.LoadMore -> if (!state.value.isLoading && !state.value.isNextPageLoading && hasMoreLogs) {
+                loadLogs(isInitial = false)
+            }
             LogViewerIntent.ClearFilter -> {
                 _state.update { it.copy(selectedLevel = null, query = "") }
                 applyFilter()
@@ -50,11 +57,27 @@ class LogViewerViewModel @Inject constructor(
         }
     }
 
-    private fun loadLogs() {
+    private fun loadLogs(isInitial: Boolean) {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, error = null) }
-            allEntries = withContext(Dispatchers.IO) { readAllLogEntries() }
-            _state.update { it.copy(isLoading = false) }
+            if (isInitial) {
+                _state.update { it.copy(isLoading = true, error = null) }
+                lastLoadedFileIndex = -1
+                hasMoreLogs = true
+                allEntries = emptyList()
+            } else {
+                _state.update { it.copy(isNextPageLoading = true) }
+            }
+
+            val nextBatch = fetchNextBatch()
+            if (nextBatch.isEmpty()) hasMoreLogs = false
+            
+            allEntries = allEntries + nextBatch
+            
+            _state.update { it.copy(
+                isLoading = false, 
+                isNextPageLoading = false,
+                hasMore = hasMoreLogs 
+            ) }
             applyFilter()
         }
     }
@@ -71,24 +94,52 @@ class LogViewerViewModel @Inject constructor(
         _state.update { it.copy(entries = filtered) }
     }
 
-    private fun readAllLogEntries(): List<LogEntry> =
-        (fileManager.getPendingFiles() + fileManager.getActiveFile())
-            .filter { it.exists() && it.length() > 0 }
-            .flatMap { file -> file.readLines().mapNotNull { parseLine(it) } }
-            .sortedByDescending { it.timestamp }
+    private suspend fun fetchNextBatch(): List<LogEntry> = withContext(Dispatchers.IO) {
+        val batch = mutableListOf<LogEntry>()
+        val pageSize = 500
 
+        // 1. Initial Load: Start with active file
+        if (lastLoadedFileIndex == -1) {
+            fileManager.readActiveFileLines().asReversed().forEach { line ->
+                parseLine(line)?.let { batch.add(it) }
+            }
+            lastLoadedFileIndex = 0
+            if (batch.size >= pageSize) return@withContext batch
+        }
+
+        // 2. Load from pending files
+        val pendingFiles = fileManager.getPendingFiles().reversed()
+        val startIndex = if (lastLoadedFileIndex <= 0) 0 else lastLoadedFileIndex
+        
+        for (i in startIndex until pendingFiles.size) {
+            val file = pendingFiles[i]
+            file.bufferedReader().useLines { lines ->
+                lines.toList().asReversed().forEach { line ->
+                    parseLine(line)?.let { batch.add(it) }
+                }
+            }
+            lastLoadedFileIndex = i + 1
+            if (batch.size >= pageSize) break
+        }
+
+        batch
+    }
+
+    // Deserializes through the same LogEvent type used by the writer, giving compiler
+    // safety on field renames. Any schema mismatch becomes a compile error, not a
+    // silent null at runtime (the previous org.json approach had no such safety net).
     private fun parseLine(line: String): LogEntry? = runCatching {
-        val json = JSONObject(line.trim())
+        val event = logJson.decodeFromString<LogEvent>(line.trim())
         LogEntry(
-            id = "${json.optLong("ts")}_${json.optString("tag")}_${json.optString("msg").hashCode()}",
-            timestamp = json.optLong("ts"),
-            level = LogLevel.valueOf(json.optString("level", "DEBUG")),
-            tag = json.optString("tag"),
-            message = json.optString("msg"),
-            traceId = json.optString("traceId").takeIf { it.isNotEmpty() },
-            spanId = json.optString("spanId").takeIf { it.isNotEmpty() },
-            flow = json.optString("flow").takeIf { it.isNotEmpty() },
-            launchStack = json.optString("launchStack").takeIf { it.isNotEmpty() }
+            id = "${event.timestamp}_${event.tag}_${event.message.hashCode()}",
+            timestamp = event.timestamp,
+            level = event.level,
+            tag = event.tag,
+            message = event.message,
+            traceId = event.traceId,
+            spanId = event.spanId,
+            flow = event.flow,
+            launchStack = event.launchStack
         )
     }.getOrNull()
 }

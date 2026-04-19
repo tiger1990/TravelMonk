@@ -13,10 +13,9 @@ import kotlinx.coroutines.launch
  */
 internal class CriticalEventUploader(
     private val criticalChannel: ReceiveChannel<LogEvent>,
-    private val sender: RemoteLogSender,
-    private val scope: CoroutineScope
+    private val sender: RemoteLogSender
 ) {
-    fun start() {
+    fun start(scope: CoroutineScope) {
         scope.launch {
             for (event in criticalChannel) {
                 try {

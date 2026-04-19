@@ -108,6 +108,7 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:common"))
     implementation(project(":core:tokens"))
+    implementation(project(":core:logger"))
 
     // --- FEATURE INTERFACES ---
     // The app module wires these to implement a loosely coupled architecture

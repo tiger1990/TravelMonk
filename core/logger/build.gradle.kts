@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.travelmonk.android.library)
     alias(libs.plugins.travelmonk.android.library.compose)
     alias(libs.plugins.travelmonk.android.hilt)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
 android {
@@ -9,6 +10,9 @@ android {
 }
 
 dependencies {
+    // Serialization
+    implementation(libs.kotlinx.serialization.json)
+
     // WorkManager — periodic upload scheduling
     implementation(libs.androidx.work.runtime.ktx)
 

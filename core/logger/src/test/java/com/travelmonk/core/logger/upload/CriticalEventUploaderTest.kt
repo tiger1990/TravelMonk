@@ -31,7 +31,7 @@ class CriticalEventUploaderTest {
         val sender = mockk<RemoteLogSender>()
         coEvery { sender.sendCritical(any()) } returns UploadResult.Success
 
-        CriticalEventUploader(channel, sender, this).start()
+        CriticalEventUploader(channel, sender).start(this)
 
         val event1 = makeEvent("first")
         val event2 = makeEvent("second")
@@ -49,7 +49,7 @@ class CriticalEventUploaderTest {
         val sender = mockk<RemoteLogSender>()
         coEvery { sender.sendCritical(any()) } throws RuntimeException("network dead")
 
-        CriticalEventUploader(channel, sender, this).start()
+        CriticalEventUploader(channel, sender).start(this)
 
         val event = makeEvent()
         channel.send(event)
@@ -64,7 +64,7 @@ class CriticalEventUploaderTest {
         val channel = Channel<LogEvent>(capacity = 10)
         val sender = mockk<RemoteLogSender>()
 
-        CriticalEventUploader(channel, sender, this).start()
+        CriticalEventUploader(channel, sender).start(this)
         channel.close()
 
         coVerify(exactly = 0) { sender.sendCritical(any()) }
@@ -82,7 +82,7 @@ class CriticalEventUploaderTest {
             UploadResult.Success
         }
 
-        CriticalEventUploader(channel, sender, this).start()
+        CriticalEventUploader(channel, sender).start(this)
 
         channel.send(makeEvent("first"))
         channel.send(makeEvent("second"))

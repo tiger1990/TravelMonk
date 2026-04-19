@@ -7,6 +7,7 @@ import com.travelmonk.core.logger.upload.DummyHttpSender
 import com.travelmonk.core.logger.upload.LogUploadOrchestrator
 import com.travelmonk.core.logger.upload.LogUploadWorker
 import com.travelmonk.core.logger.upload.RemoteLogSender
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -14,32 +15,20 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 /**
  * Public logging API for TravelMonk.
  *
  * Initialise once in Application.onCreate():
  *   TravelMonkLogger.init(context, isDebugBuild = BuildConfig.DEBUG)
- *
- * Then use from anywhere:
- *   TravelMonkLogger.d("LoginVM", "User tapped login")
- *   TravelMonkLogger.e("AuthRepo", "Token refresh failed", throwable)
- *
- * With distributed tracing:
- *   withContext(TraceContext.new()) {
- *       TravelMonkLogger.i("Api", "Calling flights endpoint")
- *       launch { TravelMonkLogger.d("Api", "Parsing response") }  // shares traceId
- *   }
  */
 object TravelMonkLogger {
 
     private val initialized = AtomicBoolean(false)
+    private val initLock = ReentrantLock()
 
-    /**
-     * Active coroutine scope. Defaults to a production IO scope.
-     * Tests may inject a TestScope via [init] to control execution with
-     * advanceUntilIdle() instead of relying on real wall-clock delays.
-     */
     private var scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private val logChannel = Channel<LogEvent>(
@@ -54,42 +43,39 @@ object TravelMonkLogger {
     internal var fileManager: LogFileManager? = null
     internal var remoteSender: RemoteLogSender? = null
     private var isDebug: Boolean = false
+    // @Volatile ensures the reference swap in updateGlobalMetadata() is visible across
+    // threads without a lock. Maps are immutable so the swap itself is atomic.
+    @Volatile private var globalMetadata: Map<String, String> = emptyMap()
 
-    /**
-     * Must be called once in Application.onCreate() before any logging.
-     * Subsequent calls are no-ops (idempotent).
-     *
-     * @param context Application context.
-     * @param isDebugBuild Pass BuildConfig.DEBUG from the app module. Controls Logcat output.
-     * @param remote Optional remote sender. Defaults to DummyHttpSender (logs to console).
-     * @param scope Coroutine scope for log processing. Defaults to a production IO scope.
-     *              Inject a TestScope in tests to control execution with advanceUntilIdle().
-     */
     fun init(
         context: Context,
+        fileManager: LogFileManager,
         isDebugBuild: Boolean = false,
         remote: RemoteLogSender? = null,
-        scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        initialMetadata: Map<String, String> = emptyMap()
     ) {
-        if (!initialized.compareAndSet(false, true)) return
-        this.scope = scope
-        isDebug = isDebugBuild
-        TraceContext.debugMode = isDebugBuild
-        val appContext = context.applicationContext
-        fileManager = LogFileManager(appContext)
-        remoteSender = remote ?: DummyHttpSender()
-        LogProcessor(logChannel, fileManager!!, this.scope).start()
-        CriticalEventUploader(criticalChannel, remoteSender!!, this.scope).start()
-        LogUploadOrchestrator(fileManager!!, remoteSender!!, this.scope).start()
-        LogUploadWorker.schedule(appContext)
+        if (initialized.get()) return
+        initLock.withLock {
+            if (initialized.get()) return
+            this.scope = CoroutineScope(SupervisorJob() + dispatcher)
+            this.isDebug = isDebugBuild
+            this.globalMetadata = initialMetadata
+            TraceContext.debugMode = isDebugBuild
+
+            val appContext = context.applicationContext
+            this.fileManager = fileManager
+            this.remoteSender = remote ?: DummyHttpSender()
+
+            LogProcessor(logChannel, fileManager).start(this.scope)
+            CriticalEventUploader(criticalChannel, remoteSender!!).start(this.scope)
+            LogUploadOrchestrator(fileManager, remoteSender!!).start(this.scope)
+            LogUploadWorker.schedule(appContext)
+
+            initialized.set(true)
+        }
     }
 
-    /**
-     * Cancels all running coroutines, drains channels, and resets all state to pre-init.
-     * Call from @Before in tests to guarantee a clean slate for each test — eliminates
-     * the race condition where multiple CriticalEventUploader instances compete for
-     * events on the shared criticalChannel across test runs.
-     */
     internal fun resetForTest() {
         scope.cancel()
         scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -97,51 +83,62 @@ object TravelMonkLogger {
         fileManager = null
         remoteSender = null
         isDebug = false
+        globalMetadata = emptyMap()
         TraceContext.debugMode = false
-        while (logChannel.tryReceive().isSuccess) { /* drain stale events */ }
-        while (criticalChannel.tryReceive().isSuccess) { /* drain stale events */ }
+        
+        // Purge stale logs from channels to ensure test isolation
+        while (logChannel.tryReceive().isSuccess) { /* drain stale events for test isolation */ }
+        while (criticalChannel.tryReceive().isSuccess) { /* drain stale events for test isolation */ }
     }
 
-    fun v(tag: String, msg: String, metadata: Map<String, Any?> = emptyMap()) =
+    /**
+     * Merges [entries] into the global metadata applied to every subsequent log event.
+     * Local metadata passed to individual log calls takes precedence on key collision.
+     * Safe to call from any thread at any time after [init] — e.g. after login to attach userId.
+     */
+    fun updateGlobalMetadata(entries: Map<String, String>) {
+        globalMetadata = globalMetadata + entries
+    }
+
+    fun v(tag: String, msg: String, metadata: Map<String, String> = emptyMap()) =
         log(LogLevel.VERBOSE, tag, msg, metadata = metadata)
 
-    fun d(tag: String, msg: String, metadata: Map<String, Any?> = emptyMap()) =
+    fun d(tag: String, msg: String, metadata: Map<String, String> = emptyMap()) =
         log(LogLevel.DEBUG, tag, msg, metadata = metadata)
 
-    fun i(tag: String, msg: String, metadata: Map<String, Any?> = emptyMap()) =
+    fun i(tag: String, msg: String, metadata: Map<String, String> = emptyMap()) =
         log(LogLevel.INFO, tag, msg, metadata = metadata)
 
     fun w(tag: String, msg: String, throwable: Throwable? = null) =
         log(LogLevel.WARN, tag, msg, throwable = throwable)
 
-    fun e(tag: String, msg: String, throwable: Throwable? = null, metadata: Map<String, Any?> = emptyMap()) =
+    fun e(tag: String, msg: String, throwable: Throwable? = null, metadata: Map<String, String> = emptyMap()) =
         log(LogLevel.ERROR, tag, msg, throwable = throwable, metadata = metadata)
-
-    /** Force-flush remaining buffer. Call from Application.onTerminate() or ProcessLifecycleOwner. */
-    fun flush() {
-        logChannel.close()
-    }
 
     private fun log(
         level: LogLevel,
         tag: String,
         message: String,
         throwable: Throwable? = null,
-        metadata: Map<String, Any?> = emptyMap()
+        metadata: Map<String, String> = emptyMap()
     ) {
         if (!initialized.get()) return
         val trace = TraceContext.current()
+        
+        // Performance optimization: Avoid map merging if local metadata is empty
+        val finalMetadata = if (metadata.isEmpty()) globalMetadata else globalMetadata + metadata
+        
         val event = LogEvent(
             timestamp   = System.currentTimeMillis(),
             level       = level,
             tag         = tag,
             message     = message,
-            throwable   = throwable,
+            stacktrace  = LogEvent.formatThrowable(throwable),
             traceId     = trace?.traceId,
             spanId      = trace?.spanId,
             flow        = trace?.flow,
             launchStack = trace?.launchStack,
-            metadata    = metadata
+            metadata    = finalMetadata
         )
         logChannel.trySend(event)
         if (isDebug) logcat(event)
@@ -149,12 +146,13 @@ object TravelMonkLogger {
     }
 
     private fun logcat(event: LogEvent) {
+        val fullMsg = if (event.stacktrace != null) "${event.message}\n${event.stacktrace}" else event.message
         when (event.level) {
-            LogLevel.VERBOSE -> Log.v(event.tag, event.message)
-            LogLevel.DEBUG   -> Log.d(event.tag, event.message)
-            LogLevel.INFO    -> Log.i(event.tag, event.message)
-            LogLevel.WARN    -> Log.w(event.tag, event.message, event.throwable)
-            LogLevel.ERROR   -> Log.e(event.tag, event.message, event.throwable)
+            LogLevel.VERBOSE -> Log.v(event.tag, fullMsg)
+            LogLevel.DEBUG   -> Log.d(event.tag, fullMsg)
+            LogLevel.INFO    -> Log.i(event.tag, fullMsg)
+            LogLevel.WARN    -> Log.w(event.tag, fullMsg)
+            LogLevel.ERROR   -> Log.e(event.tag, fullMsg)
         }
     }
 }
