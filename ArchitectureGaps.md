@@ -218,7 +218,7 @@ Room dependency declared in `build.gradle.kts` but no DAOs, entities, or databas
 | ID | Gap | File(s) | Status |
 |---|---|---|---|
 | G-01 | No `DataResult<T>` wrapper — errors silently swallowed | All `*RepositoryImpl`, `HomeViewModel`, `FlightSearchScreen` | `[x]` |
-| G-02 | Zero test coverage — no ViewModel or repository tests | All `feature/*/test/` | `[ ]` |
+| G-02 | Zero test coverage — no ViewModel or repository tests | All `feature/*/test/` | `[x]` |
 
 ---
 
@@ -261,8 +261,8 @@ Room dependency declared in `build.gradle.kts` but no DAOs, entities, or databas
 
 | Priority | Open |
 |---|---|
-| P0 — Critical | 1 |
+| P0 — Critical | 0 |
 | P1 — High | 2 |
 | P2 — Medium | 4 |
 | P3 — Low | 7 |
-| **Total** | **14** |
+| **Total** | **13** |

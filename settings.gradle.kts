@@ -69,6 +69,7 @@ rootProject.name = "TravelMonk"
 include(":app")
 
 // Core Modules
+include(":core:logger")
 include(":core:tokens")
 include(":core:navigation")
 include(":core:design-system")
@@ -77,6 +78,7 @@ include(":core:common")
 include(":core:model")
 include(":core:network")
 include(":core:database")
+include(":core:testing")
 
 // Feature API Modules (contracts: nav keys + navigator interfaces)
 include(":feature:transport-api")

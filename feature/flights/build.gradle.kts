@@ -12,4 +12,10 @@ dependencies {
     implementation(project(":feature:bookings-api"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+
+    testImplementation(project(":core:testing"))
+    testImplementation(libs.junit4)
+    testImplementation(libs.turbine)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
 }

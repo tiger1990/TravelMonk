@@ -19,7 +19,16 @@
       "Bash(./gradlew :feature:flights:compileDebugKotlin :feature:stays:compileDebugKotlin :feature:experiences:compileDebugKotlin :feature:bookings:compileDebugKotlin :feature:services:compileDebugKotlin :feature:home:compileDebugKotlin)",
       "Bash(./gradlew :feature:flights:compileDebugKotlin :feature:bookings:compileDebugKotlin)",
       "Bash(./gradlew assembleDebug)",
-      "Bash(./gradlew :core:common:compileDebugKotlin --quiet)"
+      "Bash(./gradlew :core:common:compileDebugKotlin --quiet)",
+      "Bash(./gradlew :core:logger:compileDebugKotlin --no-daemon)",
+      "Bash(./gradlew :core:logger:compileDebugKotlin --no-daemon --no-configuration-cache)",
+      "Bash(./gradlew :core:logger:clean --no-daemon --no-configuration-cache)",
+      "Bash(./gradlew :core:logger:compileDebugKotlin --no-daemon --no-configuration-cache --rerun-tasks --info)",
+      "Bash(./gradlew :core:logger:test --no-daemon --no-configuration-cache)",
+      "Bash(./gradlew :core:logger:test --no-daemon --tests \"com.travelmonk.core.logger.TravelMonkLoggerTest.ERROR log triggers sendCritical on remote sender\")",
+      "Bash(./gradlew :core:logger:test --no-daemon --tests \"com.travelmonk.core.logger.TravelMonkLoggerTest.ERROR log triggers sendCritical on remote sender\" --no-configuration-cache)",
+      "Bash(find /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/logger/build -name TEST-*.xml)",
+      "Bash(grep -r \"tests=\" /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/logger/build/test-results/testDebugUnitTest/*.xml)"
     ],
     "deny": [
       "Bash(rm -rf:*)",
