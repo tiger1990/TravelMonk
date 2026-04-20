@@ -14,7 +14,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -23,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.travelmonk.core.design.system.color.TravelYellow
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.feature.stays.mvi.*
@@ -66,7 +66,7 @@ fun StaySearchContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(TravelMonkTheme.colors.secondary, RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+                .background(TravelMonkTheme.colors.secondary, RoundedCornerShape(bottomStart = TravelMonkTheme.radius.extraLarge, bottomEnd = TravelMonkTheme.radius.extraLarge))
                 .padding(top = 40.dp, start = TravelMonkTheme.spacing.large, end = TravelMonkTheme.spacing.large, bottom = 60.dp)
         ) {
             Column {
@@ -107,10 +107,10 @@ fun StaySearchContent(
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(60.dp)
+                                .size(TravelMonkTheme.dimensions.categoryIconSize)
                                 .background(
                                     if (isSelected) TravelMonkTheme.colors.secondary else TravelMonkTheme.colors.surface,
-                                    RoundedCornerShape(16.dp)
+                                    RoundedCornerShape(TravelMonkTheme.radius.medium)
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
@@ -210,19 +210,19 @@ fun StayItem(title: String, location: String, price: String, rating: String, ima
                 AsyncImage(
                     model = imageUrl,
                     contentDescription = null,
-                    modifier = Modifier.fillMaxWidth().height(160.dp),
+                    modifier = Modifier.fillMaxWidth().height(TravelMonkTheme.dimensions.imageCardHeight),
                     contentScale = ContentScale.Crop
                 )
                 Box(
                     modifier = Modifier
                         .padding(TravelMonkTheme.spacing.small)
-                        .background(TravelMonkTheme.colors.surface.copy(alpha = 0.9f), RoundedCornerShape(8.dp))
+                        .background(TravelMonkTheme.colors.surface.copy(alpha = 0.9f), RoundedCornerShape(TravelMonkTheme.radius.small))
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                         .align(Alignment.TopEnd)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(painter = painterResource(TravelMonkIcons.Star), contentDescription = null, tint = Color(0xFFFFC107), modifier = Modifier.size(14.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(painter = painterResource(TravelMonkIcons.Star), contentDescription = null, tint = TravelYellow, modifier = Modifier.size(14.dp))
+                        Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.extraSmall))
                         Text(text = rating, style = TravelMonkTheme.typography.caption, fontWeight = FontWeight.Bold)
                     }
                 }
@@ -232,7 +232,7 @@ fun StayItem(title: String, location: String, price: String, rating: String, ima
                     Text(text = title, style = TravelMonkTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
                     Text(text = "$price / night", color = TravelMonkTheme.colors.secondary, style = TravelMonkTheme.typography.bodyLarge, fontWeight = FontWeight.ExtraBold)
                 }
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.extraSmall))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(painter = painterResource(TravelMonkIcons.LocationOn), contentDescription = null, modifier = Modifier.size(14.dp), tint = TravelMonkTheme.colors.grayText)
                     Spacer(modifier = Modifier.width(4.dp))

@@ -32,7 +32,8 @@
       "Bash(./gradlew :core:logger:test --no-daemon)",
       "Bash(./gradlew :core:logger:test 2>&1)",
       "Bash(find /Users/deepakpanwar/Documents/004_PersonalDev/TravelMonk/core/logger/build/reports/tests -name *.xml)",
-      "Bash(./gradlew :core:logger:testDebugUnitTest --rerun-tasks)"
+      "Bash(./gradlew :core:logger:testDebugUnitTest --rerun-tasks)",
+      "mcp__plugin_everything-claude-code_exa__web_fetch_exa"
     ],
     "deny": [
       "Bash(rm -rf:*)",

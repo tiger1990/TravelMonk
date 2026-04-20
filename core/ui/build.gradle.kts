@@ -8,5 +8,5 @@ android {
 }
 
 dependencies {
-    // dependencies to add
+    implementation(project(":core:design-system"))
 }

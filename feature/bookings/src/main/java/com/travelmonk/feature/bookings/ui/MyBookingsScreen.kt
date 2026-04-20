@@ -10,7 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import com.travelmonk.core.design.system.color.WarningAmber
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -107,7 +107,7 @@ fun BookingCard(booking: BookingItem) {
                 Text(
                     text = booking.status,
                     style = TravelMonkTheme.typography.caption,
-                    color = if (booking.status == "Confirmed") Color(0xFF4CAF50) else Color(0xFFFFA000),
+                    color = if (booking.status == "Confirmed") TravelMonkTheme.colors.tertiary else WarningAmber,
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(text = booking.price, style = TravelMonkTheme.typography.labelMedium, fontWeight = FontWeight.ExtraBold)

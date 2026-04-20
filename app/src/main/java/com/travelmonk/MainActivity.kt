@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
+import com.travelmonk.core.common.config.FeatureFlags
 import com.travelmonk.core.navigation.NavEntryInstaller
 import com.travelmonk.core.navigation.NavEntryInstallerSet
 import com.travelmonk.navigation.GlobalNavigator
@@ -22,6 +23,7 @@ class MainActivity : ComponentActivity() {
 
     // Each feature module contributes its own NavEntryInstaller via @IntoSet into ActivityRetainedComponent
     @Inject lateinit var navEntryInstallers: Set<@JvmSuppressWildcards NavEntryInstaller>
+    @Inject lateinit var featureFlags: FeatureFlags
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +33,8 @@ class MainActivity : ComponentActivity() {
                 TravelMonkApp(
                     globalNavigator = globalNavigator,
                     registry = navigationRegistry,
-                    navEntryInstallers = NavEntryInstallerSet(navEntryInstallers)
+                    navEntryInstallers = NavEntryInstallerSet(navEntryInstallers),
+                    featureFlags = featureFlags
                 )
             }
         }

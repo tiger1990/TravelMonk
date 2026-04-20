@@ -27,6 +27,8 @@ val SurfaceDark = Color(0xFF1E1E1E)
 val OnBackgroundLight = Color(0xFF000000)
 val OnBackgroundDark = Color(0xFFFFFFFF)
 val GrayText = Color(0xFF8E8E93)
+val SurfaceVariantLight = Color(0xFFF1F4F8)
+val SurfaceVariantDark = Color(0xFF2D2F36)
 
 /**
  * Semantic color contract for the TravelMonk design system.
@@ -48,6 +50,7 @@ data class TravelMonkColors(
     val onBackground: Color,
     val onSurface: Color,
     val grayText: Color,
+    val surfaceVariant: Color,
     val isLight: Boolean
 )
 
@@ -81,6 +84,7 @@ val LocalTravelMonkColors = staticCompositionLocalOf {
         onBackground = OnBackgroundLight,
         onSurface = OnBackgroundLight,
         grayText = GrayText,
+        surfaceVariant = SurfaceVariantLight,
         isLight = true
     )
 }

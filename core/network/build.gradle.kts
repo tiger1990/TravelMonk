@@ -8,6 +8,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:common"))
+
     // Exposed via api so consumers (feature modules) can use Retrofit service
     // interfaces and OkHttp types without re-declaring them as direct dependencies.
     api(libs.retrofit)

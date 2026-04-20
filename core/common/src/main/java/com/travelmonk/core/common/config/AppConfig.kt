@@ -6,4 +6,5 @@ package com.travelmonk.core.common.config
  */
 interface AppConfig {
     val isDebug: Boolean
+    val baseUrl: String
 }

@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.travelmonk.core.design.system.color.TravelYellow
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.model.BookingType
 import com.travelmonk.core.tokens.TravelMonkIcons
@@ -160,7 +161,7 @@ fun ExperienceCard(item: Experience, onBook: () -> Unit) {
                         Icon(
                             painter = painterResource(TravelMonkIcons.Star),
                             contentDescription = null,
-                            tint = Color(0xFFFFC107),
+                            tint = TravelYellow,
                             modifier = Modifier.size(TravelMonkTheme.dimensions.iconSmall)
                         )
                         Text(

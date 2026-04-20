@@ -27,6 +27,8 @@ import com.travelmonk.core.design.system.color.TravelGreen
 import com.travelmonk.core.design.system.color.TravelMonkColors
 import com.travelmonk.core.design.system.color.TravelOrange
 import com.travelmonk.core.design.system.color.GrayText
+import com.travelmonk.core.design.system.color.SurfaceVariantDark
+import com.travelmonk.core.design.system.color.SurfaceVariantLight
 import com.travelmonk.core.design.system.color.OnBackgroundDark
 import com.travelmonk.core.design.system.color.OnBackgroundLight
 import com.travelmonk.core.design.system.shapes.LocalRadius
@@ -91,6 +93,7 @@ fun TravelMonkTheme(
         onBackground = if (darkTheme) OnBackgroundDark else OnBackgroundLight,
         onSurface = if (darkTheme) OnBackgroundDark else OnBackgroundLight,
         grayText = GrayText,
+        surfaceVariant = if (darkTheme) SurfaceVariantDark else SurfaceVariantLight,
         isLight = !darkTheme
     )
 

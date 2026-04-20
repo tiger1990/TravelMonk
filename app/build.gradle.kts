@@ -58,11 +58,16 @@ android {
         }
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     buildTypes {
         debug {
             // Allows installing debug and release versions on the same device
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-DEBUG"
+            buildConfigField("String", "BASE_URL", "\"https://dev-api.travelmonk.com/\"")
         }
 
         create("staging") {
@@ -70,6 +75,7 @@ android {
             initWith(getByName("release"))
             applicationIdSuffix = ".staging"
             matchingFallbacks += listOf("release")
+            buildConfigField("String", "BASE_URL", "\"https://staging-api.travelmonk.com/\"")
         }
 
         release {
@@ -82,6 +88,7 @@ android {
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
+            buildConfigField("String", "BASE_URL", "\"https://api.travelmonk.com/\"")
         }
     }
 

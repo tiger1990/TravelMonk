@@ -18,7 +18,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
@@ -85,10 +84,10 @@ fun HomeTopBar(onSearchClick: () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = TravelMonkTheme.colors.primary,
-        shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
+        shape = RoundedCornerShape(bottomStart = TravelMonkTheme.radius.extraLarge, bottomEnd = TravelMonkTheme.radius.extraLarge)
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 24.dp, vertical = 32.dp)
+            modifier = Modifier.padding(horizontal = TravelMonkTheme.spacing.large, vertical = TravelMonkTheme.spacing.extraLarge)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -109,12 +108,12 @@ fun HomeTopBar(onSearchClick: () -> Unit) {
                 }
                 Icon(
                     painter = painterResource(TravelMonkIcons.Notifications),
-                    contentDescription = null,
+                    contentDescription = "Notifications",
                     tint = Color.White,
-                    modifier = Modifier.size(28.dp)
+                    modifier = Modifier.size(TravelMonkTheme.dimensions.iconMedium)
                 )
             }
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.large))
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -126,7 +125,7 @@ fun HomeTopBar(onSearchClick: () -> Unit) {
                     modifier = Modifier.padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(painter = painterResource(TravelMonkIcons.Search), contentDescription = null, tint = Color.Gray)
+                    Icon(painter = painterResource(TravelMonkIcons.Search), contentDescription = "Search", tint = Color.Gray)
                     Spacer(modifier = Modifier.width(12.dp))
                     Text("Search destinations, hotels...", color = Color.Gray)
                 }
@@ -154,7 +153,7 @@ fun BannerSection(banners: List<HomeBanner>, onBannerClick: (String) -> Unit) {
                         .width(300.dp)
                         .height(150.dp)
                         .clickable { onBannerClick(banner.id) },
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(TravelMonkTheme.radius.medium)
                 ) {
                     Box {
                         AsyncImage(
@@ -173,8 +172,8 @@ fun BannerSection(banners: List<HomeBanner>, onBannerClick: (String) -> Unit) {
                                 .align(Alignment.BottomStart)
                                 .padding(16.dp)
                         ) {
-                            Text(text = banner.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                            Text(text = banner.description, color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
+                            Text(text = banner.title, color = Color.White, style = TravelMonkTheme.typography.titleLarge)
+                            Text(text = banner.description, color = Color.White.copy(alpha = 0.8f), style = TravelMonkTheme.typography.labelMedium)
                         }
                     }
                 }
@@ -194,7 +193,7 @@ fun CategorySection(categories: List<HomeCategory>) {
                     Box(
                         modifier = Modifier
                             .size(60.dp)
-                            .background(TravelMonkTheme.colors.primary.copy(alpha = 0.1f), RoundedCornerShape(16.dp)),
+                            .background(TravelMonkTheme.colors.primary.copy(alpha = 0.1f), RoundedCornerShape(TravelMonkTheme.radius.medium)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(painter = painterResource(category.icon), contentDescription = null, tint = TravelMonkTheme.colors.primary)
@@ -213,7 +212,7 @@ fun PromoSection() {
         modifier = Modifier
             .padding(24.dp)
             .fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(TravelMonkTheme.radius.medium),
         colors = CardDefaults.cardColors(containerColor = TravelMonkTheme.colors.secondary.copy(alpha = 0.1f))
     ) {
         Row(

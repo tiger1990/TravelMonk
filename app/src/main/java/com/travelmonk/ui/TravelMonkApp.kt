@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.travelmonk.core.common.config.FeatureFlags
 import com.travelmonk.core.navigation.NavEntryInstallerSet
 import com.travelmonk.navigation.GlobalNavigator
 import com.travelmonk.navigation.NavigationRegistry
@@ -22,7 +23,8 @@ import com.travelmonk.ui.navigation.*
 fun TravelMonkApp(
     globalNavigator: GlobalNavigator,
     registry: NavigationRegistry,
-    navEntryInstallers: NavEntryInstallerSet
+    navEntryInstallers: NavEntryInstallerSet,
+    featureFlags: FeatureFlags
 ) {
     val navigationState = rememberNavigationState(registry, globalNavigator)
 
@@ -36,14 +38,14 @@ fun TravelMonkApp(
         }
     }
 
-    val bottomBarItems = listOf(
-        BottomBarItem.Home,
-        BottomBarItem.Transport,
-        BottomBarItem.Stays,
-        BottomBarItem.Experiences,
-        BottomBarItem.Services,
-        BottomBarItem.Bookings
-    )
+    val bottomBarItems = buildList {
+        add(BottomBarItem.Home)
+        if (featureFlags.isTransportEnabled) add(BottomBarItem.Transport)
+        if (featureFlags.isStaysEnabled) add(BottomBarItem.Stays)
+        if (featureFlags.isExperiencesEnabled) add(BottomBarItem.Experiences)
+        if (featureFlags.isServicesEnabled) add(BottomBarItem.Services)
+        add(BottomBarItem.Bookings)
+    }
 
     Surface(
         color = TravelMonkTheme.colors.primary

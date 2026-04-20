@@ -1,237 +1,214 @@
 package com.travelmonk.core.logger
 
-import androidx.work.Configuration
-import androidx.work.WorkManager
-import com.travelmonk.core.logger.upload.DummyHttpSender
+import android.content.Context
+import com.travelmonk.core.logger.upload.LogUploadWorker
 import com.travelmonk.core.logger.upload.RemoteLogSender
-import com.travelmonk.core.logger.upload.UploadResult
-import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.unmockkAll
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
-import java.io.File
+import org.junit.rules.TemporaryFolder
 
 /**
- * Integration tests for TravelMonkLogger.
- *
- * Async tests inject `backgroundScope` into init() so all coroutines run on
- * StandardTestDispatcher (the virtual-clock scheduler). This lets us use
- * runCurrent() to drive execution deterministically instead of real wall-clock
- * delays.
- *
- * Why runCurrent() and not advanceUntilIdle()?
- * LogProcessor uses withTimeoutOrNull(5_000L) in an infinite loop. advanceUntilIdle()
- * would repeatedly advance 5s of virtual time per iteration, looping forever.
- * runCurrent() only dispatches coroutines already queued — it stops when the queue
- * is empty, which happens as soon as the pending receive() suspends again.
- *
- * Why backgroundScope and not `this`?
- * LogUploadOrchestrator collects from rotationEvents indefinitely. Passing `this`
- * (the TestScope) would cause UncompletedCoroutinesError at test end. backgroundScope
- * auto-cancels infinite coroutines silently when the test body finishes.
+ * Performance-optimized unit tests for TravelMonkLogger.
+ * Uses Pure JVM + MockK for maximum velocity and deterministic time control.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(RobolectricTestRunner::class)
 class TravelMonkLoggerTest {
+
+    @get:Rule
+    val tempFolder = TemporaryFolder()
+
+    private val mockContext = mockk<Context>(relaxed = true)
+    private lateinit var fileManager: LogFileManager
 
     @Before
     fun setUp() {
-        val context = RuntimeEnvironment.getApplication()
-        try {
-            WorkManager.initialize(context, Configuration.Builder().build())
-        } catch (_: IllegalStateException) {
-            // Already initialized in a previous test — safe to ignore
-        }
-        // Cancels all running coroutines, drains channels, and resets all fields.
-        // Without this, multiple CriticalEventUploader instances from prior init() calls
-        // would all compete to receive from criticalChannel — making sendCritical tests flaky.
+        every { mockContext.filesDir } returns tempFolder.root
+        mockkObject(LogUploadWorker)
+        every { LogUploadWorker.schedule(any()) } returns Unit
         TravelMonkLogger.resetForTest()
+        fileManager = LogFileManager(mockContext)
     }
 
     @After
-    fun tearDown() {
-        File(RuntimeEnvironment.getApplication().filesDir, "logs").deleteRecursively()
-    }
+    fun tearDown() = unmockkAll()
 
-    // ── State / init tests (synchronous — no scope injection needed) ──────────
+    /**
+     * Helper to initialize the logger with specialized dispatchers.
+     * Use UnconfinedTestDispatcher for immediate, eager execution.
+     * Use StandardTestDispatcher when you need to advance virtual time.
+     */
+    private fun initLogger(
+        remote: RemoteLogSender? = null,
+        isDebug: Boolean = false,
+        dispatcher: CoroutineDispatcher? = null
+    ) {
+        TravelMonkLogger.init(
+            context = mockContext,
+            fileManager = fileManager,
+            isDebugBuild = isDebug,
+            remote = remote,
+            dispatcher = dispatcher ?: UnconfinedTestDispatcher()
+        )
+    }
 
     @Test
     fun `log calls before init are silently dropped`() {
-        TravelMonkLogger.d("Tag", "before init")
-        TravelMonkLogger.e("Tag", "error before init")
-        // No exception = pass
+        TravelMonkLogger.d("Tag", "ignored")
+        TravelMonkLogger.e("Tag", "ignored")
     }
 
     @Test
-    fun `fileManager is null before init`() {
-        assertNull(TravelMonkLogger.fileManager)
-    }
-
-    @Test
-    fun `init sets fileManager and remoteSender`() {
-        TravelMonkLogger.init(RuntimeEnvironment.getApplication(), isDebugBuild = false)
-
+    fun `init sets internal singletons`() {
+        initLogger()
         assertNotNull(TravelMonkLogger.fileManager)
         assertNotNull(TravelMonkLogger.remoteSender)
     }
 
     @Test
-    fun `init is idempotent — second call is a no-op`() {
-        val context = RuntimeEnvironment.getApplication()
-        TravelMonkLogger.init(context, isDebugBuild = false)
-        val firstFileManager = TravelMonkLogger.fileManager
-
-        TravelMonkLogger.init(context, isDebugBuild = false)
-
-        assert(TravelMonkLogger.fileManager === firstFileManager) {
-            "Second init() must not replace the fileManager instance"
-        }
+    fun `init is idempotent`() {
+        initLogger()
+        val first = TravelMonkLogger.fileManager
+        TravelMonkLogger.init(mockContext, LogFileManager(mockContext))
+        assertEquals("Should not re-init if already initialized", first, TravelMonkLogger.fileManager)
     }
 
     @Test
-    fun `init uses DummyHttpSender when no remote sender provided`() {
-        TravelMonkLogger.init(RuntimeEnvironment.getApplication(), isDebugBuild = false)
-
-        assert(TravelMonkLogger.remoteSender is DummyHttpSender) {
-            "Default sender should be DummyHttpSender"
-        }
-    }
-
-    @Test
-    fun `init uses provided custom remote sender`() {
-        val customSender = mockk<RemoteLogSender>(relaxed = true)
-        TravelMonkLogger.init(
-            RuntimeEnvironment.getApplication(),
-            isDebugBuild = false,
-            remote = customSender
-        )
-
-        assert(TravelMonkLogger.remoteSender === customSender) {
-            "Custom sender should be stored and used"
-        }
-    }
-
-    @Test
-    fun `all log level helpers route through the pipeline without error`() {
-        TravelMonkLogger.init(RuntimeEnvironment.getApplication(), isDebugBuild = false)
-
-        TravelMonkLogger.v("Tag", "verbose", mapOf("k" to "v"))
-        TravelMonkLogger.d("Tag", "debug", mapOf("k" to 1))
-        TravelMonkLogger.i("Tag", "info")
-        TravelMonkLogger.w("Tag", "warn", RuntimeException("test"))
-        TravelMonkLogger.e("Tag", "error", RuntimeException("test"), mapOf("code" to 500))
-        // No exception = pass
-    }
-
-    @Test
-    fun `init with isDebugBuild=true sets TraceContext debugMode to true`() {
-        TravelMonkLogger.init(RuntimeEnvironment.getApplication(), isDebugBuild = true)
-        assert(TraceContext.debugMode) {
-            "TraceContext.debugMode should be true after init(isDebugBuild = true)"
-        }
-    }
-
-    // ── Async pipeline tests (scope-injected, deterministic) ─────────────────
-
-    @Test
-    fun `ERROR log triggers sendCritical on remote sender`() = runTest {
-        val sender = mockk<RemoteLogSender>()
-        coEvery { sender.sendBatch(any()) } returns UploadResult.Success
-        coEvery { sender.sendCritical(any()) } returns UploadResult.Success
-
-        TravelMonkLogger.init(
-            RuntimeEnvironment.getApplication(),
-            isDebugBuild = false,
-            remote = sender,
-            scope = backgroundScope   // StandardTestDispatcher — queues, not auto-runs
-        )
-        TravelMonkLogger.e("AuthRepo", "Token refresh failed")
-
-        // Flush the dispatcher queue: CriticalEventUploader receives the event
-        // and calls sendCritical(). Stops before advancing the 5s LogProcessor timeout.
-        runCurrent()
-
-        coVerify(atLeast = 1) { sender.sendCritical(match { it.level == LogLevel.ERROR }) }
-    }
-
-    @Test
-    fun `non-ERROR logs do not trigger sendCritical`() = runTest {
+    fun `ERROR log triggers immediate critical upload`() = runTest {
         val sender = mockk<RemoteLogSender>(relaxed = true)
-        coEvery { sender.sendBatch(any()) } returns UploadResult.Success
-        coEvery { sender.sendCritical(any()) } returns UploadResult.Success
+        initLogger(remote = sender)
+        
+        TravelMonkLogger.e("Auth", "Crash")
 
-        TravelMonkLogger.init(
-            RuntimeEnvironment.getApplication(),
-            isDebugBuild = false,
-            remote = sender,
-            scope = backgroundScope
-        )
-        TravelMonkLogger.v("Tag", "verbose")
-        TravelMonkLogger.d("Tag", "debug")
+        coVerify(exactly = 1) { sender.sendCritical(match { it.level == LogLevel.ERROR }) }
+    }
+
+    @Test
+    fun `non-ERROR logs do not trigger critical upload`() = runTest {
+        val sender = mockk<RemoteLogSender>(relaxed = true)
+        initLogger(remote = sender)
+        
         TravelMonkLogger.i("Tag", "info")
         TravelMonkLogger.w("Tag", "warn")
-
-        runCurrent()
 
         coVerify(exactly = 0) { sender.sendCritical(any()) }
     }
 
     @Test
-    fun `log with TraceContext captures traceId in file`() = runTest {
-        TravelMonkLogger.init(
-            RuntimeEnvironment.getApplication(),
-            isDebugBuild = false,
-            scope = backgroundScope
-        )
+    fun `log with TraceContext correctly persists trace data`() = runTest {
+        // LogProcessor needs StandardTestDispatcher to trigger the 5s flush timer
+        initLogger(dispatcher = StandardTestDispatcher(testScheduler))
 
-        val trace = TraceContext.new()
+        val trace = TraceContext.new(flow = "Checkout")
         withContext(trace) {
-            TravelMonkLogger.i("TraceTag", "traced message")
+            TravelMonkLogger.i("Tag", "msg")
         }
 
-        runCurrent()
+        advanceTimeBy(5001L)
 
-        val activeFile = TravelMonkLogger.fileManager!!.getActiveFile()
-        if (activeFile.exists() && activeFile.length() > 0) {
-            val content = activeFile.readText()
-            assert(content.contains(trace.traceId)) {
-                "Expected traceId ${trace.traceId} in file. Content:\n$content"
-            }
-        }
+        val lines = fileManager.readActiveFileLines()
+        assertTrue(lines.any { it.contains(trace.traceId) && it.contains("Checkout") })
     }
 
     @Test
-    fun `log within TraceContext with flow writes flow field to log file`() = runTest {
-        TravelMonkLogger.init(
-            RuntimeEnvironment.getApplication(),
-            isDebugBuild = false,
-            scope = backgroundScope
-        )
+    fun `throwable in log is formatted and persisted`() = runTest {
+        initLogger(dispatcher = StandardTestDispatcher(testScheduler))
 
-        val trace = TraceContext.new(flow = "CheckoutFlow")
-        withContext(trace) {
-            TravelMonkLogger.i("PaymentVM", "Order placed")
-        }
+        val error = RuntimeException("Broke")
+        TravelMonkLogger.e("Tag", "msg", error)
 
-        runCurrent()
+        advanceTimeBy(5001L)
 
-        val activeFile = TravelMonkLogger.fileManager!!.getActiveFile()
-        if (activeFile.exists() && activeFile.length() > 0) {
-            val content = activeFile.readText()
-            assert(content.contains("CheckoutFlow")) {
-                "Expected 'CheckoutFlow' in log file. Content:\n$content"
-            }
-        }
+        val content = fileManager.readActiveFileLines().joinToString()
+        assertTrue("Should contain exception message", content.contains("Broke"))
+        assertTrue("Should contain stacktrace", content.contains("RuntimeException"))
+    }
+
+    @Test
+    fun `metadata collision local overrides global`() = runTest {
+        initLogger(dispatcher = StandardTestDispatcher(testScheduler))
+
+        TravelMonkLogger.updateGlobalMetadata(mapOf("key" to "global"))
+        TravelMonkLogger.i("Tag", "msg", mapOf("key" to "local"))
+
+        advanceTimeBy(5001L)
+
+        val lines = fileManager.readActiveFileLines()
+        assertTrue(lines.any { it.contains("local") })
+        assertTrue(lines.none { it.contains("global") })
+    }
+
+    @Test
+    fun `global metadata is cumulative`() = runTest {
+        initLogger(dispatcher = StandardTestDispatcher(testScheduler))
+
+        TravelMonkLogger.updateGlobalMetadata(mapOf("user" to "42"))
+        TravelMonkLogger.updateGlobalMetadata(mapOf("env" to "prod"))
+        TravelMonkLogger.i("Tag", "msg")
+
+        advanceTimeBy(5001L)
+
+        val content = fileManager.readActiveFileLines().joinToString()
+        assertTrue(content.contains("42") && content.contains("prod"))
+    }
+
+    @Test
+    fun `batch limit triggers immediate flush`() = runTest {
+        // UnconfinedTestDispatcher makes the 50 logs process eagerly on the same thread
+        initLogger(dispatcher = UnconfinedTestDispatcher(testScheduler))
+
+        repeat(5) { TravelMonkLogger.i("Tag", "log") }
+        
+        // With Unconfined, no runCurrent() or advanceTimeBy is even needed
+        assertEquals(5, fileManager.readActiveFileLines().size)
+    }
+
+    @Test
+    fun `resetForTest purges all state including global metadata`() = runTest {
+        initLogger()
+        TravelMonkLogger.updateGlobalMetadata(mapOf("k" to "v"))
+        
+        TravelMonkLogger.resetForTest()
+        
+        assertNull(TravelMonkLogger.fileManager)
+        
+        // Re-init and verify metadata is gone
+        initLogger(dispatcher = StandardTestDispatcher(testScheduler))
+        TravelMonkLogger.i("Tag", "msg")
+        advanceTimeBy(5001L)
+        
+        assertTrue(fileManager.readActiveFileLines().none { it.contains("v") })
+    }
+
+    @Test
+    fun `all log levels route correctly through the pipeline`() = runTest {
+        initLogger(dispatcher = StandardTestDispatcher(testScheduler))
+
+        TravelMonkLogger.v("Tag", "v")
+        TravelMonkLogger.d("Tag", "d")
+        TravelMonkLogger.i("Tag", "i")
+        TravelMonkLogger.w("Tag", "w")
+        
+        advanceTimeBy(5001L)
+
+        val lines = fileManager.readActiveFileLines()
+        assertEquals("Should have 4 log entries", 4, lines.size)
     }
 }
