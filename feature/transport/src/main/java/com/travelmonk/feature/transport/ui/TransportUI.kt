@@ -1,16 +1,15 @@
 package com.travelmonk.feature.transport.ui
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.tokens.TravelMonkIcons
 
@@ -31,7 +30,7 @@ fun TransportSearchCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(TravelMonkTheme.radius.large),
         colors = CardDefaults.cardColors(containerColor = TravelMonkTheme.colors.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = TravelMonkTheme.dimensions.cardElevation)
     ) {
         Column(modifier = Modifier.padding(TravelMonkTheme.spacing.large)) {
             Text(
@@ -75,7 +74,7 @@ fun TransportSearchCard(
                     text = buttonText,
                     style = TravelMonkTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = TravelMonkTheme.colors.onPrimary
                 )
             }
         }
@@ -94,7 +93,7 @@ fun SearchField(
             painter = painterResource(iconRes),
             contentDescription = null,
             tint = accentColor,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(TravelMonkTheme.dimensions.iconMedium)
         )
         Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.medium))
         Column {

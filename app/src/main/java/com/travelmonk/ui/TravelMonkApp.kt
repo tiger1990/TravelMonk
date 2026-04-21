@@ -7,6 +7,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -51,6 +52,7 @@ fun TravelMonkApp(
         color = TravelMonkTheme.colors.primary
     ) {
         Scaffold(
+            contentWindowInsets = WindowInsets(0),
             bottomBar = {
                 val currentKey = navigationState.activeBackStack.lastOrNull()
                 // Show bottom bar only when on a root tab destination

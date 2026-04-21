@@ -44,7 +44,10 @@ class FlightViewModel @Inject constructor(
                     setState { copy(isLoading = true, error = null) }
                     when (val result = searchFlightsUseCase(intent.from, intent.to)) {
                         is DataResult.Success -> setState { copy(flights = result.data, isLoading = false) }
-                        is DataResult.Error -> setState { copy(error = result.exception.message, isLoading = false) }
+                        is DataResult.Error -> {
+                            setState { copy(error = result.exception.message, isLoading = false) }
+                            setEffect(FlightEffect.ShowError(result.exception.message ?: "Failed to load flights"))
+                        }
                         is DataResult.Loading -> Unit
                     }
                 }

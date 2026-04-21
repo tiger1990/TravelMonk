@@ -10,7 +10,7 @@ import dagger.multibindings.IntoSet
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class HomeNavHandlerModule {
+internal abstract class HomeNavHandlerModule {
 
     @Binds
     @IntoSet

@@ -13,7 +13,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class ServiceModule {
+internal abstract class ServiceModule {
 
     /**
      * Binds [ServiceRepositoryImpl] as the [ServiceRepository] implementation.

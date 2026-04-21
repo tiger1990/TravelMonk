@@ -17,7 +17,7 @@ class ServicesViewModel @Inject constructor(
 ) : BaseViewModel<ServicesState, ServicesIntent, ServicesEffect>() {
     override fun createInitialState(): ServicesState = ServicesState()
 
-    init {
+    override suspend fun initialDataLoad() {
         loadServices()
     }
 

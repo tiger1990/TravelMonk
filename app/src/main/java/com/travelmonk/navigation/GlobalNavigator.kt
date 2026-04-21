@@ -16,8 +16,19 @@ sealed interface NavCommand {
 
 /**
  * App-layer implementation of [NavigationBus].
- * Uses a SharedFlow to buffer navigation events, preventing "Event Loss" 
- * during configuration changes or when the app is in the background.
+ *
+ * Navigation commands are user-initiated, exactly-once actions. The buffer strategy
+ * is intentionally [BufferOverflow.DROP_LATEST]:
+ *
+ * - [BufferOverflow.DROP_LATEST] drops the newest event on overflow — a rapid duplicate
+ *   tap is discarded rather than the user's original intent.
+ * - [BufferOverflow.DROP_OLDEST] would drop the first (intentional) action — wrong for
+ *   navigation commands where the earliest event carries the user's actual intent.
+ *
+ * Buffer capacity of 1 is sufficient: the main-thread collector in [NavigationState]
+ * processes events faster than a human can generate them. The buffer exists only as a
+ * safety net for the brief window between app start and the LaunchedEffect collector
+ * becoming active.
  */
 @Stable // Singleton — navEvents SharedFlow reference never changes; safe to skip recomposition
 @Singleton
@@ -25,7 +36,7 @@ class GlobalNavigator @Inject constructor() : NavigationBus {
 
     private val _navEvents = MutableSharedFlow<NavCommand>(
         extraBufferCapacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
+        onBufferOverflow = BufferOverflow.DROP_LATEST
     )
     val navEvents = _navEvents.asSharedFlow()
 

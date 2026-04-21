@@ -16,9 +16,10 @@ import javax.inject.Inject
 class ExperienceViewModel @Inject constructor(
     private val getExperiencesUseCase: GetExperiencesUseCase
 ) : BaseViewModel<ExperienceState, ExperienceIntent, ExperienceEffect>() {
+
     override fun createInitialState(): ExperienceState = ExperienceState()
 
-    init {
+    override suspend fun initialDataLoad() {
         loadItems(ExperienceCategory.PACKAGES)
     }
 
@@ -41,7 +42,10 @@ class ExperienceViewModel @Inject constructor(
             setState { copy(isLoading = true) }
             when (val result = getExperiencesUseCase(category)) {
                 is DataResult.Success -> setState { copy(items = result.data, isLoading = false) }
-                is DataResult.Error -> setState { copy(isLoading = false) }
+                is DataResult.Error -> {
+                    setState { copy(isLoading = false, error = result.exception.message) }
+                    setEffect(ExperienceEffect.ShowError(result.exception.message ?: "Failed to load experiences"))
+                }
                 is DataResult.Loading -> Unit
             }
         }

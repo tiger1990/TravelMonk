@@ -13,7 +13,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class HomeModule {
+internal abstract class HomeModule {
 
     /**
      * Binds [HomeRepositoryImpl] as the [HomeRepository] implementation.

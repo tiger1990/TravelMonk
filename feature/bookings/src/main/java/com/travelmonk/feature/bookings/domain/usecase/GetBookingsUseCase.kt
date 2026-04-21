@@ -8,6 +8,5 @@ import javax.inject.Inject
 class GetBookingsUseCase @Inject constructor(
     private val repository: BookingRepository
 ) {
-    suspend operator fun invoke(): DataResult<List<Booking>> =
-        repository.getBookings()
+    suspend operator fun invoke(): DataResult<List<Booking>> = repository.getBookings()
 }

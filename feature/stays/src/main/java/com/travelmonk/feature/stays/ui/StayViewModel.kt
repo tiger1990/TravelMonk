@@ -22,12 +22,15 @@ class StayViewModel @Inject constructor(
             is StayIntent.SearchStays -> {
                 viewModelScope.launch {
                     setState { copy(isLoading = true) }
-                    when (searchStaysUseCase(currentState.location)) {
+                    when (val result = searchStaysUseCase(currentState.location)) {
                         is DataResult.Success -> {
                             setState { copy(isLoading = false) }
                             setEffect(StayEffect.NavigateToResults(currentState.location))
                         }
-                        is DataResult.Error -> setState { copy(isLoading = false) }
+                        is DataResult.Error -> {
+                            setState { copy(isLoading = false, error = result.exception.message) }
+                            setEffect(StayEffect.ShowError(result.exception.message ?: "Failed to search stays"))
+                        }
                         is DataResult.Loading -> Unit
                     }
                 }

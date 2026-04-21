@@ -1,11 +1,15 @@
 package com.travelmonk.core.common.mvi
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 interface UiState
 interface UiIntent
@@ -16,7 +20,21 @@ abstract class BaseViewModel<S : UiState, I : UiIntent, E : UiEffect> : ViewMode
     abstract fun createInitialState(): S
 
     private val _uiState = MutableStateFlow(initialState)
-    val uiState: StateFlow<S> = _uiState.asStateFlow()
+    //val uiState: StateFlow<S> = _uiState.asStateFlow()
+
+    val uiState: StateFlow<S> by lazy {
+        _uiState.onStart {
+            viewModelScope.launch {
+                initialDataLoad()
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = initialState
+        )
+    }
+
+    open suspend fun initialDataLoad() {}
 
     /**
      *   private val _effect = MutableSharedFlow<E>()

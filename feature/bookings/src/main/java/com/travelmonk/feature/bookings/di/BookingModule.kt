@@ -13,7 +13,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class BookingModule {
+internal abstract class BookingModule {
 
     /**
      * Binds [BookingRepositoryImpl] as the [BookingRepository] implementation.

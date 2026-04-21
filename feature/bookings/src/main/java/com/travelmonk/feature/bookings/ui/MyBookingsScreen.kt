@@ -1,5 +1,6 @@
 package com.travelmonk.feature.bookings.ui
 
+import android.content.res.Configuration
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -19,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.model.BookingType
 import com.travelmonk.core.tokens.TravelMonkIcons
+import com.travelmonk.core.ui.TravelMonkTopBar
 import com.travelmonk.feature.bookings.domain.model.BookingItem
 import com.travelmonk.feature.bookings.mvi.BookingState
 import com.travelmonk.feature.bookingsapi.navigator.BookingNavigator
@@ -30,37 +32,40 @@ fun MyBookingsScreen(
     viewModel: BookingViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    MyBookingsContent(state = state)
+    Scaffold(
+        topBar = {
+            TravelMonkTopBar(
+                title = { Text("My Bookings") },
+                containerColor = TravelMonkTheme.colors.primary
+            )
+        },
+        containerColor = TravelMonkTheme.colors.background
+    ) { innerPadding ->
+        MyBookingsContent(state = state, modifier = Modifier.padding(innerPadding))
+    }
 }
 
 // Stateless content — previewable without ViewModel
 @Composable
-fun MyBookingsContent(state: BookingState) {
-    Column(modifier = Modifier.fillMaxSize().background(TravelMonkTheme.colors.background)) {
+fun MyBookingsContent(
+    state: BookingState,
+    modifier: Modifier = Modifier
+) {
+    if (state.isLoading) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(TravelMonkTheme.dimensions.headerHeight)
-                .background(TravelMonkTheme.colors.primary, RoundedCornerShape(bottomStart = TravelMonkTheme.radius.large, bottomEnd = TravelMonkTheme.radius.large))
-                .padding(TravelMonkTheme.spacing.large),
-            contentAlignment = Alignment.BottomStart
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            Text(text = "My Bookings", color = TravelMonkTheme.colors.onPrimary, style = TravelMonkTheme.typography.titleLarge)
+            CircularProgressIndicator(color = TravelMonkTheme.colors.primary)
         }
-
-        if (state.isLoading) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = TravelMonkTheme.colors.primary)
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(TravelMonkTheme.spacing.medium),
-                verticalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)
-            ) {
-                items(state.bookings, key = { it.id }) { booking ->
-                    BookingCard(booking)
-                }
+    } else {
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
+            contentPadding = PaddingValues(TravelMonkTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)
+        ) {
+            items(state.bookings, key = { it.id }) { booking ->
+                BookingCard(booking)
             }
         }
     }
@@ -117,7 +122,7 @@ fun BookingCard(booking: BookingItem) {
 }
 
 @Preview(name = "Bookings – Light", showBackground = true)
-@Preview(name = "Bookings – Dark", showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Bookings – Dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun MyBookingsContentPreview() {
     TravelMonkTheme {
@@ -127,7 +132,8 @@ private fun MyBookingsContentPreview() {
                     BookingItem("1", BookingType.FLIGHT, "SFO → JFK", "Oct 24, 2024", "Confirmed", "$120"),
                     BookingItem("2", BookingType.HOTEL, "The Grand Oberoi", "Nov 5, 2024", "Pending", "$240")
                 )
-            )
+            ),
+            modifier = Modifier
         )
     }
 }

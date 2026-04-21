@@ -23,6 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.tokens.TravelMonkIcons
+import com.travelmonk.core.ui.TravelMonkTopBar
 import com.travelmonk.feature.home.domain.model.HomeBanner
 import com.travelmonk.feature.home.mvi.*
 import com.travelmonk.feature.homeapi.navigator.HomeNavigator
@@ -58,8 +59,63 @@ fun HomeContent(
 ) {
     Scaffold(
         topBar = {
-            HomeTopBar(onSearchClick = { onIntent(HomeIntent.OnSearchClick) })
-        }
+            TravelMonkTopBar(
+                title = {
+                    Column {
+                        Text(
+                            text = "Hello Traveler,",
+                            color = TravelMonkTheme.colors.onPrimary.copy(alpha = 0.8f),
+                            style = TravelMonkTheme.typography.bodyLarge
+                        )
+                        Text(
+                            text = "Where to next?",
+                            style = TravelMonkTheme.typography.headlineMedium
+                        )
+                    }
+                },
+                containerColor = TravelMonkTheme.colors.primary,
+                actions = {
+                    IconButton(onClick = {}) {
+                        Icon(
+                            painter = painterResource(TravelMonkIcons.Notifications),
+                            contentDescription = "Notifications",
+                            tint = TravelMonkTheme.colors.onPrimary,
+                            modifier = Modifier.size(TravelMonkTheme.dimensions.iconMedium)
+                        )
+                    }
+                },
+                bottomContent = {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = TravelMonkTheme.spacing.large,
+                                vertical = TravelMonkTheme.spacing.medium
+                            )
+                            .clickable { onIntent(HomeIntent.OnSearchClick) },
+                        shape = RoundedCornerShape(TravelMonkTheme.radius.medium),
+                        colors = CardDefaults.cardColors(containerColor = TravelMonkTheme.colors.surface)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(TravelMonkTheme.spacing.medium),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                painter = painterResource(TravelMonkIcons.Search),
+                                contentDescription = "Search",
+                                tint = TravelMonkTheme.colors.grayText
+                            )
+                            Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.small))
+                            Text(
+                                text = "Search destinations, hotels...",
+                                color = TravelMonkTheme.colors.grayText
+                            )
+                        }
+                    }
+                }
+            )
+        },
+        containerColor = TravelMonkTheme.colors.background
     ) { padding ->
         LazyColumn(
             modifier = Modifier
@@ -75,61 +131,6 @@ fun HomeContent(
             }
             item { CategorySection(categories = state.categories) }
             item { PromoSection() }
-        }
-    }
-}
-
-@Composable
-fun HomeTopBar(onSearchClick: () -> Unit) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = TravelMonkTheme.colors.primary,
-        shape = RoundedCornerShape(bottomStart = TravelMonkTheme.radius.extraLarge, bottomEnd = TravelMonkTheme.radius.extraLarge)
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = TravelMonkTheme.spacing.large, vertical = TravelMonkTheme.spacing.extraLarge)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    Text(
-                        text = "Hello Traveler,",
-                        color = Color.White.copy(alpha = 0.8f),
-                        style = TravelMonkTheme.typography.bodyLarge
-                    )
-                    Text(
-                        text = "Where to next?",
-                        color = Color.White,
-                        style = TravelMonkTheme.typography.headlineMedium
-                    )
-                }
-                Icon(
-                    painter = painterResource(TravelMonkIcons.Notifications),
-                    contentDescription = "Notifications",
-                    tint = Color.White,
-                    modifier = Modifier.size(TravelMonkTheme.dimensions.iconMedium)
-                )
-            }
-            Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.large))
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onSearchClick() },
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(painter = painterResource(TravelMonkIcons.Search), contentDescription = "Search", tint = Color.Gray)
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text("Search destinations, hotels...", color = Color.Gray)
-                }
-            }
         }
     }
 }

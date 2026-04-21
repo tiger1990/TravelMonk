@@ -1,6 +1,5 @@
 package com.travelmonk.feature.services.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -22,6 +21,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.model.BookingType
 import com.travelmonk.core.tokens.TravelMonkIcons
+import com.travelmonk.core.ui.TravelMonkTopBar
 import com.travelmonk.feature.services.domain.model.TravelService
 import com.travelmonk.feature.services.mvi.ServicesEffect
 import com.travelmonk.feature.services.mvi.ServicesIntent
@@ -54,11 +54,22 @@ fun ServicesScreen(
         }
     }
 
-    ServicesContent(
-        state = state,
-        services = state.services.ifEmpty { defaultServices },
-        onIntent = viewModel::onIntent
-    )
+    Scaffold(
+        topBar = {
+            TravelMonkTopBar(
+                title = { Text("Home Services") },
+                containerColor = TravelMonkTheme.colors.primary
+            )
+        },
+        containerColor = TravelMonkTheme.colors.background
+    ) { innerPadding ->
+        ServicesContent(
+            state = state,
+            services = state.services.ifEmpty { defaultServices },
+            onIntent = viewModel::onIntent,
+            modifier = Modifier.padding(innerPadding)
+        )
+    }
 }
 
 // Stateless content — previewable without ViewModel
@@ -66,30 +77,18 @@ fun ServicesScreen(
 fun ServicesContent(
     state: ServicesState,
     services: List<TravelService>,
-    onIntent: (ServicesIntent) -> Unit
+    onIntent: (ServicesIntent) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Column(modifier = Modifier.fillMaxSize().background(TravelMonkTheme.colors.background)) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .background(TravelMonkTheme.colors.tertiary, RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
-                .padding(TravelMonkTheme.spacing.large),
-            contentAlignment = Alignment.BottomStart
-        ) {
-            Text(text = "Home Services", color = TravelMonkTheme.colors.onPrimary, style = TravelMonkTheme.typography.titleLarge)
-        }
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(TravelMonkTheme.spacing.medium),
-            horizontalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium),
-            verticalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)
-        ) {
-            items(services, key = { it.id }) { service ->
-                ServiceCard(service) { onIntent(ServicesIntent.SelectService(service)) }
-            }
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(TravelMonkTheme.spacing.medium),
+        horizontalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium),
+        verticalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)
+    ) {
+        items(services, key = { it.id }) { service ->
+            ServiceCard(service) { onIntent(ServicesIntent.SelectService(service)) }
         }
     }
 }
@@ -114,7 +113,7 @@ fun ServiceCard(service: TravelService, onClick: () -> Unit) {
                 painter = painterResource(TravelMonkIcons.byName(service.iconName)),
                 contentDescription = null,
                 modifier = Modifier.size(40.dp),
-                tint = TravelMonkTheme.colors.tertiary
+                tint = TravelMonkTheme.colors.primary
             )
             Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.small))
             Text(

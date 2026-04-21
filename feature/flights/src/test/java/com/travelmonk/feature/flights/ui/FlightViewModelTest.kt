@@ -10,13 +10,13 @@ import com.travelmonk.feature.flights.mvi.FlightEffect
 import com.travelmonk.feature.flights.mvi.FlightIntent
 import com.travelmonk.feature.flights.mvi.TripType
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 class FlightViewModelTest {
 

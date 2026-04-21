@@ -149,7 +149,51 @@ FlightCard(flights = listOf(...)) // new list instance every recomposition
 
 ---
 
-## 6. `remember` and `key` Usage
+## 6. Dumb Composables — No Data Transformation Inside UI
+
+Composables should **only render state** — they must not transform or compute derived data inline.
+
+Any `.map()`, `.filter()`, `.sorted()`, or similar collection operation performed directly inside a Composable body (outside of `remember`) re-executes on **every recomposition** — including those triggered by animations, scroll, or unrelated state changes.
+
+```kotlin
+// ❌ Anti-pattern — remaps the entire list every recomposition
+@Composable
+fun FlightList(flights: List<FlightDto>) {
+    val items = flights.map { it.toDomain() } // runs on EVERY recomposition
+    LazyColumn {
+        items(items) { FlightCard(it) }
+    }
+}
+
+// ✅ Acceptable — wrap in remember so mapping only runs when `flights` changes
+@Composable
+fun FlightList(flights: List<FlightDto>) {
+    val items = remember(flights) { flights.map { it.toDomain() } }
+    LazyColumn {
+        items(items, key = { it.id }) { FlightCard(it) }
+    }
+}
+
+// ✅ Preferred — transformation belongs in the ViewModel, not the UI
+// ViewModel emits ImmutableList<Flight> (already mapped domain models) via StateFlow
+// Composable receives ready-to-render state — zero transformation needed
+@Composable
+fun FlightList(flights: ImmutableList<Flight>) {
+    LazyColumn {
+        items(flights, key = { it.id }) { FlightCard(it) }
+    }
+}
+```
+
+**Rules:**
+- **Never** call `.map()`, `.filter()`, `.sorted()`, `.groupBy()`, or any collection transform directly in a Composable body
+- If transformation is unavoidable in the UI layer, wrap it in `remember(dependency) { ... }`
+- **Prefer** moving all transformations to the ViewModel — emit ready-to-render state
+- The ViewModel is the right place for data shaping; the Composable is only responsible for rendering
+
+---
+
+## 7. `remember` and `key` Usage
 
 ```kotlin
 // ✅ Expensive object — created once
@@ -171,7 +215,7 @@ items(flights) { FlightCard(it) }
 
 ---
 
-## 7. Lifecycle-Safe Patterns
+## 8. Lifecycle-Safe Patterns
 
 ```kotlin
 // ✅ collectAsStateWithLifecycle — stops collection when UI is not visible
@@ -190,7 +234,7 @@ GlobalScope.launch { ... } // WRONG — not tied to composition lifecycle
 
 ---
 
-## 8. Theming & Design System — Zero Hardcoding
+## 9. Theming & Design System — Zero Hardcoding
 
 ```kotlin
 // ✅ Always use design system tokens
@@ -212,7 +256,7 @@ Text(text = "Book Now", fontSize = 16.sp, color = Color(0xFF1A73E8))
 
 ---
 
-## 9. Previews — Mandatory for Every Composable
+## 10. Previews — Mandatory for Every Composable
 
 Every `*Content` composable must have both Light and Dark previews.
 
@@ -236,11 +280,12 @@ private fun BookingContentPreview() {
 
 ---
 
-## 10. Pre-Commit Composable Checklist
+## 11. Pre-Commit Composable Checklist
 
 Before marking any Composable done, verify:
 
 - [ ] No business logic or I/O in the Composable body
+- [ ] No `.map()` / `.filter()` / `.sorted()` called directly in Composable body — use ViewModel or `remember`
 - [ ] Expensive computations wrapped in `remember { }`
 - [ ] Computed/derived values use `derivedStateOf { }`
 - [ ] Lazy lists have `key = { item.id }` on every `items()` call

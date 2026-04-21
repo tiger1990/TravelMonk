@@ -7,7 +7,8 @@ import com.travelmonk.feature.bookings.domain.model.BookingItem
 
 data class BookingState(
     val bookings: List<BookingItem> = emptyList(),
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val error: String? = null
 ) : UiState
 
 sealed class BookingIntent : UiIntent {

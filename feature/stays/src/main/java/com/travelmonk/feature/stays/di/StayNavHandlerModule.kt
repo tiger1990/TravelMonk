@@ -10,7 +10,7 @@ import dagger.multibindings.IntoSet
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class StayNavHandlerModule {
+internal abstract class StayNavHandlerModule {
 
     @Binds
     @IntoSet

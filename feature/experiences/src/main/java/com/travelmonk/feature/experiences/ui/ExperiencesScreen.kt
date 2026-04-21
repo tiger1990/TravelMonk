@@ -18,6 +18,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.travelmonk.core.ui.utils.TravelMonkSnackBarHost
+import com.travelmonk.core.ui.TravelMonkTopBar
 import com.travelmonk.core.design.system.color.TravelYellow
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.model.BookingType
@@ -36,6 +38,7 @@ fun ExperiencesScreen(
     viewModel: ExperienceViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -45,72 +48,70 @@ fun ExperiencesScreen(
                         BookingType.PACKAGE,
                         effect.item.title
                     )
+                is ExperienceEffect.ShowError -> snackBarHostState.showSnackbar(effect.message)
             }
         }
     }
 
-    ExperiencesContent(
-        state = state,
-        onIntent = viewModel::onIntent
-    )
+    Scaffold(
+        topBar = {
+            TravelMonkTopBar(
+                title = { Text(
+                    text = "Experiences",
+                    color = TravelMonkTheme.colors.onPrimary,
+                    style = TravelMonkTheme.typography.titleLarge
+                ) },
+                containerColor = TravelMonkTheme.colors.primary,
+                bottomContent = {
+                    SecondaryScrollableTabRow(
+                        selectedTabIndex = state.selectedCategory.ordinal,
+                        edgePadding = TravelMonkTheme.spacing.medium,
+                        divider = {},
+                        containerColor = Color.Transparent,
+                        contentColor = TravelMonkTheme.colors.onPrimary
+                    ) {
+                        ExperienceCategory.entries.forEach { category ->
+                            Tab(
+                                selected = state.selectedCategory == category,
+                                onClick = { viewModel.onIntent(ExperienceIntent.SelectCategory(category)) },
+                                selectedContentColor = TravelMonkTheme.colors.onPrimary,
+                                unselectedContentColor = TravelMonkTheme.colors.onPrimary.copy(alpha = 0.6f),
+                                text = {
+                                    Text(
+                                        category.name.lowercase().replaceFirstChar { it.uppercase() },
+                                        style = TravelMonkTheme.typography.labelMedium
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
+            )
+        },
+        snackbarHost = { TravelMonkSnackBarHost(snackBarHostState) },
+        containerColor = TravelMonkTheme.colors.background
+    ) { innerPadding ->
+        ExperiencesContent(
+            state = state,
+            onIntent = viewModel::onIntent,
+            modifier = Modifier.padding(innerPadding)
+        )
+    }
 }
 
 // Stateless content — previewable without ViewModel
 @Composable
 fun ExperiencesContent(
     state: ExperienceState,
-    onIntent: (ExperienceIntent) -> Unit
+    onIntent: (ExperienceIntent) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Column(modifier = Modifier
+    Column(modifier = modifier
         .fillMaxSize()
         .background(TravelMonkTheme.colors.background)) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(TravelMonkTheme.dimensions.headerHeight)
-                .background(
-                    TravelMonkTheme.colors.tertiary,
-                    RoundedCornerShape(
-                        bottomStart = TravelMonkTheme.radius.large,
-                        bottomEnd = TravelMonkTheme.radius.large
-                    )
-                )
-                .padding(TravelMonkTheme.spacing.large),
-            contentAlignment = Alignment.BottomStart
-        ) {
-            Text(
-                text = "Experiences",
-                color = TravelMonkTheme.colors.onPrimary,
-                style = TravelMonkTheme.typography.titleLarge
-            )
-        }
-
-        SecondaryScrollableTabRow(
-            selectedTabIndex = state.selectedCategory.ordinal,
-            edgePadding = TravelMonkTheme.spacing.medium,
-            divider = {},
-            containerColor = Color.Transparent,
-            contentColor = TravelMonkTheme.colors.tertiary
-        ) {
-            ExperienceCategory.entries.forEach { category ->
-                Tab(
-                    selected = state.selectedCategory == category,
-                    onClick = { onIntent(ExperienceIntent.SelectCategory(category)) },
-                    selectedContentColor = TravelMonkTheme.colors.tertiary,
-                    unselectedContentColor = TravelMonkTheme.colors.grayText,
-                    text = {
-                        Text(
-                            category.name.lowercase().replaceFirstChar { it.uppercase() },
-                            style = TravelMonkTheme.typography.labelMedium
-                        )
-                    }
-                )
-            }
-        }
-
         if (state.isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = TravelMonkTheme.colors.tertiary)
+                CircularProgressIndicator(color = TravelMonkTheme.colors.primary)
             }
         } else {
             LazyColumn(
@@ -188,11 +189,11 @@ fun ExperienceCard(item: Experience, onBook: () -> Unit) {
                     Text(
                         text = item.price,
                         style = TravelMonkTheme.typography.headlineMedium,
-                        color = TravelMonkTheme.colors.tertiary
+                        color = TravelMonkTheme.colors.primary
                     )
                     Button(
                         onClick = onBook,
-                        colors = ButtonDefaults.buttonColors(containerColor = TravelMonkTheme.colors.tertiary),
+                        colors = ButtonDefaults.buttonColors(containerColor = TravelMonkTheme.colors.primary),
                         shape = RoundedCornerShape(TravelMonkTheme.radius.small)
                     ) {
                         Text(text = "Book Now")

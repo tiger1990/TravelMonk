@@ -11,12 +11,23 @@ core/
   designsystem/             # Theme, color/typography/spacing/shape tokens
   model/                    # Domain data models (Booking, Location)
   navigation/               # TravelNavKey, NavKeyHandler, NavigationBus, NavDestination, NavTab
-  network/                  # Retrofit + Moshi + OkHttp setup
+  network/                  # Retrofit + OkHttp setup (Moshi was considered but later changed to kotlinx.serialization)
   tokens/                   # TravelMonkIcons
   ui/                       # Shared UI components (WIP)
   database/                 # Room (WIP)
 feature/
-  <name>/                   # Feature implementation (UI, ViewModel, DI, navigation handler)
+  <name>/                   # Feature implementation
+    ui/                     # Screen composables, ViewModel
+    mvi/                    # State, Intent, Effect sealed classes
+    domain/model/           # Domain data models
+    domain/repository/      # Repository interface
+    domain/usecase/         # Use cases
+    data/api/               # Retrofit interface (returns DTOs)
+    data/api/dto/           # Network DTOs (@Serializable, @SerialName snake_case)
+    data/mapper/            # *Mapper.kt — FooDto.toDomain() extension functions
+    data/repository/        # Repository implementation (fake data → toDomain() until backend ready)
+    di/                     # Hilt modules
+    navigation/             # NavKeyHandler implementation
   <name>-api/               # Feature contract (navigator interface, nav keys)
 ```
 ##Workflow
@@ -61,6 +72,30 @@ Five-layer architecture:
 - Follow Compose UDF(Unidirectional data flow) and stateless composable principles
 - Use `@Stable` or `@Immutable` on data passed to composables when needed
 - Every composable should have Preview for light and dark mode
+
+### Data Layer — DTO + Mapper Pattern
+
+Every feature follows a strict network-to-domain decoupling convention:
+
+```
+API Interface → *Dto  →  *Mapper.toDomain()  →  Domain Model  →  Repository
+```
+
+**Layer responsibilities:**
+- `data/api/*.kt` — Retrofit interface, returns `List<FooDto>` (never domain models directly)
+- `data/api/dto/*.kt` — Network shape, `@Serializable` with `@SerialName` (snake_case). Enum fields are raw `String`.
+- `data/mapper/*Mapper.kt` — Extension function `FooDto.toDomain(): Foo`. Unknown enum values use safe `entries.firstOrNull` fallback.
+- `data/repository/*RepositoryImpl.kt` — Calls API and maps: `api.getFoo().map { it.toDomain() }`
+
+**Fake data (pre-backend integration):** Repositories return hardcoded `FooDto` objects mapped through `toDomain()`. The real API call is present but commented out directly above the fake call:
+
+```kotlin
+// TODO: Replace with real API call when backend is integrated:
+// DataResult.Success(api.searchFlights(from, to).map { it.toDomain() })
+DataResult.Success(fakeFlights(from, to))
+```
+
+**To wire a real backend:** uncomment the API call, delete the `fake*()` method, and enhance `*Mapper.kt` field mappings to match the actual response shape.
 
 ### Dependency Injection
 - Hilt throughout — convention plugins auto-apply Hilt to all feature modules

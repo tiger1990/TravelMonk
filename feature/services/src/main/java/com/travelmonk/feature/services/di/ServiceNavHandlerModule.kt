@@ -10,7 +10,7 @@ import dagger.multibindings.IntoSet
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class ServiceNavHandlerModule {
+internal abstract class ServiceNavHandlerModule {
 
     @Binds
     @IntoSet

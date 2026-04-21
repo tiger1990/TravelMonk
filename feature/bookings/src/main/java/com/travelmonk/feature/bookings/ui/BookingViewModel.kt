@@ -19,7 +19,7 @@ class BookingViewModel @Inject constructor(
 
     override fun createInitialState(): BookingState = BookingState()
 
-    init {
+    override suspend fun initialDataLoad() {
         loadBookings()
     }
 
@@ -58,7 +58,10 @@ class BookingViewModel @Inject constructor(
                     }
                     setState { copy(bookings = uiBookings, isLoading = false) }
                 }
-                is DataResult.Error -> setState { copy(isLoading = false) }
+                is DataResult.Error -> {
+                    setState { copy(isLoading = false, error = result.exception.message) }
+                    setEffect(BookingEffect.ShowMessage(result.exception.message ?: "Failed to load bookings"))
+                }
                 is DataResult.Loading -> Unit
             }
         }

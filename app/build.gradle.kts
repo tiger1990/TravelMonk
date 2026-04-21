@@ -137,6 +137,10 @@ dependencies {
     implementation(project(":feature:bookings"))
     implementation(project(":feature:home"))
 
+    // --- SPLASH SCREEN & ANIMATION ---
+    implementation(libs.androidx.core.splashscreen)
+    implementation(libs.lottie.compose)
+
     // --- ANDROIDX & KOTLIN EXTENSIONS ---
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -166,4 +170,5 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    testImplementation(libs.konsist)
 }

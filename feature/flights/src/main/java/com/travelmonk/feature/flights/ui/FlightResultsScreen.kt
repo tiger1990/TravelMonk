@@ -10,6 +10,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import com.travelmonk.core.ui.utils.TravelMonkSnackBarHost
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -20,14 +22,10 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.tokens.TravelMonkIcons
+import com.travelmonk.feature.flights.domain.model.Flight
+import com.travelmonk.feature.flights.mvi.FlightEffect
 import com.travelmonk.feature.flights.mvi.FlightIntent
 import com.travelmonk.feature.flightsapi.navigator.FlightNavigator
-
-private val previewFlights = listOf(
-    FlightResultItem("Air Indigo",    "08:30", "11:45", "3h 15m", "$120"),
-    FlightResultItem("Sky Jet",       "10:15", "13:30", "3h 15m", "$145"),
-    FlightResultItem("Star Airways",  "14:00", "17:15", "3h 15m", "$110")
-)
 
 @Composable
 fun FlightResultsScreen(
@@ -38,33 +36,48 @@ fun FlightResultsScreen(
     viewModel: FlightViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(from, to) {
         viewModel.onIntent(FlightIntent.LoadResults(from, to))
     }
 
-    val flights = state.flights.map { flight ->
-        FlightResultItem(flight.airline, flight.departureTime, flight.arrivalTime, flight.duration, flight.price)
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is FlightEffect.ShowError -> snackBarHostState.showSnackbar(effect.message)
+                else -> Unit
+            }
+        }
     }
 
-    FlightResultsContent(
-        from = from,
-        to = to,
-        flights = flights.ifEmpty { previewFlights },
-        onBack = navigator::back,
-        onBook = onBook
-    )
+    Scaffold(
+        snackbarHost = { TravelMonkSnackBarHost(snackBarHostState) },
+        containerColor = TravelMonkTheme.colors.background
+    ) { innerPadding ->
+        FlightResultsContent(
+            from = from,
+            to = to,
+            flights = state.flights,
+            isLoading = state.isLoading,
+            onBack = navigator::back,
+            onBook = onBook,
+            modifier = Modifier.padding(innerPadding)
+        )
+    }
 }
 
 @Composable
 fun FlightResultsContent(
     from: String,
     to: String,
-    flights: List<FlightResultItem>,
+    flights: List<Flight>,
+    isLoading: Boolean,
     onBack: () -> Unit,
-    onBook: (String) -> Unit
+    onBook: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Column(modifier = Modifier.fillMaxSize().background(TravelMonkTheme.colors.background)) {
+    Column(modifier = modifier.fillMaxSize().background(TravelMonkTheme.colors.background)) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -83,22 +96,28 @@ fun FlightResultsContent(
             }
         }
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(TravelMonkTheme.spacing.medium),
-            verticalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)
-        ) {
-            items(flights, key = { it.airline }) { flight ->
-                FlightTicketCard(flight, onBook)
+        when {
+            isLoading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = TravelMonkTheme.colors.primary)
+            }
+            flights.isEmpty() -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("No flights found", style = TravelMonkTheme.typography.bodyLarge, color = TravelMonkTheme.colors.grayText)
+            }
+            else -> LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(TravelMonkTheme.spacing.medium),
+                verticalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)
+            ) {
+                items(flights, key = { it.id }) { flight ->
+                    FlightTicketCard(flight, onBook)
+                }
             }
         }
     }
 }
 
-data class FlightResultItem(val airline: String, val dep: String, val arr: String, val duration: String, val price: String)
-
 @Composable
-fun FlightTicketCard(flight: FlightResultItem, onBook: (String) -> Unit) {
+fun FlightTicketCard(flight: Flight, onBook: (String) -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -118,7 +137,7 @@ fun FlightTicketCard(flight: FlightResultItem, onBook: (String) -> Unit) {
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Column {
-                    Text(text = flight.dep, style = TravelMonkTheme.typography.headlineMedium)
+                    Text(text = flight.departureTime, style = TravelMonkTheme.typography.headlineMedium)
                     Text(text = "Dep", color = TravelMonkTheme.colors.grayText, style = TravelMonkTheme.typography.caption)
                 }
 
@@ -129,7 +148,7 @@ fun FlightTicketCard(flight: FlightResultItem, onBook: (String) -> Unit) {
                 }
 
                 Column(horizontalAlignment = Alignment.End) {
-                    Text(text = flight.arr, style = TravelMonkTheme.typography.headlineMedium)
+                    Text(text = flight.arrivalTime, style = TravelMonkTheme.typography.headlineMedium)
                     Text(text = "Arr", color = TravelMonkTheme.colors.grayText, style = TravelMonkTheme.typography.caption)
                 }
             }
@@ -156,7 +175,12 @@ private fun FlightResultsContentPreview() {
         FlightResultsContent(
             from = "San Francisco",
             to = "New York",
-            flights = previewFlights,
+            flights = listOf(
+                Flight("1", "Air Indigo",   "08:30", "11:45", "3h 15m", "$120", "SFO", "JFK"),
+                Flight("2", "Sky Jet",      "10:15", "13:30", "3h 15m", "$145", "SFO", "JFK"),
+                Flight("3", "Star Airways", "14:00", "17:15", "3h 15m", "$110", "SFO", "JFK")
+            ),
+            isLoading = false,
             onBack = {},
             onBook = {}
         )

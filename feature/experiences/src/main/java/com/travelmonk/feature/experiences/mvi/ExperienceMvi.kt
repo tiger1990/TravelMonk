@@ -9,7 +9,8 @@ import com.travelmonk.feature.experiences.domain.model.ExperienceCategory
 data class ExperienceState(
     val selectedCategory: ExperienceCategory = ExperienceCategory.PACKAGES,
     val items: List<Experience> = emptyList(),
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val error: String? = null
 ) : UiState
 
 sealed class ExperienceIntent : UiIntent {
@@ -19,4 +20,5 @@ sealed class ExperienceIntent : UiIntent {
 
 sealed class ExperienceEffect : UiEffect {
     data class NavigateToBooking(val item: Experience) : ExperienceEffect()
+    data class ShowError(val message: String) : ExperienceEffect()
 }

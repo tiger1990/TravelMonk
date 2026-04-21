@@ -1,9 +1,12 @@
-package com.travelmonk.core.logger.viewer
+package com.travelmonk.core.logger.viewer.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.travelmonk.core.logger.LogEvent
 import com.travelmonk.core.logger.LogFileManager
+import com.travelmonk.core.logger.viewer.LogEntry
+import com.travelmonk.core.logger.viewer.LogViewerIntent
+import com.travelmonk.core.logger.viewer.LogViewerState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

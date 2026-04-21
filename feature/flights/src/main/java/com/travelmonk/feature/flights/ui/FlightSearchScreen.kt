@@ -17,11 +17,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.tokens.TravelMonkIcons
+import com.travelmonk.core.ui.TravelMonkTopBar
+import com.travelmonk.core.ui.utils.TravelMonkSnackBarHost
 import com.travelmonk.feature.flights.mvi.*
 import com.travelmonk.feature.flightsapi.navigation.FlightNavKey
 import com.travelmonk.feature.flightsapi.navigator.FlightNavigator
@@ -33,22 +34,49 @@ fun FlightSearchScreen(
     viewModel: FlightViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 is FlightEffect.NavigateToResults ->
                     navigator.navigateTo(FlightNavKey.Results(effect.from, effect.to))
-                is FlightEffect.ShowError -> { /* Handle error */ }
+                is FlightEffect.ShowError ->
+                    snackBarHostState.showSnackbar(effect.message)
             }
         }
     }
 
-    FlightSearchContent(
-        state = state,
-        onIntent = viewModel::onIntent,
-        onBack = navigator::back
-    )
+    Scaffold(
+        topBar = {
+            TravelMonkTopBar(
+                title = {
+                    Column {
+                        Text("Search Flights", style = TravelMonkTheme.typography.titleLarge)
+                        Text("Where are you going today?", style = TravelMonkTheme.typography.bodyLarge)
+                    }
+                },
+                containerColor = TravelMonkTheme.colors.primary,
+                navigationIcon = {
+                    IconButton(onClick = navigator::back) {
+                        Icon(
+                            painter = painterResource(TravelMonkIcons.ArrowBack),
+                            contentDescription = "Navigate back",
+                            tint = TravelMonkTheme.colors.onPrimary
+                        )
+                    }
+                }
+            )
+        },
+        snackbarHost = { TravelMonkSnackBarHost(snackBarHostState) },
+        containerColor = TravelMonkTheme.colors.background
+    ) { innerPadding ->
+        FlightSearchContent(
+            state = state,
+            onIntent = viewModel::onIntent,
+            modifier = Modifier.padding(innerPadding)
+        )
+    }
 }
 
 // Stateless content — previewable without ViewModel
@@ -56,44 +84,25 @@ fun FlightSearchScreen(
 fun FlightSearchContent(
     state: FlightSearchState,
     onIntent: (FlightIntent) -> Unit,
-    onBack: () -> Unit
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(TravelMonkTheme.colors.background)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(TravelMonkTheme.colors.primary, RoundedCornerShape(bottomStart = TravelMonkTheme.radius.extraLarge, bottomEnd = TravelMonkTheme.radius.extraLarge))
-                .padding(top = 60.dp, start = 24.dp, end = 24.dp, bottom = 40.dp)
-        ) {
-            Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = onBack) {
-                        Icon(painter = painterResource(TravelMonkIcons.ArrowBack), contentDescription = "Navigate back", tint = TravelMonkTheme.colors.onPrimary)
-                    }
-                    Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.medium))
-                    Text("Search Flights", color = TravelMonkTheme.colors.onPrimary, style = TravelMonkTheme.typography.titleLarge)
-                }
-                Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.large))
-                Text("Where are you\ngoing today?", color = TravelMonkTheme.colors.onPrimary, style = TravelMonkTheme.typography.headlineMedium)
-            }
-        }
-
         Column(
             modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .offset(y = (-30).dp)
+                .padding(horizontal = TravelMonkTheme.spacing.large)
+                .padding(top = TravelMonkTheme.spacing.large)
         ) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(TravelMonkTheme.radius.large),
                 colors = CardDefaults.cardColors(containerColor = TravelMonkTheme.colors.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = TravelMonkTheme.dimensions.cardElevationLarge)
             ) {
-                Column(modifier = Modifier.padding(20.dp)) {
+                Column(modifier = Modifier.padding(TravelMonkTheme.spacing.large)) {
                     TripTypeSelector(
                         selectedType = state.tripType,
                         onTypeSelected = { onIntent(FlightIntent.ChangeTripType(it)) }
@@ -116,7 +125,7 @@ fun FlightSearchContent(
                             shape = CircleShape,
                             containerColor = TravelMonkTheme.colors.primary,
                             contentColor = TravelMonkTheme.colors.onPrimary,
-                            elevation = FloatingActionButtonDefaults.elevation(4.dp)
+                            elevation = FloatingActionButtonDefaults.elevation(TravelMonkTheme.dimensions.cardElevation)
                         ) {
                             Icon(painter = painterResource(TravelMonkIcons.Swap_Vert),
                                 contentDescription = "Swap",
@@ -159,7 +168,7 @@ fun TripTypeSelector(selectedType: TripType, onTypeSelected: (TripType) -> Unit)
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(TravelMonkTheme.radius.small))
             .background(TravelMonkTheme.colors.surfaceVariant),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
@@ -170,7 +179,7 @@ fun TripTypeSelector(selectedType: TripType, onTypeSelected: (TripType) -> Unit)
                     .weight(1f)
                     .clickable { onTypeSelected(type) }
                     .background(if (isSelected) TravelMonkTheme.colors.primary else Color.Transparent)
-                    .padding(vertical = 10.dp),
+                    .padding(vertical = TravelMonkTheme.spacing.small),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -204,14 +213,14 @@ fun LocationField(label: String, city: String, code: String, @DrawableRes icon: 
 fun SearchInfoCard(label: String, value: String, @DrawableRes icon: Int, modifier: Modifier) {
     Column(
         modifier = modifier
-            .background(TravelMonkTheme.colors.surfaceVariant, RoundedCornerShape(12.dp))
-            .padding(12.dp)
+            .background(TravelMonkTheme.colors.surfaceVariant, RoundedCornerShape(TravelMonkTheme.radius.small))
+            .padding(TravelMonkTheme.spacing.medium)
     ) {
         Text(label, color = TravelMonkTheme.colors.grayText, style = TravelMonkTheme.typography.caption)
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.extraSmall))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(painter = painterResource(icon), contentDescription = null, modifier = Modifier.size(TravelMonkTheme.dimensions.iconSmall), tint = TravelMonkTheme.colors.primary)
-            Spacer(modifier = Modifier.width(6.dp))
+            Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.extraSmall))
             Text(value, style = TravelMonkTheme.typography.labelMedium)
         }
     }
@@ -224,8 +233,7 @@ private fun FlightSearchContentPreview() {
     TravelMonkTheme {
         FlightSearchContent(
             state = FlightSearchState(),
-            onIntent = {},
-            onBack = {}
+            onIntent = {}
         )
     }
 }

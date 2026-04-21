@@ -10,7 +10,7 @@ import dagger.multibindings.IntoSet
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class ExperienceNavHandlerModule {
+internal abstract class ExperienceNavHandlerModule {
 
     @Binds
     @IntoSet

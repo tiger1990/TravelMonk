@@ -33,7 +33,7 @@ Status legend: `[ ]` = todo · `[~]` = in progress · `[x]` = done
 ---
 
 ### GAP-03 — Silent Exception Swallowing / No Error State
-- **Status:** `[ ]`
+- **Status:** `[x]`
 - **File(s):**
   - `feature/stays/src/main/java/com/travelmonk/feature/stays/ui/StayViewModel.kt:28`
   - `feature/flights/src/main/java/com/travelmonk/feature/flights/ui/FlightViewModel.kt:32`
@@ -120,7 +120,7 @@ Status legend: `[ ]` = todo · `[~]` = in progress · `[x]` = done
 ---
 
 ### GAP-09 — `FlightRepositoryImpl` Missing `@Singleton`
-- **Status:** `[ ]`
+- **Status:** `[x]`
 - **File(s):** `feature/flights/src/main/java/com/travelmonk/feature/flights/data/repository/FlightRepositoryImpl.kt:8`
 - **Problem:** `BookingRepositoryImpl` is `@Singleton`. `FlightRepositoryImpl` has no scope annotation — Hilt creates a new instance on every injection point. Any in-memory cache or shared state in the repository is lost between injections.
 - **Fix:** Add `@Singleton` annotation to `FlightRepositoryImpl`. Audit `StayRepositoryImpl`, `ExperienceRepositoryImpl`, `ServiceRepositoryImpl` for the same issue.
@@ -158,7 +158,7 @@ Status legend: `[ ]` = todo · `[~]` = in progress · `[x]` = done
 ---
 
 ### GAP-12 — HTTP Logging Always at `BODY` Level (Security Issue)
-- **Status:** `[ ]`
+- **Status:** `[x]`
 - **File(s):** `core/network/src/main/java/com/travelmonk/core/network/di/NetworkModule.kt:31`
 - **Problem:** `HttpLoggingInterceptor.Level.BODY` is unconditional. In release builds, full HTTP bodies — including auth tokens, session cookies, and PII — are written to Logcat, accessible to any app with `READ_LOGS` permission.
 - **Fix:**
@@ -215,7 +215,7 @@ Status legend: `[ ]` = todo · `[~]` = in progress · `[x]` = done
 ---
 
 ### GAP-16 — SharedFlow Buffer Overflow Strategy Under Navigation Load
-- **Status:** `[ ]`
+- **Status:** `[x]`
 - **File(s):** `app/src/main/java/com/travelmonk/navigation/GlobalNavigator.kt:26`
 - **Problem:** `MutableSharedFlow(extraBufferCapacity = 8, onBufferOverflow = BufferOverflow.DROP_OLDEST)`. If 9+ navigation events fire before the `LaunchedEffect` collector in `TravelMonkApp` resumes (e.g., on app cold start or after a brief background pause), the oldest events are silently dropped. `DROP_OLDEST` is counterintuitive for navigation — the most meaningful event is usually the earliest (the user's tap), not the latest.
 - **Fix:**
@@ -231,17 +231,17 @@ Status legend: `[ ]` = todo · `[~]` = in progress · `[x]` = done
 |-----|----------|--------|------|
 | GAP-01 | CRITICAL | `[x]` | Process Death — NavigationState |
 | GAP-02 | CRITICAL | `[x]` | Crash — BookingType Mismatch |
-| GAP-03 | CRITICAL | `[ ]` | Silent Error Swallowing |
+| GAP-03 | CRITICAL | `[x]` | Silent Error Swallowing |
 | GAP-04 | HIGH | `[ ]` | Process Death — SavedStateHandle |
 | GAP-05 | HIGH | `[ ]` | Clean Architecture — No Use Cases |
 | GAP-06 | HIGH | `[ ]` | Lifecycle — collectAsState |
 | GAP-07 | HIGH | `[ ]` | Module Coupling — NavigationState |
 | GAP-08 | HIGH | `[ ]` | Module Coupling — Cross-Feature Nav Keys |
-| GAP-09 | HIGH | `[ ]` | DI — FlightRepositoryImpl Singleton |
+| GAP-09 | HIGH | `[x]` | DI — FlightRepositoryImpl Singleton |
 | GAP-10 | HIGH | `[ ]` | Module Hygiene — Typealias Shim |
 | GAP-11 | MEDIUM | `[ ]` | Design System — Hardcoded Colors |
-| GAP-12 | MEDIUM | `[ ]` | Security — HTTP Logging in Release |
+| GAP-12 | MEDIUM | `[x]` | Security — HTTP Logging in Release |
 | GAP-13 | MEDIUM | `[ ]` | Reactivity — List vs Flow |
 | GAP-14 | MEDIUM | `[ ]` | Missing Feature — Deep Links |
 | GAP-15 | MEDIUM | `[ ]` | Effect Delivery — LaunchedEffect Race |
-| GAP-16 | LOW | `[ ]` | Navigation — SharedFlow Overflow Strategy |
+| GAP-16 | LOW | `[x]` | Navigation — SharedFlow Overflow Strategy |

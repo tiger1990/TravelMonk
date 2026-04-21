@@ -13,7 +13,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class StayModule {
+internal abstract class StayModule {
 
     /**
      * Binds [StayRepositoryImpl] as the [StayRepository] implementation.

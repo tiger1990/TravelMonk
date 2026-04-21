@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.travelmonk.core.logger.LogLevel
+import com.travelmonk.core.logger.viewer.ui.LogViewerViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

@@ -13,7 +13,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class ExperienceModule {
+internal abstract class ExperienceModule {
 
     /**
      * Binds [ExperienceRepositoryImpl] as the [ExperienceRepository] implementation.

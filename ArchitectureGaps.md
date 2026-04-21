@@ -92,7 +92,12 @@ Room dependency declared in `build.gradle.kts` but no DAOs, entities, or databas
 
 `FlightsApi` and other API interfaces return domain models directly (`List<Flight>`) instead of DTOs. This couples the network layer to the domain layer — any API field rename breaks the domain model.
 
-**Fix:** Introduce `data/api/dto/` + mappers in each feature when real backend is integrated. `FlightsApi` → `List<FlightDto>`, mapped to `List<Flight>` in the repository.
+**Status:** DTO layer introduced across all 6 features (`data/api/dto/`) with mappers (`data/mapper/`). API interfaces now return DTOs. Repositories return fake data via `FooDto(...).toDomain()` until real backend is integrated.
+
+**To integrate real backend (per feature):**
+1. Uncomment the real API call in `*RepositoryImpl` and delete the `fake*()` method
+2. Enhance field mappings in `*Mapper.kt` to match actual API response shape
+3. Add `@SerialName` adjustments in `*Dto.kt` if API field names differ
 
 ---
 
@@ -106,7 +111,7 @@ Room dependency declared in `build.gradle.kts` but no DAOs, entities, or databas
 | G-04 | 3.1 | All user-visible strings hardcoded — zero `strings.xml` usage | All `*Screen.kt` | `[ ]` |
 | G-05 | 4.1 | No crash reporting or analytics | Entire project | `[ ]` |
 | G-06 | 5.1 | `core:database` declared but empty — implement or remove | `core/database/` | `[ ]` |
-| G-07 | 5.2 | No DTO layer — API interfaces return domain models directly | All `data/api/*.kt` | `[ ]` |
+| G-07 | 5.2 | No DTO layer — API interfaces return domain models directly | All `data/api/*.kt` | `[~]` |
 
 ---
 
@@ -114,4 +119,4 @@ Room dependency declared in `build.gradle.kts` but no DAOs, entities, or databas
 
 | Total Open |
 |---|
-| **6** |
+| **5** |
