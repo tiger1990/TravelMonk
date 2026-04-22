@@ -37,7 +37,13 @@ declare -a PATTERNS=(
 
 for pattern in "${PATTERNS[@]}"; do
   if echo "$cmd" | grep -qE "$pattern"; then
-    echo '{"decision":"block","reason":"Security: command matches restricted pattern — review and run manually if intended."}'
+    echo '{
+      hookSpecificOutput: {
+      "hookEventName": "PreToolUse",
+      "permissionDecision":"block",
+      "permissionDecisionReason":"Security: command matches restricted pattern — review and run manually if intended."
+      }
+    }'
     exit 0
   fi
 done

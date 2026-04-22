@@ -38,8 +38,11 @@ data class Dimensions(
 
     // Content component sizes
     val imageCardHeight: Dp = 160.dp,
+    val heroImageHeight: Dp = 300.dp,
+    val splashIconSize: Dp = 240.dp,
     val fabSize: Dp = 44.dp,
-    val categoryIconSize: Dp = 60.dp
+    val categoryIconSize: Dp = 60.dp,
+    val bookingButtonWidth: Dp = 160.dp
 )
 
 /**

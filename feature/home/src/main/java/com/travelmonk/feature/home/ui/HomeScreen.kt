@@ -103,12 +103,12 @@ fun HomeContent(
                             Icon(
                                 painter = painterResource(TravelMonkIcons.Search),
                                 contentDescription = "Search",
-                                tint = TravelMonkTheme.colors.grayText
+                                tint = TravelMonkTheme.colors.onSurfaceVariant
                             )
                             Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.small))
                             Text(
                                 text = "Search destinations, hotels...",
-                                color = TravelMonkTheme.colors.grayText
+                                color = TravelMonkTheme.colors.onSurfaceVariant
                             )
                         }
                     }
@@ -214,13 +214,13 @@ fun PromoSection() {
             .padding(24.dp)
             .fillMaxWidth(),
         shape = RoundedCornerShape(TravelMonkTheme.radius.medium),
-        colors = CardDefaults.cardColors(containerColor = TravelMonkTheme.colors.secondary.copy(alpha = 0.1f))
+        colors = CardDefaults.cardColors(containerColor = TravelMonkTheme.colors.tertiary.copy(alpha = 0.1f))
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(painter = painterResource(TravelMonkIcons.CardGiftCard), contentDescription = null, tint = TravelMonkTheme.colors.secondary, modifier = Modifier.size(40.dp))
+            Icon(painter = painterResource(TravelMonkIcons.CardGiftCard), contentDescription = null, tint = TravelMonkTheme.colors.primary, modifier = Modifier.size(40.dp))
             Spacer(modifier = Modifier.width(16.dp))
             Column {
                 Text(text = "Refer & Earn", fontWeight = FontWeight.Bold, style = TravelMonkTheme.typography.titleLarge)

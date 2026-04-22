@@ -99,7 +99,7 @@ fun SearchField(
         Column {
             Text(
                 text = label,
-                color = TravelMonkTheme.colors.grayText,
+                color = TravelMonkTheme.colors.onSurfaceVariant,
                 style = TravelMonkTheme.typography.caption
             )
             Text(

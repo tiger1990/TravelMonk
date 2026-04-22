@@ -29,6 +29,11 @@ class ExperienceViewModel @Inject constructor(
                 setState { copy(selectedCategory = intent.category) }
                 loadItems(intent.category)
             }
+            is ExperienceIntent.SelectExperience -> {
+                viewModelScope.launch {
+                    setEffect(ExperienceEffect.NavigateToDetail(intent.experienceId))
+                }
+            }
             is ExperienceIntent.BookItem -> {
                 viewModelScope.launch {
                     setEffect(ExperienceEffect.NavigateToBooking(intent.item))

@@ -8,6 +8,7 @@ android {
 
 dependencies {
     implementation(project(":feature:stays-api"))
+    implementation(project(":feature:bookings-api"))
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 }

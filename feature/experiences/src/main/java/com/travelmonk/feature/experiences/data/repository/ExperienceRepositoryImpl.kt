@@ -23,6 +23,19 @@ class ExperienceRepositoryImpl @Inject constructor(
             DataResult.Success(fakeExperiences(category))
         }
 
+    override suspend fun getExperienceById(id: String): DataResult<Experience> =
+        withContext(ioDispatcher) {
+            val experience = ExperienceCategory.entries
+                .flatMap { fakeExperiences(it) }
+                .find { it.id == id }
+            
+            if (experience != null) {
+                DataResult.Success(experience)
+            } else {
+                DataResult.Error(Exception("Experience with id $id not found"))
+            }
+        }
+
     private fun fakeExperiences(category: ExperienceCategory): List<Experience> = when (category) {
         ExperienceCategory.PACKAGES -> listOf(
             ExperienceDto("1", "Bali Paradise", "5 Days, 4 Nights", "$499", 4.8, "https://images.unsplash.com/photo-1537996194471-e657df975ab4", category.name).toDomain(),

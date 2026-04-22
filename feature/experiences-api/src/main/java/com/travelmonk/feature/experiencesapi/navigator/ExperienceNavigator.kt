@@ -8,5 +8,6 @@ import com.travelmonk.feature.experiencesapi.navigation.ExperienceNavKey
 interface ExperienceNavigator {
     fun navigateTo(key: ExperienceNavKey)
     fun back()
+    fun navigateToExperienceDetail(experienceId: String)
     fun navigateToBookingConfirmation(type: BookingType, title: String)
 }

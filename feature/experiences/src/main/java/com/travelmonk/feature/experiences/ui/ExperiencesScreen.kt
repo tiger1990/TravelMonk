@@ -31,7 +31,10 @@ import com.travelmonk.feature.experiences.mvi.ExperienceIntent
 import com.travelmonk.feature.experiences.mvi.ExperienceState
 import com.travelmonk.feature.experiencesapi.navigator.ExperienceNavigator
 
-// Stateful entry point
+/**
+ * Stateful entry point for the Experiences Screen.
+ * Connects the ViewModel state and effects to the stateless UI.
+ */
 @Composable
 fun ExperiencesScreen(
     navigator: ExperienceNavigator,
@@ -43,6 +46,8 @@ fun ExperiencesScreen(
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
+                is ExperienceEffect.NavigateToDetail ->
+                    navigator.navigateToExperienceDetail(effect.experienceId)
                 is ExperienceEffect.NavigateToBooking ->
                     navigator.navigateToBookingConfirmation(
                         BookingType.PACKAGE,
@@ -53,62 +58,108 @@ fun ExperiencesScreen(
         }
     }
 
+    ExperiencesScreenContent(
+        state = state,
+        onIntent = viewModel::onIntent,
+        snackBarHostState = snackBarHostState
+    )
+}
+
+/**
+ * Stateless full-screen content for Experiences.
+ * Includes the TopBar, Tabs, and the main scrollable list.
+ * This is the primary composable for Previews.
+ */
+@Composable
+fun ExperiencesScreenContent(
+    state: ExperienceState,
+    onIntent: (ExperienceIntent) -> Unit,
+    snackBarHostState: SnackbarHostState = remember { SnackbarHostState() }
+) {
     Scaffold(
         topBar = {
-            TravelMonkTopBar(
-                title = { Text(
-                    text = "Experiences",
-                    color = TravelMonkTheme.colors.onPrimary,
-                    style = TravelMonkTheme.typography.titleLarge
-                ) },
-                containerColor = TravelMonkTheme.colors.primary,
-                bottomContent = {
-                    SecondaryScrollableTabRow(
-                        selectedTabIndex = state.selectedCategory.ordinal,
-                        edgePadding = TravelMonkTheme.spacing.medium,
-                        divider = {},
-                        containerColor = Color.Transparent,
-                        contentColor = TravelMonkTheme.colors.onPrimary
-                    ) {
-                        ExperienceCategory.entries.forEach { category ->
-                            Tab(
-                                selected = state.selectedCategory == category,
-                                onClick = { viewModel.onIntent(ExperienceIntent.SelectCategory(category)) },
-                                selectedContentColor = TravelMonkTheme.colors.onPrimary,
-                                unselectedContentColor = TravelMonkTheme.colors.onPrimary.copy(alpha = 0.6f),
-                                text = {
-                                    Text(
-                                        category.name.lowercase().replaceFirstChar { it.uppercase() },
-                                        style = TravelMonkTheme.typography.labelMedium
-                                    )
-                                }
-                            )
-                        }
-                    }
-                }
+            ExperiencesTopBar(
+                selectedCategory = state.selectedCategory,
+                onCategorySelected = { onIntent(ExperienceIntent.SelectCategory(it)) }
             )
         },
         snackbarHost = { TravelMonkSnackBarHost(snackBarHostState) },
         containerColor = TravelMonkTheme.colors.background
     ) { innerPadding ->
-        ExperiencesContent(
+        ExperiencesListContent(
             state = state,
-            onIntent = viewModel::onIntent,
+            onIntent = onIntent,
             modifier = Modifier.padding(innerPadding)
         )
     }
 }
 
-// Stateless content — previewable without ViewModel
+/**
+ * Dedicated TopBar for the Experiences screen.
+ * Extracted to allow for isolated previews and cleaner Scaffold structure.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExperiencesContent(
+private fun ExperiencesTopBar(
+    selectedCategory: ExperienceCategory,
+    onCategorySelected: (ExperienceCategory) -> Unit
+) {
+    TravelMonkTopBar(
+        title = {
+            Text(
+                text = "Experiences",
+                color = TravelMonkTheme.colors.onPrimary,
+                style = TravelMonkTheme.typography.titleLarge
+            )
+        },
+        containerColor = TravelMonkTheme.colors.primary,
+        bottomContent = {
+            SecondaryScrollableTabRow(
+                selectedTabIndex = selectedCategory.ordinal,
+                edgePadding = TravelMonkTheme.spacing.medium,
+                containerColor = Color.Transparent,
+                contentColor = TravelMonkTheme.colors.onPrimary,
+                indicator = {
+                    TabRowDefaults.SecondaryIndicator(
+                        modifier = Modifier.tabIndicatorOffset(selectedCategory.ordinal),
+                        color = TravelMonkTheme.colors.onPrimary
+                    )
+                },
+                divider = {} // Clean look without a full-width divider
+            ) {
+                ExperienceCategory.entries.forEach { category ->
+                    Tab(
+                        selected = selectedCategory == category,
+                        onClick = { onCategorySelected(category) },
+                        selectedContentColor = TravelMonkTheme.colors.onPrimary,
+                        unselectedContentColor = TravelMonkTheme.colors.onPrimary.copy(alpha = 0.6f),
+                        text = {
+                            Text(
+                                category.name.lowercase().replaceFirstChar { it.uppercase() },
+                                style = TravelMonkTheme.typography.labelMedium
+                            )
+                        }
+                    )
+                }
+            }
+        }
+    )
+}
+
+/**
+ * The scrollable list part of the Experiences screen.
+ */
+@Composable
+private fun ExperiencesListContent(
     state: ExperienceState,
     onIntent: (ExperienceIntent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier
-        .fillMaxSize()
-        .background(TravelMonkTheme.colors.background)) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(TravelMonkTheme.colors.background)
+    ) {
         if (state.isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = TravelMonkTheme.colors.primary)
@@ -120,7 +171,11 @@ fun ExperiencesContent(
                 verticalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)
             ) {
                 items(state.items, key = { it.id }) { item ->
-                    ExperienceCard(item) { onIntent(ExperienceIntent.BookItem(item)) }
+                    ExperienceCard(
+                        item = item,
+                        onClick = { onIntent(ExperienceIntent.SelectExperience(item.id)) },
+                        onBook = { onIntent(ExperienceIntent.BookItem(item)) }
+                    )
                 }
             }
         }
@@ -128,8 +183,13 @@ fun ExperiencesContent(
 }
 
 @Composable
-fun ExperienceCard(item: Experience, onBook: () -> Unit) {
+fun ExperienceCard(
+    item: Experience,
+    onClick: () -> Unit,
+    onBook: () -> Unit
+) {
     Card(
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(TravelMonkTheme.radius.medium),
         colors = CardDefaults.cardColors(containerColor = TravelMonkTheme.colors.surface),
@@ -176,7 +236,7 @@ fun ExperienceCard(item: Experience, onBook: () -> Unit) {
                 Text(
                     text = item.description,
                     style = TravelMonkTheme.typography.bodyLarge,
-                    color = TravelMonkTheme.colors.grayText
+                    color = TravelMonkTheme.colors.onSurfaceVariant
                 )
 
                 Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
@@ -204,16 +264,16 @@ fun ExperienceCard(item: Experience, onBook: () -> Unit) {
     }
 }
 
-@Preview(name = "Experiences – Light", showBackground = true)
+@Preview(name = "Experiences – Full Screen Light", showSystemUi = true)
 @Preview(
-    name = "Experiences – Dark",
-    showBackground = true,
+    name = "Experiences – Full Screen Dark",
+    showSystemUi = true,
     uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
-private fun ExperiencesContentPreview() {
+private fun ExperiencesScreenPreview() {
     TravelMonkTheme {
-        ExperiencesContent(
+        ExperiencesScreenContent(
             state = ExperienceState(
                 items = listOf(
                     Experience(

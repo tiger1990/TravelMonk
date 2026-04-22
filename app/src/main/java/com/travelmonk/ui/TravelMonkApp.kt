@@ -69,7 +69,9 @@ fun TravelMonkApp(
         ) { innerPadding ->
             NavDisplay(
                 entries = navigationState.toDecoratedEntries(entryProvider),
-                modifier = Modifier.padding(innerPadding),
+                // To achieve the glass effect, we ignore bottom padding so content flows behind the bar.
+                // We keep top padding for the status/top bar area.
+                modifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
                 onBack = { navigationState.pop() },
                 transitionSpec = {
                     (slideInHorizontally(tween(300)) { it / 4 } + fadeIn(tween(300))) togetherWith

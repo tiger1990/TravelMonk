@@ -11,12 +11,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.travelmonk.core.design.system.color.WarningAmber
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.travelmonk.core.design.system.color.WarningAmber
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.model.BookingType
 import com.travelmonk.core.tokens.TravelMonkIcons
@@ -51,21 +51,27 @@ fun MyBookingsContent(
     state: BookingState,
     modifier: Modifier = Modifier
 ) {
-    if (state.isLoading) {
-        Box(
-            modifier = modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(color = TravelMonkTheme.colors.primary)
-        }
-    } else {
-        LazyColumn(
-            modifier = modifier.fillMaxSize(),
-            contentPadding = PaddingValues(TravelMonkTheme.spacing.medium),
-            verticalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)
-        ) {
-            items(state.bookings, key = { it.id }) { booking ->
-                BookingCard(booking)
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(TravelMonkTheme.colors.background)
+    ) {
+        if (state.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = TravelMonkTheme.colors.primary)
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(TravelMonkTheme.spacing.medium),
+                verticalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)
+            ) {
+                items(state.bookings, key = { it.id }) { booking ->
+                    BookingCard(booking)
+                }
             }
         }
     }
@@ -105,7 +111,7 @@ fun BookingCard(booking: BookingItem) {
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(text = booking.title, style = TravelMonkTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-                Text(text = booking.date, style = TravelMonkTheme.typography.caption, color = TravelMonkTheme.colors.grayText)
+                Text(text = booking.date, style = TravelMonkTheme.typography.caption, color = TravelMonkTheme.colors.onSurfaceVariant)
             }
 
             Column(horizontalAlignment = Alignment.End) {

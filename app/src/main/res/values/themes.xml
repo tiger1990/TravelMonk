@@ -9,8 +9,8 @@
 
     <!-- Launch theme: shown during cold start, hands off to NoActionBar after splash -->
     <style name="Theme.TravelMonk" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/travel_orange</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <!-- <item name="windowSplashScreenBackground">@color/travel_orange</item> -->
+        <!-- <item name="windowSplashScreenAnimatedIcon">@drawable/ic_app_logo</item> -->
         <item name="postSplashScreenTheme">@style/Theme.TravelMonk.NoActionBar</item>
 
         <!-- Make status bar transparent during splash to prevent grey flash -->

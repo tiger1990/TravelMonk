@@ -24,6 +24,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalInspectionMode
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
@@ -37,17 +39,18 @@ fun TravelMonkSplashScreen(
     onAnimationComplete: () -> Unit
 ) {
     val isDark = isSystemInDarkTheme()
+    val isPreview = LocalInspectionMode.current
     val composition by rememberLottieComposition(
-        LottieCompositionSpec.RawRes(com.travelmonk.R.raw.travel_splash)
+        LottieCompositionSpec.RawRes(R.raw.travel_splash)
     )
     val lottieState = animateLottieCompositionAsState(
         composition = composition,
         iterations = 1
     )
 
-    // Fade in text quickly once composition is ready
+    // Fade in text quickly. In preview, show immediately (alpha 1f).
     val textAlpha by animateFloatAsState(
-        targetValue = if (composition != null) 1f else 0f,
+        targetValue = if (isPreview || composition != null) 1f else 0f,
         animationSpec = tween(durationMillis = 500),
         label = "text_fade_in"
     )
@@ -75,46 +78,42 @@ fun TravelMonkSplashScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(if (isDark) TravelMonkTheme.colors.background else TravelMonkTheme.colors.primary)
+            .background(if (isDark) TravelMonkTheme.colors.background else TravelMonkTheme.colors.secondary)
     ) {
-        // Centered Lottie Animation
-        Box(
+        // Full-screen Lottie Animation (Immersive)
+        LottieAnimation(
+            composition = composition,
+            progress = { lottieState.progress },
             modifier = Modifier
-                .align(Alignment.Center)
+                .fillMaxSize()
                 .graphicsLayer {
                     scaleX = contentScale
                     scaleY = contentScale
-                }
-        ) {
-            LottieAnimation(
-                composition = composition,
-                progress = { lottieState.progress },
-                modifier = Modifier.size(240.dp)
-            )
-        }
+                },
+            contentScale = ContentScale.FillBounds
+        )
 
         // Bottom Branding Information
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 64.dp)
+                .padding(bottom = TravelMonkTheme.spacing.extraLarge)
                 .graphicsLayer { alpha = textAlpha },
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = stringResource(R.string.app_name).uppercase(),
                 style = TravelMonkTheme.typography.headlineLarge.copy(
-                    color = Color.White,
+                    color = TravelMonkTheme.colors.primary,
                     letterSpacing = 6.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 28.sp
+                    fontWeight = FontWeight.ExtraBold
                 )
             )
 
             Text(
                 text = "YOUR JOURNEY STARTS HERE",
                 style = TravelMonkTheme.typography.labelMedium.copy(
-                    color = Color.White.copy(alpha = 0.8f),
+                    color = TravelMonkTheme.colors.onBackground.copy(alpha = 0.6f),
                     letterSpacing = 2.sp,
                     fontWeight = FontWeight.Medium
                 )

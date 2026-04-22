@@ -70,7 +70,7 @@ fun TravelMonkTextField(
                         Text(
                             text = placeholder,
                             style = typography.bodyLarge,
-                            color = colors.grayText
+                            color = colors.onSurfaceVariant
                         )
                     }
                     innerTextField()

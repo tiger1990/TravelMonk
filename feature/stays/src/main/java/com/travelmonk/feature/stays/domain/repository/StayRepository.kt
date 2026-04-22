@@ -5,4 +5,5 @@ import com.travelmonk.feature.stays.domain.model.Stay
 
 interface StayRepository {
     suspend fun searchStays(location: String): DataResult<List<Stay>>
+    suspend fun getStayById(id: String): DataResult<Stay>
 }

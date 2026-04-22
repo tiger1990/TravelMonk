@@ -15,10 +15,12 @@ data class ExperienceState(
 
 sealed class ExperienceIntent : UiIntent {
     data class SelectCategory(val category: ExperienceCategory) : ExperienceIntent()
+    data class SelectExperience(val experienceId: String) : ExperienceIntent()
     data class BookItem(val item: Experience) : ExperienceIntent()
 }
 
 sealed class ExperienceEffect : UiEffect {
+    data class NavigateToDetail(val experienceId: String) : ExperienceEffect()
     data class NavigateToBooking(val item: Experience) : ExperienceEffect()
     data class ShowError(val message: String) : ExperienceEffect()
 }

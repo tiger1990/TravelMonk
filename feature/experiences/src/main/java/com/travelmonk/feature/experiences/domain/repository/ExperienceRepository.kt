@@ -6,4 +6,5 @@ import com.travelmonk.feature.experiences.domain.model.ExperienceCategory
 
 interface ExperienceRepository {
     suspend fun getExperiences(category: ExperienceCategory): DataResult<List<Experience>>
+    suspend fun getExperienceById(id: String): DataResult<Experience>
 }

@@ -101,7 +101,7 @@ fun FlightResultsContent(
                 CircularProgressIndicator(color = TravelMonkTheme.colors.primary)
             }
             flights.isEmpty() -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("No flights found", style = TravelMonkTheme.typography.bodyLarge, color = TravelMonkTheme.colors.grayText)
+                Text("No flights found", style = TravelMonkTheme.typography.bodyLarge, color = TravelMonkTheme.colors.onSurfaceVariant)
             }
             else -> LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -126,7 +126,7 @@ fun FlightTicketCard(flight: Flight, onBook: (String) -> Unit) {
     ) {
         Column(modifier = Modifier.padding(TravelMonkTheme.spacing.medium)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(modifier = Modifier.size(32.dp).background(TravelMonkTheme.colors.grayText.copy(alpha = 0.2f), RoundedCornerShape(4.dp)))
+                Box(modifier = Modifier.size(32.dp).background(TravelMonkTheme.colors.onSurfaceVariant.copy(alpha = 0.2f), RoundedCornerShape(4.dp)))
                 Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.medium))
                 Text(text = flight.airline, style = TravelMonkTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
                 Spacer(modifier = Modifier.weight(1f))
@@ -138,18 +138,18 @@ fun FlightTicketCard(flight: Flight, onBook: (String) -> Unit) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Column {
                     Text(text = flight.departureTime, style = TravelMonkTheme.typography.headlineMedium)
-                    Text(text = "Dep", color = TravelMonkTheme.colors.grayText, style = TravelMonkTheme.typography.caption)
+                    Text(text = "Dep", color = TravelMonkTheme.colors.onSurfaceVariant, style = TravelMonkTheme.typography.caption)
                 }
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = flight.duration, style = TravelMonkTheme.typography.caption, color = TravelMonkTheme.colors.grayText)
+                    Text(text = flight.duration, style = TravelMonkTheme.typography.caption, color = TravelMonkTheme.colors.onSurfaceVariant)
                     Icon(painter = painterResource(TravelMonkIcons.FlightTakeoff), contentDescription = null, tint = TravelMonkTheme.colors.primary.copy(alpha = 0.5f))
                     HorizontalDivider(modifier = Modifier.width(60.dp), color = TravelMonkTheme.colors.primary.copy(alpha = 0.3f))
                 }
 
                 Column(horizontalAlignment = Alignment.End) {
                     Text(text = flight.arrivalTime, style = TravelMonkTheme.typography.headlineMedium)
-                    Text(text = "Arr", color = TravelMonkTheme.colors.grayText, style = TravelMonkTheme.typography.caption)
+                    Text(text = "Arr", color = TravelMonkTheme.colors.onSurfaceVariant, style = TravelMonkTheme.typography.caption)
                 }
             }
 

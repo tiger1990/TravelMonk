@@ -10,7 +10,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
@@ -22,7 +21,9 @@ import com.travelmonk.feature.transportapi.TransportTab
 import com.travelmonk.feature.transportapi.navigator.TransportNavigator
 import dagger.hilt.android.EntryPointAccessors
 
-// Stateful entry point
+/**
+ * Stateful entry point for the Transport Screen.
+ */
 @Composable
 fun TransportScreen(
     navigator: TransportNavigator,
@@ -46,7 +47,10 @@ fun TransportScreen(
     )
 }
 
-// Stateless content — previewable without ViewModel or Hilt
+/**
+ * Stateless content for the Transport screen.
+ * Follows the 'map' pattern by delegating specific UI sections to sub-composables.
+ */
 @Composable
 fun TransportContent(
     state: TransportState,
@@ -54,60 +58,18 @@ fun TransportContent(
     modifier: Modifier = Modifier,
     tabContent: @Composable () -> Unit = {}
 ) {
-    val icons = listOf(
-        painterResource(id = R.drawable.ic_flight),
-        painterResource(id = R.drawable.ic_bus),
-        painterResource(id = R.drawable.ic_transit)
-    )
-
     Scaffold(
+        modifier = modifier,
         topBar = {
-            TravelMonkTopBar(
-                title = { Text("Transport") },
-                containerColor = TravelMonkTheme.colors.primary,
-                bottomContent = {
-                    SecondaryTabRow(
-                        selectedTabIndex = state.selectedTab.ordinal,
-                        containerColor = TravelMonkTheme.colors.primary,
-                        contentColor = TravelMonkTheme.colors.onPrimary,
-                        indicator = {
-                            TabRowDefaults.SecondaryIndicator(
-                                modifier = Modifier.tabIndicatorOffset(state.selectedTab.ordinal),
-                                color = TravelMonkTheme.colors.onPrimary
-                            )
-                        }
-                    ) {
-                        TransportTab.entries.forEach { tab ->
-                            val isSelected = state.selectedTab == tab
-                            Tab(
-                                selected = isSelected,
-                                onClick = { onIntent(TransportIntent.SelectTab(tab)) },
-                                text = {
-                                    Text(
-                                        text = tab.name.lowercase().replaceFirstChar { it.uppercase() },
-                                        style = TravelMonkTheme.typography.labelMedium,
-                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                                    )
-                                },
-                                icon = {
-                                    Icon(
-                                        painter = icons[tab.ordinal],
-                                        contentDescription = null,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                },
-                                selectedContentColor = TravelMonkTheme.colors.onPrimary,
-                                unselectedContentColor = TravelMonkTheme.colors.onPrimary.copy(alpha = 0.6f)
-                            )
-                        }
-                    }
-                }
+            TransportTopBar(
+                selectedTab = state.selectedTab,
+                onTabSelected = { onIntent(TransportIntent.SelectTab(it)) }
             )
         },
         containerColor = TravelMonkTheme.colors.background
     ) { innerPadding ->
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .background(TravelMonkTheme.colors.background)
@@ -117,8 +79,77 @@ fun TransportContent(
     }
 }
 
-@Preview(name = "Transport – Light", showBackground = true)
-@Preview(name = "Transport – Dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+/**
+ * Dedicated TopBar for the Transport screen.
+ * Extracted for readability and isolated preview support.
+ */
+@Composable
+private fun TransportTopBar(
+    selectedTab: TransportTab,
+    onTabSelected: (TransportTab) -> Unit
+) {
+    val icons = listOf(
+        painterResource(id = R.drawable.ic_flight),
+        painterResource(id = R.drawable.ic_bus),
+        painterResource(id = R.drawable.ic_transit)
+    )
+
+    TravelMonkTopBar(
+        title = {
+            Text(
+                text = "Transport",
+                color = TravelMonkTheme.colors.onPrimary,
+                style = TravelMonkTheme.typography.titleLarge
+            )
+        },
+        containerColor = TravelMonkTheme.colors.primary,
+        bottomContent = {
+            SecondaryTabRow(
+                selectedTabIndex = selectedTab.ordinal,
+                containerColor = TravelMonkTheme.colors.primary,
+                contentColor = TravelMonkTheme.colors.onPrimary,
+                indicator = {
+                    TabRowDefaults.SecondaryIndicator(
+                        modifier = Modifier.tabIndicatorOffset(selectedTab.ordinal),
+                        color = TravelMonkTheme.colors.onPrimary
+                    )
+                },
+                divider = {}
+            ) {
+                TransportTab.entries.forEach { tab ->
+                    val isSelected = selectedTab == tab
+                    Tab(
+                        selected = isSelected,
+                        onClick = { onTabSelected(tab) },
+                        text = {
+                            Text(
+                                text = tab.name.lowercase().replaceFirstChar { it.uppercase() },
+                                style = TravelMonkTheme.typography.labelMedium,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                            )
+                        },
+                        icon = {
+                            Icon(
+                                painter = icons[tab.ordinal],
+                                contentDescription = null,
+                                modifier = Modifier.size(TravelMonkTheme.dimensions.iconSmall)
+                            )
+                        },
+                        selectedContentColor = TravelMonkTheme.colors.onPrimary,
+                        unselectedContentColor = TravelMonkTheme.colors.onPrimary.copy(alpha = 0.6f)
+                    )
+                }
+            }
+        }
+    )
+}
+
+@Preview(name = "Transport – Light Full", showSystemUi = true)
+@Preview(
+    name = "Transport – Dark Full",
+    showSystemUi = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 private fun TransportContentPreview() {
     TravelMonkTheme {

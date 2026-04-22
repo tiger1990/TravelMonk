@@ -1,5 +1,6 @@
 package com.travelmonk.feature.services.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -57,7 +58,13 @@ fun ServicesScreen(
     Scaffold(
         topBar = {
             TravelMonkTopBar(
-                title = { Text("Home Services") },
+                title = { 
+                    Text(
+                        text = "Home Services",
+                        color = TravelMonkTheme.colors.onPrimary,
+                        style = TravelMonkTheme.typography.titleLarge
+                    ) 
+                },
                 containerColor = TravelMonkTheme.colors.primary
             )
         },
@@ -82,7 +89,9 @@ fun ServicesContent(
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .background(TravelMonkTheme.colors.background),
         contentPadding = PaddingValues(TravelMonkTheme.spacing.medium),
         horizontalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium),
         verticalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)
@@ -125,7 +134,7 @@ fun ServiceCard(service: TravelService, onClick: () -> Unit) {
             Text(
                 text = service.description,
                 style = TravelMonkTheme.typography.caption,
-                color = TravelMonkTheme.colors.grayText,
+                color = TravelMonkTheme.colors.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 lineHeight = 12.sp
             )

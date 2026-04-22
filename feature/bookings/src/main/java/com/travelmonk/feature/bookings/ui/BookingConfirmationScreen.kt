@@ -7,6 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import android.content.res.Configuration
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.model.BookingType
 import com.travelmonk.core.tokens.TravelMonkIcons
@@ -17,8 +19,18 @@ fun BookingConfirmationScreen(
     title: String,
     onDone: () -> Unit
 ) {
+    BookingConfirmationContent(type = type, title = title, onDone = onDone)
+}
+
+@Composable
+fun BookingConfirmationContent(
+    type: BookingType,
+    title: String,
+    onDone: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(TravelMonkTheme.colors.background),
         contentAlignment = Alignment.Center
@@ -31,11 +43,15 @@ fun BookingConfirmationScreen(
                 tint = TravelMonkTheme.colors.tertiary
             )
             Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
-            Text(text = "${type.name.lowercase().replaceFirstChar { it.uppercase() }} Booked Successfully!", style = TravelMonkTheme.typography.titleLarge)
+            Text(
+                text = "${type.name.lowercase().replaceFirstChar { it.uppercase() }} Booked Successfully!",
+                style = TravelMonkTheme.typography.titleLarge,
+                color = TravelMonkTheme.colors.onBackground
+            )
             Text(
                 text = "Confirmed with $title",
                 style = TravelMonkTheme.typography.bodyLarge,
-                color = TravelMonkTheme.colors.grayText
+                color = TravelMonkTheme.colors.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.extraLarge))
             Button(
@@ -45,5 +61,22 @@ fun BookingConfirmationScreen(
                 Text("View My Bookings", color = TravelMonkTheme.colors.onPrimary)
             }
         }
+    }
+}
+
+@Preview(name = "Booking Confirmation – Light", showBackground = true)
+@Preview(
+    name = "Booking Confirmation – Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+private fun BookingConfirmationContentPreview() {
+    TravelMonkTheme {
+        BookingConfirmationContent(
+            type = BookingType.FLIGHT,
+            title = "Air Indigo",
+            onDone = {}
+        )
     }
 }

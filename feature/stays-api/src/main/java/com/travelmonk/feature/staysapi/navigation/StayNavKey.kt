@@ -13,4 +13,8 @@ sealed interface StayNavKey : TravelNavKey {
     @Serializable
     @SerialName("stay.results")
     data class Results(val location: String) : StayNavKey
+
+    @Serializable
+    @SerialName("stay.details")
+    data class Details(val stayId: String) : StayNavKey
 }

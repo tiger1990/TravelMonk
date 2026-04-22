@@ -184,7 +184,7 @@ fun TripTypeSelector(selectedType: TripType, onTypeSelected: (TripType) -> Unit)
             ) {
                 Text(
                     text = type.name.replace("_", " "),
-                    color = if (isSelected) TravelMonkTheme.colors.onPrimary else TravelMonkTheme.colors.grayText,
+                    color = if (isSelected) TravelMonkTheme.colors.onPrimary else TravelMonkTheme.colors.onSurfaceVariant,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                     style = TravelMonkTheme.typography.labelMedium,
                 )
@@ -199,11 +199,11 @@ fun LocationField(label: String, city: String, code: String, @DrawableRes icon: 
         Icon(painter = painterResource(icon), contentDescription = null, tint = TravelMonkTheme.colors.primary, modifier = Modifier.size(TravelMonkTheme.dimensions.iconMedium))
         Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.medium))
         Column {
-            Text(label, color = TravelMonkTheme.colors.grayText, style = TravelMonkTheme.typography.caption)
+            Text(label, color = TravelMonkTheme.colors.onSurfaceVariant, style = TravelMonkTheme.typography.caption)
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(city, style = TravelMonkTheme.typography.titleLarge)
                 Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.small))
-                Text("($code)", style = TravelMonkTheme.typography.labelMedium, color = TravelMonkTheme.colors.grayText)
+                Text("($code)", style = TravelMonkTheme.typography.labelMedium, color = TravelMonkTheme.colors.onSurfaceVariant)
             }
         }
     }
@@ -216,7 +216,7 @@ fun SearchInfoCard(label: String, value: String, @DrawableRes icon: Int, modifie
             .background(TravelMonkTheme.colors.surfaceVariant, RoundedCornerShape(TravelMonkTheme.radius.small))
             .padding(TravelMonkTheme.spacing.medium)
     ) {
-        Text(label, color = TravelMonkTheme.colors.grayText, style = TravelMonkTheme.typography.caption)
+        Text(label, color = TravelMonkTheme.colors.onSurfaceVariant, style = TravelMonkTheme.typography.caption)
         Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.extraSmall))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(painter = painterResource(icon), contentDescription = null, modifier = Modifier.size(TravelMonkTheme.dimensions.iconSmall), tint = TravelMonkTheme.colors.primary)

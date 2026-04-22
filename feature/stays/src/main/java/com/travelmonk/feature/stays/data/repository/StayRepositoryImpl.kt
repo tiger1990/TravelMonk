@@ -22,6 +22,16 @@ class StayRepositoryImpl @Inject constructor(
             DataResult.Success(fakeStays(location))
         }
 
+    override suspend fun getStayById(id: String): DataResult<Stay> =
+        withContext(ioDispatcher) {
+            val stay = fakeStays("Ubud, Bali").find { it.id == id }
+            if (stay != null) {
+                DataResult.Success(stay)
+            } else {
+                DataResult.Error(Exception("Stay not found"))
+            }
+        }
+
     private fun fakeStays(location: String): List<Stay> = listOf(
         StayDto("1", "The Grand Oberoi", location, "$240", "4.9", "https://images.unsplash.com/photo-1566073771259-6a8506099945").toDomain(),
         StayDto("2", "Azure Apartment", location, "$180", "4.7", "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267").toDomain(),

@@ -18,7 +18,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
@@ -31,7 +30,9 @@ import com.travelmonk.feature.stays.mvi.*
 import com.travelmonk.feature.staysapi.navigation.StayNavKey
 import com.travelmonk.feature.staysapi.navigator.StayNavigator
 
-// Stateful entry point
+/**
+ * Stateful entry point for the Stay Search Screen.
+ */
 @Composable
 fun StaySearchScreen(
     navigator: StayNavigator,
@@ -49,61 +50,89 @@ fun StaySearchScreen(
         }
     }
 
+    StaySearchScreenContent(
+        state = state,
+        onIntent = viewModel::onIntent,
+        snackBarHostState = snackBarHostState
+    )
+}
+
+/**
+ * Stateless full-screen content for Stay Search.
+ */
+@Composable
+fun StaySearchScreenContent(
+    state: StaySearchState,
+    onIntent: (StayIntent) -> Unit,
+    snackBarHostState: SnackbarHostState = remember { SnackbarHostState() }
+) {
     Scaffold(
         topBar = {
-            TravelMonkTopBar(
-                title = {
-                    Text(
-                        text = "Find your best\nstaying place",
-                        style = TravelMonkTheme.typography.headlineMedium
-                    )
-                },
-                containerColor = TravelMonkTheme.colors.primary,
-                bottomContent = {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(
-                                horizontal = TravelMonkTheme.spacing.large,
-                                vertical = TravelMonkTheme.spacing.medium
-                            ),
-                        shape = RoundedCornerShape(TravelMonkTheme.radius.medium),
-                        colors = CardDefaults.cardColors(containerColor = TravelMonkTheme.colors.surface)
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(TravelMonkTheme.spacing.medium),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                painter = painterResource(TravelMonkIcons.Search),
-                                contentDescription = null,
-                                tint = TravelMonkTheme.colors.grayText
-                            )
-                            Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.small))
-                            Text(
-                                text = "Search for hotel, apartment...",
-                                color = TravelMonkTheme.colors.grayText,
-                                style = TravelMonkTheme.typography.labelMedium
-                            )
-                        }
-                    }
-                }
-            )
+            StaySearchTopBar()
         },
         snackbarHost = { TravelMonkSnackBarHost(snackBarHostState) },
         containerColor = TravelMonkTheme.colors.background
     ) { innerPadding ->
-        StaySearchContent(
+        StaySearchListContent(
             state = state,
-            onIntent = viewModel::onIntent,
+            onIntent = onIntent,
             modifier = Modifier.padding(innerPadding)
         )
     }
 }
 
-// Stateless content — previewable without ViewModel
+/**
+ * Dedicated TopBar for the Stay Search screen.
+ */
 @Composable
-fun StaySearchContent(
+private fun StaySearchTopBar() {
+    TravelMonkTopBar(
+        title = {
+            Text(
+                text = "Find your stay",
+                style = TravelMonkTheme.typography.headlineMedium,
+                color = TravelMonkTheme.colors.onPrimary
+            )
+        },
+        containerColor = TravelMonkTheme.colors.primary,
+        bottomContent = {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = TravelMonkTheme.spacing.large,
+                        vertical = TravelMonkTheme.spacing.medium
+                    ),
+                shape = RoundedCornerShape(TravelMonkTheme.radius.medium),
+                colors = CardDefaults.cardColors(containerColor = TravelMonkTheme.colors.surface)
+            ) {
+                Row(
+                    modifier = Modifier.padding(TravelMonkTheme.spacing.medium),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(TravelMonkIcons.Search),
+                        contentDescription = null,
+                        tint = TravelMonkTheme.colors.onSurfaceVariant,
+                        modifier = Modifier.size(TravelMonkTheme.dimensions.iconSmall)
+                    )
+                    Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.small))
+                    Text(
+                        text = "Search for hotel, apartment...",
+                        color = TravelMonkTheme.colors.onSurfaceVariant,
+                        style = TravelMonkTheme.typography.labelMedium
+                    )
+                }
+            }
+        }
+    )
+}
+
+/**
+ * The scrollable list part of the Stay Search screen.
+ */
+@Composable
+private fun StaySearchListContent(
     state: StaySearchState,
     onIntent: (StayIntent) -> Unit,
     modifier: Modifier = Modifier
@@ -115,6 +144,7 @@ fun StaySearchContent(
             .verticalScroll(rememberScrollState())
     ) {
         Column(modifier = Modifier.padding(TravelMonkTheme.spacing.large)) {
+            // Stay Type Categories
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -188,7 +218,7 @@ fun StaySearchContent(
 }
 
 @Composable
-fun SectionHeader(title: String) {
+private fun SectionHeader(title: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -200,30 +230,42 @@ fun SectionHeader(title: String) {
 }
 
 @Composable
-fun DestinationChip(city: String) {
+private fun DestinationChip(city: String) {
     Card(
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(TravelMonkTheme.radius.medium),
         colors = CardDefaults.cardColors(containerColor = TravelMonkTheme.colors.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = TravelMonkTheme.dimensions.cardElevation)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = TravelMonkTheme.spacing.medium, vertical = TravelMonkTheme.spacing.small),
+            modifier = Modifier.padding(
+                horizontal = TravelMonkTheme.spacing.medium, 
+                vertical = TravelMonkTheme.spacing.small
+            ),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(painter = painterResource(TravelMonkIcons.LocationOn), contentDescription = null, modifier = Modifier.size(16.dp), tint = TravelMonkTheme.colors.primary)
+            Icon(
+                painter = painterResource(TravelMonkIcons.LocationOn), 
+                contentDescription = null, 
+                modifier = Modifier.size(TravelMonkTheme.dimensions.iconSmall), 
+                tint = TravelMonkTheme.colors.primary
+            )
             Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.small))
-            Text(text = city, style = TravelMonkTheme.typography.labelMedium, fontWeight = FontWeight.Medium)
+            Text(
+                text = city, 
+                style = TravelMonkTheme.typography.labelMedium, 
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 }
 
 @Composable
-fun StayItem(title: String, location: String, price: String, rating: String, imageUrl: String) {
+private fun StayItem(title: String, location: String, price: String, rating: String, imageUrl: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(TravelMonkTheme.radius.large),
         colors = CardDefaults.cardColors(containerColor = TravelMonkTheme.colors.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = TravelMonkTheme.dimensions.cardElevation)
     ) {
         Column {
             Box {
@@ -236,39 +278,69 @@ fun StayItem(title: String, location: String, price: String, rating: String, ima
                 Box(
                     modifier = Modifier
                         .padding(TravelMonkTheme.spacing.small)
-                        .background(TravelMonkTheme.colors.surface.copy(alpha = 0.9f), RoundedCornerShape(TravelMonkTheme.radius.small))
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .background(
+                            TravelMonkTheme.colors.surface.copy(alpha = 0.9f), 
+                            RoundedCornerShape(TravelMonkTheme.radius.small)
+                        )
+                        .padding(horizontal = TravelMonkTheme.spacing.small, vertical = TravelMonkTheme.spacing.extraSmall)
                         .align(Alignment.TopEnd)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(painter = painterResource(TravelMonkIcons.Star), contentDescription = null, tint = TravelYellow, modifier = Modifier.size(14.dp))
+                        Icon(
+                            painter = painterResource(TravelMonkIcons.Star), 
+                            contentDescription = null, 
+                            tint = TravelYellow, 
+                            modifier = Modifier.size(TravelMonkTheme.dimensions.iconSmall)
+                        )
                         Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.extraSmall))
-                        Text(text = rating, style = TravelMonkTheme.typography.caption, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = rating, 
+                            style = TravelMonkTheme.typography.caption, 
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }
             Column(modifier = Modifier.padding(TravelMonkTheme.spacing.medium)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(text = title, style = TravelMonkTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-                    Text(text = "$price / night", color = TravelMonkTheme.colors.primary, style = TravelMonkTheme.typography.bodyLarge, fontWeight = FontWeight.ExtraBold)
+                    Text(text = title, style = TravelMonkTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = "$price / night", 
+                        color = TravelMonkTheme.colors.primary, 
+                        style = TravelMonkTheme.typography.bodyLarge, 
+                        fontWeight = FontWeight.ExtraBold
+                    )
                 }
                 Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.extraSmall))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(painter = painterResource(TravelMonkIcons.LocationOn), contentDescription = null, modifier = Modifier.size(14.dp), tint = TravelMonkTheme.colors.grayText)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = location, style = TravelMonkTheme.typography.caption, color = TravelMonkTheme.colors.grayText)
+                    Icon(
+                        painter = painterResource(TravelMonkIcons.LocationOn), 
+                        contentDescription = null, 
+                        modifier = Modifier.size(TravelMonkTheme.dimensions.iconSmall), 
+                        tint = TravelMonkTheme.colors.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.extraSmall))
+                    Text(
+                        text = location, 
+                        style = TravelMonkTheme.typography.caption,
+                        color = TravelMonkTheme.colors.onSurfaceVariant
+                    )
                 }
             }
         }
     }
 }
 
-@Preview(name = "Stays – Light", showBackground = true)
-@Preview(name = "Stays – Dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Stay Search – Light", showSystemUi = true)
+@Preview(
+    name = "Stay Search – Dark", 
+    showSystemUi = true, 
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
-private fun StaySearchContentPreview() {
+private fun StaySearchScreenPreview() {
     TravelMonkTheme {
-        StaySearchContent(
+        StaySearchScreenContent(
             state = StaySearchState(),
             onIntent = {}
         )
