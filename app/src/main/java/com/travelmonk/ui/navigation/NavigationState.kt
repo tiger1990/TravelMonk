@@ -86,9 +86,12 @@ class NavigationState(
     /**
      * Returns Navigation3 decorated entries for all currently active tab stacks.
      *
-     * Each tab gets its OWN [rememberSaveableStateHolderNavEntryDecorator], so Compose
-     * state (scroll position, text field content) is preserved independently per tab
-     * when switching between tabs. This is the key difference from a single shared decorator.
+     * Optimization: We create and remember the decorators once for all stacks. Passing
+     * a stable, remembered list to [rememberDecoratedNavEntries] prevents unnecessary
+     * re-decoration churn during tab switches and within-tab navigation.
+     *
+     * IMPORTANT: We map all stacks to decorated entries outside the flatMap to preserve
+     * identity and avoid re-calculating decorations in a loop, which causes lag.
      *
      * "Exit through home" pattern: home stack is always kept active underneath the
      * selected tab, matching the Google recipe's behavior.
@@ -97,17 +100,21 @@ class NavigationState(
     fun toDecoratedEntries(
         entryProvider: (TravelNavKey) -> NavEntry<TravelNavKey>
     ): List<NavEntry<TravelNavKey>> {
+        val saveableStateDecorator = rememberSaveableStateHolderNavEntryDecorator<TravelNavKey>()
+        val viewModelStoreDecorator = rememberViewModelStoreNavEntryDecorator<TravelNavKey>()
+        val decorators = remember(saveableStateDecorator, viewModelStoreDecorator) {
+            listOf(saveableStateDecorator, viewModelStoreDecorator)
+        }
+
         @Suppress("UNCHECKED_CAST")
         val decoratedByRoute = backStacks.mapValues { (_, stack) ->
             rememberDecoratedNavEntries(
                 backStack = stack as NavBackStack<TravelNavKey>,
-                entryDecorators = listOf(
-                    rememberSaveableStateHolderNavEntryDecorator(), // per-tab UI state isolation
-                    rememberViewModelStoreNavEntryDecorator()        // ViewModel scoped to entry
-                ),
+                entryDecorators = decorators,
                 entryProvider = entryProvider
             )
         }
+        
         return activeRoutes().flatMap { decoratedByRoute[it] ?: emptyList() }
     }
 

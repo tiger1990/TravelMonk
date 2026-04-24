@@ -88,11 +88,13 @@ private fun TransportTopBar(
     selectedTab: TransportTab,
     onTabSelected: (TransportTab) -> Unit
 ) {
-    val icons = listOf(
-        painterResource(id = R.drawable.ic_flight),
-        painterResource(id = R.drawable.ic_bus),
-        painterResource(id = R.drawable.ic_transit)
-    )
+    val icons = remember {
+        listOf(
+            R.drawable.ic_flight,
+            R.drawable.ic_bus,
+            R.drawable.ic_transit
+        )
+    }
 
     TravelMonkTopBar(
         title = {
@@ -130,7 +132,7 @@ private fun TransportTopBar(
                         },
                         icon = {
                             Icon(
-                                painter = icons[tab.ordinal],
+                                painter = painterResource(id = icons[tab.ordinal]),
                                 contentDescription = null,
                                 modifier = Modifier.size(TravelMonkTheme.dimensions.iconSmall)
                             )

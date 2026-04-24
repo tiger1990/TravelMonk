@@ -21,8 +21,8 @@ kotlinxSerializationCore = "1.11.0"
 # ── AndroidX Core ─────────────────────────────────────────────────────────────
 coreKtx         = "1.18.0"
 activityCompose = "1.13.0"
-splashscreen    = "1.0.1"
-lottie          = "6.6.6"
+splashscreen    = "1.2.0"
+lottie          = "6.7.1"
 
 # ── Lifecycle & ViewModel ─────────────────────────────────────────────────────
 # Single version drives all lifecycle-* artifacts + lifecycle-viewmodel-navigation3
@@ -31,14 +31,14 @@ lifecycle = "2.10.0"
 # ── Compose ───────────────────────────────────────────────────────────────────
 # BOM manages versions for all androidx.compose.* artifacts.
 # Explicit versions below are for artifacts NOT covered by the BOM.
-composeBom                       = "2026.03.01"
-composeAnimation                 = "1.10.6"
-uiToolingPreview                 = "1.10.6"   # override if BOM version has issues
-uiTooling                        = "1.10.6"   # override if BOM version has issues
+composeBom                       = "2026.04.01"
+composeAnimation                 = "1.11.0"
+uiToolingPreview                 = "1.11.0"   # override if BOM version has issues
+uiTooling                        = "1.11.0"   # override if BOM version has issues
 androidxComposeMaterial3AdaptiveNav3 = "1.0.0-alpha03" # adaptive-navigation3 integration (not in BOM yet)
 
 # ── Navigation 3 ──────────────────────────────────────────────────────────────
-navigation3 = "1.1.0"   # androidx.navigation3 — alpha/beta; pin explicitly
+navigation3 = "1.1.1"   # androidx.navigation3 — alpha/beta; pin explicitly
 
 # ── Dependency Injection ──────────────────────────────────────────────────────
 hilt                  = "2.59.2"
@@ -53,7 +53,7 @@ okhttp   = "5.3.2"   # OkHttp is a shared transitive dep; pin to avoid conflicts
 moshi    = "1.15.2"
 
 # ── WorkManager ───────────────────────────────────────────────────────────────
-workManager = "2.10.1"
+workManager = "2.11.2"
 
 # ── Image Loading ─────────────────────────────────────────────────────────────
 coil = "3.4.0"

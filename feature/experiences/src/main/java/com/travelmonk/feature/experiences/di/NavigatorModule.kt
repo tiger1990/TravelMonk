@@ -20,6 +20,8 @@ object NavigatorModule {
     fun provideExperienceNavigator(bus: NavigationBus): ExperienceNavigator = object : ExperienceNavigator {
         override fun navigateTo(key: ExperienceNavKey) = bus.navigate(key)
         override fun back() = bus.back()
+        override fun navigateToExperienceDetail(experienceId: String) =
+            bus.navigate(ExperienceNavKey.Details(experienceId))
         override fun navigateToBookingConfirmation(type: BookingType, title: String) =
             bus.navigate(BookingNavKey.Confirmation(type, title))
     }
