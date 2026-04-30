@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.travelmonk.core.ui.utils.LogScreenLifecycle
 import com.travelmonk.core.ui.utils.TravelMonkSnackBarHost
 import com.travelmonk.core.ui.TravelMonkTopBar
 import com.travelmonk.core.design.system.color.TravelYellow
@@ -38,6 +39,8 @@ fun StaySearchScreen(
     navigator: StayNavigator,
     viewModel: StayViewModel = hiltViewModel()
 ) {
+    LogScreenLifecycle("StaySearchScreen")
+
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
 

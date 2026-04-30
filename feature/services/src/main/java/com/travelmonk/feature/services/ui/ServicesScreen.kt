@@ -23,6 +23,7 @@ import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.model.BookingType
 import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.core.ui.TravelMonkTopBar
+import com.travelmonk.core.ui.utils.LogScreenLifecycle
 import com.travelmonk.feature.services.domain.model.TravelService
 import com.travelmonk.feature.services.mvi.ServicesEffect
 import com.travelmonk.feature.services.mvi.ServicesIntent
@@ -44,6 +45,8 @@ fun ServicesScreen(
     navigator: ServiceNavigator,
     viewModel: ServicesViewModel = hiltViewModel()
 ) {
+    LogScreenLifecycle("ServicesScreen")
+
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {

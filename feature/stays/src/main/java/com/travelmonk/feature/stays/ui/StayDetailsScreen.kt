@@ -24,6 +24,7 @@ import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.model.BookingType
 import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.core.ui.TravelMonkButton
+import com.travelmonk.core.ui.utils.LogScreenLifecycle
 import com.travelmonk.core.ui.utils.TravelMonkSnackBarHost
 import com.travelmonk.feature.stays.domain.model.Stay
 import com.travelmonk.feature.stays.mvi.StayDetailsEffect
@@ -38,8 +39,10 @@ fun StayDetailsScreen(
     navigator: StayNavigator,
     viewModel: StayDetailsViewModel = hiltViewModel()
 ) {
+    LogScreenLifecycle("StayDetailsScreen")
+
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(stayId) {
         viewModel.onIntent(StayDetailsIntent.LoadDetails(stayId))
@@ -52,7 +55,7 @@ fun StayDetailsScreen(
                     // navigator.navigateToBooking(effect.stay)
                 }
                 is StayDetailsEffect.ShowError -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    snackBarHostState.showSnackbar(effect.message)
                 }
             }
         }
@@ -60,7 +63,7 @@ fun StayDetailsScreen(
 
     StayDetailsContent(
         state = state,
-        snackbarHostState = snackbarHostState,
+        snackbarHostState = snackBarHostState,
         onIntent = viewModel::onIntent,
         onBackClick = { navigator.back() }
     )

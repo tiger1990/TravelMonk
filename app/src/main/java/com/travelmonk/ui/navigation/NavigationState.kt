@@ -89,6 +89,13 @@ class NavigationState(
      * Optimization: We create and remember the decorators once for all stacks. Passing
      * a stable, remembered list to [rememberDecoratedNavEntries] prevents unnecessary
      * re-decoration churn during tab switches and within-tab navigation.
+     * rememberViewModelStoreNavEntryDecorator : This scopes ViewModels to
+     * individual screens (NavEntries), each destination gets its own ViewModelStore
+     * `ie: Each screen gets its own unique instance of a ViewModel.
+     *
+     * rememberSaveableStateHolderNavEntryDecorator: This enables Saveable State for each screen
+     * survive process death by saving state into the OS Bundle
+     * `ie: Each screen gets its own unique instance of a SaveableStateHolder.
      *
      * IMPORTANT: We map all stacks to decorated entries outside the flatMap to preserve
      * identity and avoid re-calculating decorations in a loop, which causes lag.

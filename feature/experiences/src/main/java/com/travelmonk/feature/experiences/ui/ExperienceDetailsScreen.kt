@@ -22,6 +22,7 @@ import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.model.BookingType
 import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.core.ui.TravelMonkButton
+import com.travelmonk.core.ui.utils.LogScreenLifecycle
 import com.travelmonk.core.ui.utils.TravelMonkSnackBarHost
 import com.travelmonk.feature.experiences.domain.model.Experience
 import com.travelmonk.feature.experiences.domain.model.ExperienceCategory
@@ -37,6 +38,8 @@ fun ExperienceDetailsScreen(
     navigator: ExperienceNavigator,
     viewModel: ExperienceDetailsViewModel = hiltViewModel()
 ) {
+    LogScreenLifecycle("ExperienceDetailsScreen")
+
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 

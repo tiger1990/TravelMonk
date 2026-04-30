@@ -32,6 +32,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 add("implementation", project(":core:design-system"))
                 add("implementation", project(":core:tokens"))
                 add("implementation", project(":core:network"))
+                add("implementation", project(":core:logger"))
 
                 // Compose UI primitives — every feature screen needs basic Compose + Material3
                 add("implementation", libs.findLibrary("androidx-compose-ui").get())

@@ -14,6 +14,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.ui.TravelMonkTopBar
+import com.travelmonk.core.ui.utils.LogScreenLifecycle
 import com.travelmonk.feature.transport.R
 import com.travelmonk.feature.transport.di.TransportTabProviderEntryPoint
 import com.travelmonk.feature.transport.mvi.*
@@ -29,6 +30,8 @@ fun TransportScreen(
     navigator: TransportNavigator,
     viewModel: TransportViewModel = hiltViewModel()
 ) {
+    LogScreenLifecycle("TransportScreen")
+
     val context = LocalContext.current
     val providers = remember {
         EntryPointAccessors.fromApplication(

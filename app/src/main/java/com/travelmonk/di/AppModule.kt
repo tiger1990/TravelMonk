@@ -19,6 +19,9 @@ object AppModule {
     fun provideAppConfig(@ApplicationContext context: Context): AppConfig = object : AppConfig {
 
         override val isDebug: Boolean = BuildConfig.DEBUG
+        // This is the standard Android way to check for debug status
+        // without relying on generated BuildConfig files.
+        // override val isDebug = (context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
 
         override val baseUrl: String = BuildConfig.BASE_URL
     }

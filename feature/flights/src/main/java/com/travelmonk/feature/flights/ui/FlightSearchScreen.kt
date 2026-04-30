@@ -22,6 +22,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.core.ui.TravelMonkTopBar
+import com.travelmonk.core.ui.utils.LogScreenLifecycle
 import com.travelmonk.core.ui.utils.TravelMonkSnackBarHost
 import com.travelmonk.feature.flights.mvi.*
 import com.travelmonk.feature.flightsapi.navigation.FlightNavKey
@@ -33,6 +34,8 @@ fun FlightSearchScreen(
     navigator: FlightNavigator,
     viewModel: FlightViewModel = hiltViewModel()
 ) {
+    LogScreenLifecycle("FlightSearchScreen")
+
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
 

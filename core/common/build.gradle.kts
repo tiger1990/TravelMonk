@@ -11,4 +11,5 @@ dependencies {
     // ...existing code...
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.kotlinx.coroutines.core)
+    implementation(project(":core:logger"))
 }

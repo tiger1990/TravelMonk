@@ -2,6 +2,7 @@ package com.travelmonk.core.common.mvi
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.travelmonk.core.logger.TravelMonkLogger
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,6 +17,14 @@ interface UiIntent
 interface UiEffect
 
 abstract class BaseViewModel<S : UiState, I : UiIntent, E : UiEffect> : ViewModel() {
+
+    init {
+        TravelMonkLogger.d(
+            tag = "ViewModel",
+            msg = "${this::class.simpleName} created | hash=${Integer.toHexString(System.identityHashCode(this))}"
+        )
+    }
+
     private val initialState: S by lazy { createInitialState() }
     abstract fun createInitialState(): S
 
@@ -68,6 +77,10 @@ abstract class BaseViewModel<S : UiState, I : UiIntent, E : UiEffect> : ViewMode
     }
 
     override fun onCleared() {
+        TravelMonkLogger.d(
+            tag = "ViewModel",
+            msg = "${this::class.simpleName} cleared | hash=${Integer.toHexString(System.identityHashCode(this))}"
+        )
         super.onCleared()
         _effect.close()
     }

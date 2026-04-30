@@ -21,6 +21,7 @@ import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.model.BookingType
 import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.core.ui.TravelMonkTopBar
+import com.travelmonk.core.ui.utils.LogScreenLifecycle
 import com.travelmonk.feature.bookings.domain.model.BookingItem
 import com.travelmonk.feature.bookings.mvi.BookingState
 import com.travelmonk.feature.bookingsapi.navigator.BookingNavigator
@@ -31,6 +32,8 @@ fun MyBookingsScreen(
     navigator: BookingNavigator,
     viewModel: BookingViewModel = hiltViewModel()
 ) {
+    LogScreenLifecycle("MyBookingsScreen")
+
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     Scaffold(
         topBar = {

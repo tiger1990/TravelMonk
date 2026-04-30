@@ -23,6 +23,7 @@ import coil3.compose.AsyncImage
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.core.ui.TravelMonkTopBar
+import com.travelmonk.core.ui.utils.LogScreenLifecycle
 import com.travelmonk.core.ui.utils.TravelMonkSnackBarHost
 import com.travelmonk.feature.stays.domain.model.Stay
 import com.travelmonk.feature.stays.mvi.StayResultsEffect
@@ -37,6 +38,8 @@ fun StayResultsScreen(
     navigator: StayNavigator,
     viewModel: StayResultsViewModel = hiltViewModel()
 ) {
+    LogScreenLifecycle("StayResultsScreen")
+
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 

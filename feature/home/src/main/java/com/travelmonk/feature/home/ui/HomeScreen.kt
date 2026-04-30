@@ -24,6 +24,7 @@ import coil3.compose.AsyncImage
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.core.ui.TravelMonkTopBar
+import com.travelmonk.core.ui.utils.LogScreenLifecycle
 import com.travelmonk.feature.home.domain.model.HomeBanner
 import com.travelmonk.feature.home.mvi.*
 import com.travelmonk.feature.homeapi.navigator.HomeNavigator
@@ -34,6 +35,8 @@ fun HomeScreen(
     navigator: HomeNavigator,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
+    LogScreenLifecycle("HomeScreen")
+
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {

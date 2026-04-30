@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.travelmonk.core.ui.utils.LogScreenLifecycle
 import com.travelmonk.feature.flights.mvi.FlightEffect
 import com.travelmonk.feature.flights.ui.FlightSearchContent
 import com.travelmonk.feature.flights.ui.FlightViewModel
@@ -23,6 +24,8 @@ class FlightsTabContentProvider @Inject constructor(
 
     @Composable
     override fun Content() {
+        LogScreenLifecycle("Tab_FlightSearchScreen")
+
         val viewModel: FlightViewModel = hiltViewModel()
         val state by viewModel.uiState.collectAsStateWithLifecycle()
         val snackBarHostState = remember { SnackbarHostState() }
