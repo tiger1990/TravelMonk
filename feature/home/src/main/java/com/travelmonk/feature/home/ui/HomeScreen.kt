@@ -1,6 +1,5 @@
 package com.travelmonk.feature.home.ui
 
-import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,11 +11,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -25,6 +22,9 @@ import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.core.ui.TravelMonkTopBar
 import com.travelmonk.core.ui.utils.LogScreenLifecycle
+import com.travelmonk.core.design.system.theme.TravelMonkThemeWrapper
+import androidx.compose.ui.tooling.preview.PreviewWrapper
+import com.travelmonk.core.design.system.theme.TravelMonkComponentPreviews
 import com.travelmonk.feature.home.domain.model.HomeBanner
 import com.travelmonk.feature.home.mvi.*
 import com.travelmonk.feature.homeapi.navigator.HomeNavigator
@@ -169,15 +169,15 @@ fun BannerSection(banners: List<HomeBanner>, onBannerClick: (String) -> Unit) {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(Color.Black.copy(alpha = 0.3f))
+                                .background(TravelMonkTheme.colors.imageScrim)
                         )
                         Column(
                             modifier = Modifier
                                 .align(Alignment.BottomStart)
                                 .padding(16.dp)
                         ) {
-                            Text(text = banner.title, color = Color.White, style = TravelMonkTheme.typography.titleLarge)
-                            Text(text = banner.description, color = Color.White.copy(alpha = 0.8f), style = TravelMonkTheme.typography.labelMedium)
+                            Text(text = banner.title, color = TravelMonkTheme.colors.onImage, style = TravelMonkTheme.typography.titleLarge)
+                            Text(text = banner.description, color = TravelMonkTheme.colors.onImage.copy(alpha = 0.8f), style = TravelMonkTheme.typography.labelMedium)
                         }
                     }
                 }
@@ -233,19 +233,17 @@ fun PromoSection() {
     }
 }
 
-@Preview(name = "Home – Light", showBackground = true)
-@Preview(name = "Home – Dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@TravelMonkComponentPreviews
+@PreviewWrapper(TravelMonkThemeWrapper::class)
 @Composable
 private fun HomeContentPreview() {
-    TravelMonkTheme {
-        HomeContent(
-            state = HomeState(
-                banners = listOf(
-                    HomeBanner("1", "Summer Sale", "Up to 40% off", ""),
-                    HomeBanner("2", "Bali Getaway", "From $299", "")
-                )
-            ),
-            onIntent = {}
-        )
-    }
+    HomeContent(
+        state = HomeState(
+            banners = listOf(
+                HomeBanner("1", "Summer Sale", "Up to 40% off", ""),
+                HomeBanner("2", "Bali Getaway", "From $299", "")
+            )
+        ),
+        onIntent = {}
+    )
 }

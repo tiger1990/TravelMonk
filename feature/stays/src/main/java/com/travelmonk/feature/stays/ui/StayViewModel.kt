@@ -1,5 +1,6 @@
 package com.travelmonk.feature.stays.ui
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.travelmonk.core.common.mvi.BaseViewModel
 import com.travelmonk.core.common.result.DataResult
@@ -11,14 +12,27 @@ import javax.inject.Inject
 
 @HiltViewModel
 class StayViewModel @Inject constructor(
-    private val searchStaysUseCase: SearchStaysUseCase
-) : BaseViewModel<StaySearchState, StayIntent, StayEffect>() {
-    override fun createInitialState(): StaySearchState = StaySearchState()
+    private val searchStaysUseCase: SearchStaysUseCase,
+    private val savedStateHandle: SavedStateHandle
+) : BaseViewModel<StaySearchState, StayIntent, StayEffect>(
+    StaySearchState(
+        location = savedStateHandle[KEY_LOCATION] ?: "Paris, France",
+        stayType = savedStateHandle.get<String>(KEY_STAY_TYPE)
+            ?.let { name -> StayType.entries.firstOrNull { it.name == name } }
+            ?: StayType.HOTEL
+    )
+) {
 
     override fun handleIntent(intent: StayIntent) {
         when (intent) {
-            is StayIntent.ChangeStayType -> setState { copy(stayType = intent.type) }
-            is StayIntent.UpdateLocation -> setState { copy(location = intent.location) }
+            is StayIntent.ChangeStayType -> {
+                setState { copy(stayType = intent.type) }
+                savedStateHandle[KEY_STAY_TYPE] = intent.type.name
+            }
+            is StayIntent.UpdateLocation -> {
+                setState { copy(location = intent.location) }
+                savedStateHandle[KEY_LOCATION] = intent.location
+            }
             is StayIntent.SearchStays -> {
                 viewModelScope.launch {
                     setState { copy(isLoading = true) }
@@ -36,5 +50,10 @@ class StayViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    companion object {
+        private const val KEY_LOCATION  = "location"
+        private const val KEY_STAY_TYPE = "stay_type"
     }
 }

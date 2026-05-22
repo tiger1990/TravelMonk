@@ -1,15 +1,14 @@
 package com.travelmonk.feature.stays.ui
 
-import android.content.res.Configuration
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,16 +16,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
 import com.travelmonk.core.ui.utils.LogScreenLifecycle
 import com.travelmonk.core.ui.utils.TravelMonkSnackBarHost
 import com.travelmonk.core.ui.TravelMonkTopBar
 import com.travelmonk.core.design.system.color.TravelYellow
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.tokens.TravelMonkIcons
+import androidx.compose.ui.tooling.preview.PreviewWrapper
+import coil3.request.crossfade
+import com.travelmonk.core.design.system.theme.TravelMonkComponentPreviews
+import com.travelmonk.core.design.system.theme.TravelMonkThemeWrapper
 import com.travelmonk.feature.stays.mvi.*
 import com.travelmonk.feature.staysapi.navigation.StayNavKey
 import com.travelmonk.feature.staysapi.navigator.StayNavigator
@@ -140,55 +143,18 @@ private fun StaySearchListContent(
     onIntent: (StayIntent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
+    LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .background(TravelMonkTheme.colors.background)
-            .verticalScroll(rememberScrollState())
+            .background(TravelMonkTheme.colors.background),
+        contentPadding = PaddingValues(TravelMonkTheme.spacing.large),
+        verticalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)
     ) {
-        Column(modifier = Modifier.padding(TravelMonkTheme.spacing.large)) {
-            // Stay Type Categories
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                StayType.entries.forEach { type ->
-                    val isSelected = state.stayType == type
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.clickable { onIntent(StayIntent.ChangeStayType(type)) }
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(TravelMonkTheme.dimensions.categoryIconSize)
-                                .background(
-                                    if (isSelected) TravelMonkTheme.colors.primary else TravelMonkTheme.colors.surface,
-                                    RoundedCornerShape(TravelMonkTheme.radius.medium)
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            @DrawableRes val icon = when (type) {
-                                StayType.HOTEL     -> TravelMonkIcons.Hotel
-                                StayType.APARTMENT -> TravelMonkIcons.Apartment
-                                StayType.RESORT    -> TravelMonkIcons.HolidayVillage
-                            }
-                            Icon(
-                                painter = painterResource(icon),
-                                contentDescription = null,
-                                tint = if (isSelected) TravelMonkTheme.colors.onPrimary else TravelMonkTheme.colors.primary
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.small))
-                        Text(
-                            text = type.name.lowercase().replaceFirstChar { it.uppercase() },
-                            style = TravelMonkTheme.typography.labelMedium,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.extraLarge))
+        item(key = "stay_type_tabs") {
+            StayTypeTabRow(selectedType = state.stayType, onIntent = onIntent)
+        }
+        item(key = "popular_section") {
+            Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
             SectionHeader(title = "Popular Destinations")
             Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
             LazyRow(horizontalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)) {
@@ -196,11 +162,12 @@ private fun StaySearchListContent(
                     DestinationChip(city)
                 }
             }
-
-            Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.extraLarge))
-            SectionHeader(title = "Recommended Stays")
+        }
+        item(key = "recommended_header") {
             Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
-
+            SectionHeader(title = "Recommended Stays")
+        }
+        item(key = "grand_oberoi") {
             StayItem(
                 title = "The Grand Oberoi",
                 location = "Bali, Indonesia",
@@ -208,7 +175,8 @@ private fun StaySearchListContent(
                 rating = "4.9",
                 imageUrl = "https://images.unsplash.com/photo-1566073771259-6a8506099945"
             )
-            Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
+        }
+        item(key = "azure_apartment") {
             StayItem(
                 title = "Azure Apartment",
                 location = "Paris, France",
@@ -216,6 +184,55 @@ private fun StaySearchListContent(
                 rating = "4.7",
                 imageUrl = "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267"
             )
+        }
+    }
+}
+
+@Composable
+private fun StayTypeTabRow(
+    selectedType: StayType,
+    onIntent: (StayIntent) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        StayType.entries.forEach { type ->
+            val isSelected = selectedType == type
+            val label = remember(type) {
+                type.name.lowercase().replaceFirstChar { it.uppercase() }
+            }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.clickable { onIntent(StayIntent.ChangeStayType(type)) }
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(TravelMonkTheme.dimensions.categoryIconSize)
+                        .background(
+                            if (isSelected) TravelMonkTheme.colors.primary else TravelMonkTheme.colors.surface,
+                            RoundedCornerShape(TravelMonkTheme.radius.medium)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    @DrawableRes val icon = when (type) {
+                        StayType.HOTEL     -> TravelMonkIcons.Hotel
+                        StayType.APARTMENT -> TravelMonkIcons.Apartment
+                        StayType.RESORT    -> TravelMonkIcons.HolidayVillage
+                    }
+                    Icon(
+                        painter = painterResource(icon),
+                        contentDescription = null,
+                        tint = if (isSelected) TravelMonkTheme.colors.onPrimary else TravelMonkTheme.colors.primary
+                    )
+                }
+                Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.small))
+                Text(
+                    text = label,
+                    style = TravelMonkTheme.typography.labelMedium,
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                )
+            }
         }
     }
 }
@@ -264,6 +281,10 @@ private fun DestinationChip(city: String) {
 
 @Composable
 private fun StayItem(title: String, location: String, price: String, rating: String, imageUrl: String) {
+    val context = LocalContext.current
+    val imageRequest: ImageRequest = remember(imageUrl) {
+        ImageRequest.Builder(context).data(imageUrl).crossfade(true).build()
+    }
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(TravelMonkTheme.radius.large),
@@ -273,7 +294,7 @@ private fun StayItem(title: String, location: String, price: String, rating: Str
         Column {
             Box {
                 AsyncImage(
-                    model = imageUrl,
+                    model = imageRequest,
                     contentDescription = null,
                     modifier = Modifier.fillMaxWidth().height(TravelMonkTheme.dimensions.imageCardHeight),
                     contentScale = ContentScale.Crop
@@ -334,18 +355,12 @@ private fun StayItem(title: String, location: String, price: String, rating: Str
     }
 }
 
-@Preview(name = "Stay Search – Light", showSystemUi = true)
-@Preview(
-    name = "Stay Search – Dark", 
-    showSystemUi = true, 
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
+@TravelMonkComponentPreviews
+@PreviewWrapper(TravelMonkThemeWrapper::class)
 @Composable
 private fun StaySearchScreenPreview() {
-    TravelMonkTheme {
-        StaySearchScreenContent(
-            state = StaySearchState(),
-            onIntent = {}
-        )
-    }
+    StaySearchScreenContent(
+        state = StaySearchState(),
+        onIntent = {}
+    )
 }

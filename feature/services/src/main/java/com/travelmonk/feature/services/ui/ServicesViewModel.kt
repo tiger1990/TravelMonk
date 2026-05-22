@@ -14,8 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ServicesViewModel @Inject constructor(
     private val getServicesUseCase: GetServicesUseCase
-) : BaseViewModel<ServicesState, ServicesIntent, ServicesEffect>() {
-    override fun createInitialState(): ServicesState = ServicesState()
+) : BaseViewModel<ServicesState, ServicesIntent, ServicesEffect>(ServicesState()) {
 
     override suspend fun initialDataLoad() {
         loadServices()
@@ -35,10 +34,12 @@ class ServicesViewModel @Inject constructor(
     private fun loadServices() {
         viewModelScope.launch {
             setState { copy(isLoading = true) }
-            when (val result = getServicesUseCase()) {
-                is DataResult.Success -> setState { copy(services = result.data, isLoading = false) }
-                is DataResult.Error -> setState { copy(isLoading = false) }
-                is DataResult.Loading -> Unit
+            getServicesUseCase().collect { result ->
+                when (result) {
+                    is DataResult.Success -> setState { copy(services = result.data, isLoading = false) }
+                    is DataResult.Error -> setState { copy(isLoading = false) }
+                    is DataResult.Loading -> Unit
+                }
             }
         }
     }

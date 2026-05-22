@@ -79,8 +79,10 @@ include(":core:model")
 include(":core:network")
 include(":core:database")
 include(":core:testing")
+include(":core:permissions")
 
 // Feature API Modules (contracts: nav keys + navigator interfaces)
+include(":feature:onboarding-api")
 include(":feature:transport-api")
 include(":feature:flights-api")
 include(":feature:stays-api")
@@ -90,6 +92,7 @@ include(":feature:bookings-api")
 include(":feature:home-api")
 
 // Feature Implementation Modules
+include(":feature:onboarding")
 include(":feature:transport")
 include(":feature:flights")
 include(":feature:stays")

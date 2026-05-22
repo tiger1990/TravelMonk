@@ -8,8 +8,8 @@ android {
 }
 
 dependencies {
-    // ...existing code...
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.androidx.datastore.preferences)
     implementation(project(":core:logger"))
 }

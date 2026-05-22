@@ -1,13 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-   Sample backup rules file; uncomment and customize as necessary.
-   See https://developer.android.com/guide/topics/data/autobackup
-   for details.
-   Note: This file is ignored for devices older than API 31
-   See https://developer.android.com/about/versions/12/backup-restore
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Exclude all session-related files from Auto Backup (API 23-30).
+  On API 31+ the system uses data_extraction_rules.xml instead.
+
+  Android Keystore keys are hardware-bound and cannot be restored to another device.
+  These files are useless without their key and represent a data leak surface in a backup.
+
+  travelmonk_tink_prefs.xml   - Tink AES256-GCM keyset, encrypted by the Keystore master key
+  travelmonk_key_meta.xml     - key creation timestamp used for 30-day rotation checks
+  datastore/travelmonk_session.db - encrypted session DataStore (access token, userId, flags)
 -->
 <full-backup-content>
-    <!--
-   <include domain="sharedpref" path="."/>
-   <exclude domain="sharedpref" path="device.xml"/>
--->
+    <exclude domain="sharedpref" path="travelmonk_tink_prefs.xml"/>
+    <exclude domain="sharedpref" path="travelmonk_key_meta.xml"/>
+    <exclude domain="file"       path="datastore/travelmonk_session.db"/>
 </full-backup-content>

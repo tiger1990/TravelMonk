@@ -8,7 +8,9 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:common"))
     implementation(project(":core:design-system"))
     implementation(project(":core:logger"))
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 }

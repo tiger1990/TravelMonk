@@ -14,8 +14,8 @@ agp        = "9.1.1"   # Android Gradle Plugin
 ksp        = "2.3.6"   # Kotlin Symbol Processing — must match kotlin version
 
 # ── Kotlin ────────────────────────────────────────────────────────────────────
-kotlin                 = "2.3.20"
-kotlinxCoroutines      = "1.10.2"
+kotlin                 = "2.3.21"
+kotlinxCoroutines      = "1.11.0"
 kotlinxSerializationCore = "1.11.0"
 
 # ── AndroidX Core ─────────────────────────────────────────────────────────────
@@ -31,14 +31,14 @@ lifecycle = "2.10.0"
 # ── Compose ───────────────────────────────────────────────────────────────────
 # BOM manages versions for all androidx.compose.* artifacts.
 # Explicit versions below are for artifacts NOT covered by the BOM.
-composeBom                       = "2026.04.01"
-composeAnimation                 = "1.11.0"
-uiToolingPreview                 = "1.11.0"   # override if BOM version has issues
-uiTooling                        = "1.11.0"   # override if BOM version has issues
+composeBom                       = "2026.05.01"
+composeAnimation                 = "1.11.2"
+uiToolingPreview                 = "1.11.2"   # override if BOM version has issues
+uiTooling                        = "1.11.2"   # override if BOM version has issues
 androidxComposeMaterial3AdaptiveNav3 = "1.0.0-alpha03" # adaptive-navigation3 integration (not in BOM yet)
 
 # ── Navigation 3 ──────────────────────────────────────────────────────────────
-navigation3 = "1.1.1"   # androidx.navigation3 — alpha/beta; pin explicitly
+navigation3 = "1.1.2"   # androidx.navigation3 — alpha/beta; pin explicitly
 
 # ── Dependency Injection ──────────────────────────────────────────────────────
 hilt                  = "2.59.2"
@@ -51,6 +51,15 @@ room = "2.8.4"
 retrofit = "3.0.0"
 okhttp   = "5.3.2"   # OkHttp is a shared transitive dep; pin to avoid conflicts
 moshi    = "1.15.2"
+
+# ── DataStore ─────────────────────────────────────────────────────────────────
+datastore = "1.2.1"
+
+# ── Tink (AEAD encryption for DataStore) ──────────────────────────────────────
+tink = "1.21.0"
+
+# ── Credentials (Passkeys / Credential Manager) ───────────────────────────────
+credentials = "1.6.0"
 
 # ── WorkManager ───────────────────────────────────────────────────────────────
 workManager = "2.11.2"
@@ -141,7 +150,7 @@ androidx-room-compiler = { group = "androidx.room", name = "room-compiler", vers
 retrofit            = { group = "com.squareup.retrofit2", name = "retrofit",            version.ref = "retrofit" }
 converter-moshi     = { group = "com.squareup.retrofit2", name = "converter-moshi",     version.ref = "retrofit" }  # Moshi ↔ Retrofit bridge
 okhttp              = { group = "com.squareup.okhttp3",   name = "okhttp",              version.ref = "okhttp" }
-logging-interceptor = { group = "com.squareup.okhttp3",   name = "logging-interceptor", version.ref = "okhttp" }   # disable in release — see ArchitectureGaps.md
+logging-interceptor = { group = "com.squareup.okhttp3",   name = "logging-interceptor", version.ref = "okhttp" }   # disable in release — see architecture_gaps.md
 
 # ── JSON (Moshi) ──────────────────────────────────────────────────────────────
 moshi-kotlin         = { group = "com.squareup.moshi", name = "moshi-kotlin",         version.ref = "moshi" }  # reflection adapter (runtime)
@@ -155,6 +164,17 @@ kotlinx-coroutines-test    = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 # ── Serialization ─────────────────────────────────────────────────────────────
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerializationCore" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationCore" }  # JSON format
+
+# ── DataStore ─────────────────────────────────────────────────────────────────
+androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
+androidx-datastore-core        = { group = "androidx.datastore", name = "datastore",             version.ref = "datastore" }  # proto-style DataStore (not preferences)
+
+# ── Tink ──────────────────────────────────────────────────────────────────────
+tink-android = { group = "com.google.crypto.tink", name = "tink-android", version.ref = "tink" }  # AEAD encryption for DataStore
+
+# ── Credentials (Passkeys / Credential Manager) ───────────────────────────────
+androidx-credentials                    = { group = "androidx.credentials", name = "credentials",                    version.ref = "credentials" }
+androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
 
 # ── WorkManager ───────────────────────────────────────────────────────────────
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workManager" }

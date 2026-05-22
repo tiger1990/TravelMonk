@@ -1,0 +1,12 @@
+{
+  "challenge": "QVVUSEVOVElDQVRJT05fQ0hBTExFTkdF",
+  "rpId": "travelmonk.com",
+  "timeout": 60000,
+  "allowCredentials": [
+    {
+      "id": "ZHVtbXlfY3JlZGVudGlhbF9pZA",
+      "type": "public-key"
+    }
+  ],
+  "userVerification": "preferred"
+}

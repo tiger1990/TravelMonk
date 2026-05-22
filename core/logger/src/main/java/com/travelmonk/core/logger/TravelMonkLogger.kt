@@ -14,6 +14,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -70,7 +71,12 @@ object TravelMonkLogger {
             LogProcessor(logChannel, fileManager).start(this.scope)
             CriticalEventUploader(criticalChannel, remoteSender!!).start(this.scope)
             LogUploadOrchestrator(fileManager, remoteSender!!).start(this.scope)
-            LogUploadWorker.schedule(appContext)
+            
+            // Scheduling WorkManager can involve disk I/O (DB init), 
+            // so we move it to the background scope.
+            this.scope.launch {
+                LogUploadWorker.schedule(appContext)
+            }
 
             initialized.set(true)
         }

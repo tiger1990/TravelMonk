@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.travelmonk.android.library)
+    alias(libs.plugins.travelmonk.android.hilt)
 }
 
 android {
@@ -8,6 +9,7 @@ android {
 
 dependencies {
     api(project(":core:common"))
+    api(libs.hilt.android.testing)
     api(libs.junit4)
     api(libs.turbine)
     api(libs.kotlinx.coroutines.test)

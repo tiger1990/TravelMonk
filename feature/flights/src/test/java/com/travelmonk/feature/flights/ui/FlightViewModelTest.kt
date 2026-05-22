@@ -3,6 +3,7 @@ package com.travelmonk.feature.flights.ui
 import app.cash.turbine.test
 import com.travelmonk.core.common.result.DataResult
 import com.travelmonk.core.testing.MainDispatcherRule
+import androidx.lifecycle.SavedStateHandle
 import com.travelmonk.feature.flights.domain.usecase.SearchFlightsUseCase
 import com.travelmonk.feature.flights.fakes.FakeFlightRepository
 import com.travelmonk.feature.flights.fixtures.FlightFixtures
@@ -29,7 +30,7 @@ class FlightViewModelTest {
     @Before
     fun setUp() {
         fakeRepository = FakeFlightRepository()
-        viewModel = FlightViewModel(SearchFlightsUseCase(fakeRepository))
+        viewModel = FlightViewModel(SearchFlightsUseCase(fakeRepository), SavedStateHandle())
     }
 
     @Test

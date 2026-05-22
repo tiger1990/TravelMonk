@@ -8,19 +8,20 @@ import com.travelmonk.feature.services.data.mapper.toDomain
 import com.travelmonk.feature.services.domain.model.TravelService
 import com.travelmonk.feature.services.domain.repository.ServiceRepository
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class ServiceRepositoryImpl @Inject constructor(
     private val servicesApi: ServicesApi,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ServiceRepository {
-    override suspend fun getServices(): DataResult<List<TravelService>> =
-        withContext(ioDispatcher) {
-            // TODO: Replace with real API call when backend is integrated:
-            // DataResult.Success(servicesApi.getServices().map { it.toDomain() })
-            DataResult.Success(fakeServices())
-        }
+    override fun getServices(): Flow<DataResult<List<TravelService>>> = flow {
+        // TODO: Replace with real API call when backend is integrated:
+        // emit(DataResult.Success(servicesApi.getServices().map { it.toDomain() }))
+        emit(DataResult.Success(fakeServices()))
+    }.flowOn(ioDispatcher)
 
     private fun fakeServices(): List<TravelService> = listOf(
         TravelServiceDto("1", "Maid & Helper", "cleaning", "Daily cleaning & domestic help").toDomain(),

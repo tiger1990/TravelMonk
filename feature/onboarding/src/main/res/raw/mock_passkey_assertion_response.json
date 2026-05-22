@@ -1,0 +1,9 @@
+{
+  "id": "mock_cred_id",
+  "type": "public-key",
+  "response": {
+    "authenticatorData": "bW9jaw",
+    "clientDataJSON": "bW9jaw",
+    "signature": "bW9jaw"
+  }
+}

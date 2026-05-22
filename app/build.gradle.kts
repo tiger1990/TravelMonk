@@ -9,48 +9,27 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
+/**
+ * Compose Compiler Configuration (Kotlin 2.0+)
+ * Using stabilityConfigurationFiles (plural) which replaces the deprecated singular version.
+ * This allows marking non-Compose module classes (like FeatureFlags) as stable.
+ */
+composeCompiler {
+    stabilityConfigurationFiles.add(project.layout.projectDirectory.file("compose_stability_config.conf"))
+}
+
 android {
     namespace = "com.travelmonk"
 
     defaultConfig {
-        // Unique ID for the app in the Google Play Store
         applicationId = "com.travelmonk"
-
-        // version number for internal tracking
         versionCode = 1
-        // User-visible version string
         versionName = "1.0"
-
-        // Custom test runner for Hilt compatibility (recommended for production)
         testInstrumentationRunner = "com.travelmonk.testing.HiltTestRunner"
     }
-    
-    /**
-     *  // Define flavor dimensions to group your flavors
-     *     flavorDimensions += "tier"
-     *     // Build type will have tier:
-     *     // free and paid freeDebug, freeRelease || paidDebug, paidRelease
-     *     productFlavors {
-     *         create("free") {
-     *             dimension = "tier"
-     *             // Different package name for the free version
-     *             applicationIdSuffix = ".free"
-     *             versionNameSuffix = "-free"
-     *         }
-     *
-     *         create("paid") {
-     *             dimension = "tier"
-     *             // Different package name for the paid version
-     *             applicationIdSuffix = ".paid"
-     *             versionNameSuffix = "-paid"
-     *         }
-     *     }
-     */
 
     signingConfigs {
-        // Production apps define signing configs here (usually via local.properties for security)
         create("release") {
-            // Placeholder for production keystore settings
             storeFile = file("release.keystore")
             storePassword = "password"
             keyAlias = "alias"
@@ -64,27 +43,27 @@ android {
 
     buildTypes {
         debug {
-            // Allows installing debug and release versions on the same device
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-DEBUG"
             buildConfigField("String", "BASE_URL", "\"https://dev-api.travelmonk.com/\"")
         }
 
         create("staging") {
-            // Inherits release settings but with a different suffix for testing environments
             initWith(getByName("release"))
             applicationIdSuffix = ".staging"
             matchingFallbacks += listOf("release")
             buildConfigField("String", "BASE_URL", "\"https://staging-api.travelmonk.com/\"")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+                "proguard-staging.pro"
+            )
         }
 
         release {
-            // Enables R8 code shrinking and obfuscation
             isMinifyEnabled = true
-            // Removes unused resources to reduce APK size
             isShrinkResources = true
             signingConfig = signingConfigs.getByName("release")
-            // Standard ProGuard optimization rules
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
@@ -94,12 +73,10 @@ android {
 
     packaging {
         resources {
-            // Exclude duplicate license files from the final APK
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
 
-    // Modern apps use this to control Bundle behavior
     @Suppress("UnstableApiUsage")
     bundle {
         language { enableSplit = true }
@@ -118,7 +95,6 @@ dependencies {
     implementation(project(":core:logger"))
 
     // --- FEATURE INTERFACES ---
-    // The app module wires these to implement a loosely coupled architecture
     implementation(project(":feature:transport-api"))
     implementation(project(":feature:flights-api"))
     implementation(project(":feature:stays-api"))
@@ -128,7 +104,6 @@ dependencies {
     implementation(project(":feature:home-api"))
 
     // --- FEATURE IMPLEMENTATIONS ---
-    // Injected at runtime or defined via TravelEntryProvider
     implementation(project(":feature:transport"))
     implementation(project(":feature:flights"))
     implementation(project(":feature:stays"))
@@ -136,29 +111,23 @@ dependencies {
     implementation(project(":feature:services"))
     implementation(project(":feature:bookings"))
     implementation(project(":feature:home"))
+    implementation(project(":feature:onboarding-api"))
+    implementation(project(":feature:onboarding"))
 
-    // --- SPLASH SCREEN & ANIMATION ---
+    // --- LIBRARIES ---
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.lottie.compose)
-
-    // --- ANDROIDX & KOTLIN EXTENSIONS ---
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.activity.compose)
-
-    // Navigation 3 (Modern Navigation for Compose)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
-
-    // Hilt / DI
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
-
-    // Serialization & Networking
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.coil.compose)
     implementation(libs.retrofit)

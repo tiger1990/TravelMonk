@@ -20,12 +20,19 @@ import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.ui.navigation.BottomBarItem
 
 /**
+ * Stable wrapper for the list of bottom bar items to ensure skippability.
+ * @Todo consider using ImmutableListDirectly instead of a wrapper
+ */
+@Immutable
+data class BottomBarItems(val items: List<BottomBarItem>)
+
+/**
  * Custom floating capsule bottom navigation bar with a "glass-like" design.
  * Matches the premium design with circular indicators, translucency, and high-contrast styling.
  */
 @Composable
 fun TravelMonkBottomBar(
-    items: List<BottomBarItem>,
+    items: BottomBarItems,
     selectedItem: BottomBarItem,
     onItemSelected: (BottomBarItem) -> Unit,
     modifier: Modifier = Modifier
@@ -54,45 +61,47 @@ fun TravelMonkBottomBar(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                items.forEach { item ->
-                    val isSelected = selectedItem == item
-                    
-                    // Animate colors for a smooth transition effect
-                    val contentColor by animateColorAsState(
-                        targetValue = if (isSelected) {
-                            // Uses the dedicated semantic content token for perfect contrast/effect
-                            TravelMonkTheme.colors.bottomBarIndicatorContent
-                        } else {
-                            // Unselected icons use the indicator content color with alpha
-                            TravelMonkTheme.colors.bottomBarIndicatorContent.copy(alpha = 0.6f)
-                        },
-                        label = "icon_color"
-                    )
-                    
-                    val indicatorColor by animateColorAsState(
-                        targetValue = if (isSelected) {
-                            // Uses the dedicated semantic indicator token
-                            TravelMonkTheme.colors.bottomBarIndicator
-                        } else {
-                            Color.Transparent
-                        },
-                        label = "indicator_color"
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .size(TravelMonkTheme.dimensions.fabSize)
-                            .clip(CircleShape)
-                            .background(indicatorColor)
-                            .clickable { onItemSelected(item) },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            painter = painterResource(item.icon),
-                            contentDescription = item.title,
-                            tint = contentColor,
-                            modifier = Modifier.size(TravelMonkTheme.dimensions.iconMedium)
+                items.items.forEach { item ->
+                    key(item.route) {
+                        val isSelected = selectedItem == item
+                        
+                        // Animate colors for a smooth transition effect
+                        val contentColor by animateColorAsState(
+                            targetValue = if (isSelected) {
+                                // Uses the dedicated semantic content token for perfect contrast/effect
+                                TravelMonkTheme.colors.bottomBarIndicatorContent
+                            } else {
+                                // Unselected icons use the indicator content color with alpha
+                                TravelMonkTheme.colors.bottomBarIndicatorContent.copy(alpha = 0.6f)
+                            },
+                            label = "icon_color"
                         )
+                        
+                        val indicatorColor by animateColorAsState(
+                            targetValue = if (isSelected) {
+                                // Uses the dedicated semantic indicator token
+                                TravelMonkTheme.colors.bottomBarIndicator
+                            } else {
+                                Color.Transparent
+                            },
+                            label = "indicator_color"
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .size(TravelMonkTheme.dimensions.fabSize)
+                                .clip(CircleShape)
+                                .background(indicatorColor)
+                                .clickable { onItemSelected(item) },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(item.icon),
+                                contentDescription = item.title,
+                                tint = contentColor,
+                                modifier = Modifier.size(TravelMonkTheme.dimensions.iconMedium)
+                            )
+                        }
                     }
                 }
             }
@@ -104,13 +113,15 @@ fun TravelMonkBottomBar(
 @Preview(name = "Bottom Bar – Dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun TravelMonkBottomBarPreview() {
-    val items = listOf(
-        BottomBarItem.Home,
-        BottomBarItem.Transport,
-        BottomBarItem.Stays,
-        BottomBarItem.Experiences,
-        BottomBarItem.Services,
-        BottomBarItem.Bookings
+    val items = BottomBarItems(
+        listOf(
+            BottomBarItem.Home,
+            BottomBarItem.Transport,
+            BottomBarItem.Stays,
+            BottomBarItem.Experiences,
+            BottomBarItem.Services,
+            BottomBarItem.Bookings
+        )
     )
     TravelMonkTheme {
         Box(modifier = Modifier.fillMaxSize().background(TravelMonkTheme.colors.background)) {

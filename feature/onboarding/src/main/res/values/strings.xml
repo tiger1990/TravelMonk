@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Onboarding — Welcome -->
+    <string name="feature_onboarding_title">TravelMonk</string>
+    <string name="feature_onboarding_tagline">Your journey begins here</string>
+    <string name="feature_onboarding_get_started">Get Started</string>
+    <string name="feature_onboarding_have_account">I already have an account</string>
+
+    <!-- Onboarding — Phone Entry -->
+    <string name="feature_onboarding_phone_title">Enter your phone number</string>
+    <string name="feature_onboarding_phone_subtitle">We\'ll send a one-time code to verify</string>
+    <string name="feature_onboarding_phone_label">Phone number</string>
+    <string name="feature_onboarding_send_code">Send Code</string>
+
+    <!-- Onboarding — OTP -->
+    <string name="feature_onboarding_otp_title">Verify your number</string>
+    <string name="feature_onboarding_otp_subtitle">Enter the 6-digit code sent to %s</string>
+    <string name="feature_onboarding_otp_field_label">Verification code</string>
+    <string name="feature_onboarding_verify">Verify</string>
+    <string name="feature_onboarding_resend_in">Resend in %ds</string>
+    <string name="feature_onboarding_resend_code">Resend code</string>
+
+    <!-- Onboarding — Passkey Prompt -->
+    <string name="feature_onboarding_passkey_title">Set up Passkey</string>
+    <string name="feature_onboarding_passkey_subtitle">Use biometrics or your device PIN to sign in faster next time</string>
+    <string name="feature_onboarding_create_passkey">Create Passkey</string>
+    <string name="feature_onboarding_sign_in_passkey">Sign in with existing Passkey</string>
+    <string name="feature_onboarding_skip">Skip for now</string>
+
+    <!-- Onboarding — Error fallbacks (see review item #20: migrate to UiText before beta) -->
+    <string name="feature_onboarding_error_invalid_phone">Enter a valid phone number with country code (e.g. +91 98765 43210)</string>
+    <string name="feature_onboarding_error_send_otp_failed">Failed to send OTP. Please try again.</string>
+    <string name="feature_onboarding_error_otp_verification_failed">Verification failed. Please try again.</string>
+    <string name="feature_onboarding_error_resend_failed">Failed to resend code. Please try again.</string>
+    <string name="feature_onboarding_error_passkey_registration_start">Could not start passkey registration. Please try again.</string>
+    <string name="feature_onboarding_error_passkey_registration_failed">Passkey registration failed. Please try again.</string>
+    <string name="feature_onboarding_error_passkey_auth_start">Could not start passkey sign-in. Please try again.</string>
+    <string name="feature_onboarding_error_passkey_auth_failed">Passkey sign-in failed. Please try again.</string>
+    <string name="feature_onboarding_error_passkey_interrupted">Operation interrupted. Please try again.</string>
+    <string name="feature_onboarding_error_passkey_no_provider">No passkey provider available on this device.</string>
+    <string name="feature_onboarding_error_passkey_no_credential">No passkeys found for this account. Tap "Create Passkey" to register one.</string>
+    <string name="feature_onboarding_error_passkey_tx_signing_failed">Could not sign passkey operation. Please try again.</string>
+    <!-- Transaction key biometric prompt strings -->
+    <string name="feature_onboarding_passkey_tx_biometric_title">Confirm passkey operation</string>
+    <string name="feature_onboarding_passkey_tx_biometric_subtitle">Authenticate to bind this operation to your device</string>
+</resources>

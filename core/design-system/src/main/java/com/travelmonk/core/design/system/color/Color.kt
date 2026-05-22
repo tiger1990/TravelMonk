@@ -40,6 +40,10 @@ val ErrorRed = Color(0xFFBA1A1A)
 val ErrorContainer = Color(0xFFFFDAD6)
 val WarningAmber = Color(0xFFFFC107)
 
+// Image overlay tokens — used on banner/card images
+val OnImage = Color.White
+val ImageScrim = Color(0x4D000000) // Black 30%
+
 /**
  * TravelMonk Semantic Color Contract.
  * Uses @Stable and mutableStateOf to support smooth color animations and
@@ -67,6 +71,8 @@ class TravelMonkColors(
     bottomBarIndicatorContent: Color,
     error: Color,
     errorContainer: Color,
+    onImage: Color,
+    imageScrim: Color,
     isLight: Boolean
 ) {
     var primary by mutableStateOf(primary)
@@ -109,6 +115,10 @@ class TravelMonkColors(
         private set
     var errorContainer by mutableStateOf(errorContainer)
         private set
+    var onImage by mutableStateOf(onImage)
+        private set
+    var imageScrim by mutableStateOf(imageScrim)
+        private set
     var isLight by mutableStateOf(isLight)
         private set
 
@@ -133,6 +143,8 @@ class TravelMonkColors(
         bottomBarIndicatorContent = other.bottomBarIndicatorContent
         error = other.error
         errorContainer = other.errorContainer
+        onImage = other.onImage
+        imageScrim = other.imageScrim
         isLight = other.isLight
     }
 
@@ -157,6 +169,8 @@ class TravelMonkColors(
         bottomBarIndicatorContent = bottomBarIndicatorContent,
         error = error,
         errorContainer = errorContainer,
+        onImage = onImage,
+        imageScrim = imageScrim,
         isLight = isLight
     )
 }
@@ -182,6 +196,8 @@ val TravelMonkLightPalette = TravelMonkColors(
     bottomBarIndicatorContent = BottomBarIndicatorContentLight,
     error = ErrorRed,
     errorContainer = ErrorContainer,
+    onImage = OnImage,
+    imageScrim = ImageScrim,
     isLight = true
 )
 
@@ -206,6 +222,8 @@ val TravelMonkDarkPalette = TravelMonkColors(
     bottomBarIndicatorContent = BottomBarIndicatorContentDark,
     error = ErrorRed,
     errorContainer = ErrorContainer,
+    onImage = OnImage,
+    imageScrim = ImageScrim,
     isLight = false
 )
 

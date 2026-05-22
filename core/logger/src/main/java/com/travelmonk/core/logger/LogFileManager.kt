@@ -1,11 +1,13 @@
 package com.travelmonk.core.logger
 
 import android.content.Context
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileOutputStream
@@ -25,12 +27,16 @@ class LogFileManager(context: Context) {
         private const val MAX_PENDING_FILES = 10      // ~5MB total storage limit for rotated logs
     }
 
-    private val writingDir = File(context.filesDir, "logs/writing").apply { mkdirs() }
-    private val pendingDir = File(context.filesDir, "logs/pending").apply { mkdirs() }
-    private val uploadingDir = File(context.filesDir, "logs/uploading").apply { mkdirs() }
-    private val activeFile = File(writingDir, "current.log")
-    
+    private val writingDir by lazy { File(context.filesDir, "logs/writing") }
+    private val pendingDir by lazy { File(context.filesDir, "logs/pending") }
+    private val uploadingDir by lazy { File(context.filesDir, "logs/uploading") }
+    private val activeFile by lazy { File(writingDir, "current.log") }
+
     private val writeMutex = Mutex()
+    // No @Volatile needed — ensureInitialized() is always called inside writeMutex.withLock {},
+    // which already provides mutual exclusion and memory visibility.
+    private var isInitialized = false
+
     /**
      * explicitNulls = false omits null fields (traceId, spanId, flow, stacktrace, launchStack)
      * from the JSON output when they are null. A plain INFO log is ~60% smaller as a result.
@@ -42,9 +48,19 @@ class LogFileManager(context: Context) {
     val rotationEvents: SharedFlow<File> = _rotationEvents.asSharedFlow()
 
     init {
+        // No disk I/O in constructor to avoid StrictMode violations on main thread.
+        // Initialization is deferred to ensure it happens on a background thread.
+    }
+
+    private fun ensureInitialized() {
+        if (isInitialized) return
         try {
+            if (!writingDir.exists()) writingDir.mkdirs()
+            if (!pendingDir.exists()) pendingDir.mkdirs()
+            if (!uploadingDir.exists()) uploadingDir.mkdirs()
             if (!activeFile.exists()) activeFile.createNewFile()
             cleanupOrphanedUploads()
+            isInitialized = true
         } catch (_: Exception) {
             // Fail-safe: If storage is completely blocked, we just won't log
         }
@@ -54,25 +70,29 @@ class LogFileManager(context: Context) {
      * Writes a batch of events directly to disk.
      * Wrapped in try-catch to ensure logging failures never crash the app.
      */
-    suspend fun writeBatch(events: List<LogEvent>) = writeMutex.withLock {
-        try {
-            if (activeFile.length() >= MAX_FILE_SIZE) rotate()
-            
-            FileOutputStream(activeFile, true).bufferedWriter().use { writer ->
-                events.forEach { event ->
-                    writer.append(json.encodeToString(event))
-                    writer.append("\n")
+    suspend fun writeBatch(events: List<LogEvent>): Unit = withContext(Dispatchers.IO) {
+        writeMutex.withLock {
+            ensureInitialized()
+            try {
+                if (activeFile.length() >= MAX_FILE_SIZE) rotate()
+
+                FileOutputStream(activeFile, true).bufferedWriter().use { writer ->
+                    events.forEach { event ->
+                        writer.append(json.encodeToString(event))
+                        writer.append("\n")
+                    }
+                    writer.flush()
                 }
-                writer.flush()
+
+                if (activeFile.length() >= MAX_FILE_SIZE) rotate()
+            } catch (_: Exception) {
+                // Logging should never crash the host app.
+                // We'll let it fail silently or print to logcat if in debug.
             }
-            
-            if (activeFile.length() >= MAX_FILE_SIZE) rotate()
-        } catch (_: Exception) {
-            // Logging should never crash the host app. 
-            // We'll let it fail silently or print to logcat if in debug.
         }
     }
 
+    // Regular function — no suspend calls inside. Called from within writeMutex.withLock {}.
     private fun rotate() {
         val dest = File(pendingDir, "log_${System.currentTimeMillis()}.txt")
         if (activeFile.exists()) {
@@ -91,7 +111,7 @@ class LogFileManager(context: Context) {
      * counting only pending/ allowed actual usage to exceed the ~10MB cap during active uploads.
      */
     private fun enforceRetention() {
-        val pendingFiles = getPendingFiles()
+        val pendingFiles = getPendingFilesInternal()
         val uploadingCount = uploadingDir.listFiles()?.size ?: 0
         val totalCount = pendingFiles.size + uploadingCount
         if (totalCount > MAX_PENDING_FILES) {
@@ -103,19 +123,25 @@ class LogFileManager(context: Context) {
      * Atomically claims a file for upload by moving it to the uploading directory.
      * Returns the new file location, or null if the file was already claimed/deleted.
      */
-    fun claimFileForUpload(file: File): File? {
-        if (!file.exists() || file.parentFile?.name != "pending") return null
-        val dest = File(uploadingDir, file.name)
-        return if (file.renameTo(dest)) dest else null
+    suspend fun claimFileForUpload(file: File): File? = withContext(Dispatchers.IO) {
+        writeMutex.withLock {
+            ensureInitialized()
+            if (!file.exists() || file.parentFile?.name != "pending") return@withLock null
+            val dest = File(uploadingDir, file.name)
+            if (file.renameTo(dest)) dest else null
+        }
     }
 
     /**
      * Releases a failed upload back to the pending directory.
      */
-    fun releaseFile(file: File) {
-        if (!file.exists() || file.parentFile?.name != "uploading") return
-        val dest = File(pendingDir, file.name)
-        file.renameTo(dest)
+    suspend fun releaseFile(file: File): Unit = withContext(Dispatchers.IO) {
+        writeMutex.withLock {
+            ensureInitialized()
+            if (!file.exists() || file.parentFile?.name != "uploading") return@withLock
+            val dest = File(pendingDir, file.name)
+            file.renameTo(dest)
+        }
     }
 
     /**
@@ -129,13 +155,35 @@ class LogFileManager(context: Context) {
      * Reads all lines from the active log file safely.
      * Uses the writeMutex to ensure we don't read while a write or rotation is in progress.
      */
-    suspend fun readActiveFileLines(): List<String> = writeMutex.withLock {
-        if (!activeFile.exists()) return@withLock emptyList()
-        activeFile.readLines()
+    suspend fun readActiveFileLines(): List<String> = withContext(Dispatchers.IO) {
+        writeMutex.withLock {
+            ensureInitialized()
+            if (!activeFile.exists()) return@withLock emptyList()
+            activeFile.readLines()
+        }
     }
 
-    fun getPendingFiles(): List<File> =
+    /**
+     * Public access to pending files, properly synchronized.
+     */
+    suspend fun getPendingFiles(): List<File> = withContext(Dispatchers.IO) {
+        writeMutex.withLock {
+            ensureInitialized()
+            getPendingFilesInternal()
+        }
+    }
+
+    /**
+     * Internal access to pending files without re-acquiring the lock.
+     * Must only be called from contexts already holding writeMutex.
+     */
+    private fun getPendingFilesInternal(): List<File> =
         pendingDir.listFiles()?.sortedBy { it.lastModified() } ?: emptyList()
 
-    fun deleteAfterUpload(file: File) { file.delete() }
+    suspend fun deleteAfterUpload(file: File): Unit = withContext(Dispatchers.IO) {
+        writeMutex.withLock {
+            ensureInitialized()
+            file.delete()
+        }
+    }
 }

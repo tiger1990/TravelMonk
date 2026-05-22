@@ -14,9 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ExperienceDetailsViewModel @Inject constructor(
     private val getExperienceDetailsUseCase: GetExperienceDetailsUseCase
-) : BaseViewModel<ExperienceDetailsState, ExperienceDetailsIntent, ExperienceDetailsEffect>() {
-
-    override fun createInitialState(): ExperienceDetailsState = ExperienceDetailsState()
+) : BaseViewModel<ExperienceDetailsState, ExperienceDetailsIntent, ExperienceDetailsEffect>(ExperienceDetailsState()) {
 
     override fun handleIntent(intent: ExperienceDetailsIntent) {
         when (intent) {

@@ -3,7 +3,7 @@ package com.travelmonk.feature.transport.mvi
 import com.travelmonk.core.common.mvi.UiEffect
 import com.travelmonk.core.common.mvi.UiIntent
 import com.travelmonk.core.common.mvi.UiState
-import com.travelmonk.feature.transport.api.TransportTab
+import com.travelmonk.feature.transportapi.TransportTab
 
 data class TransportState(
     val selectedTab: TransportTab = TransportTab.FLIGHTS,

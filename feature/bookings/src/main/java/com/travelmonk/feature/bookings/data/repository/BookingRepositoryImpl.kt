@@ -7,18 +7,20 @@ import com.travelmonk.feature.bookings.data.api.dto.BookingDto
 import com.travelmonk.feature.bookings.data.mapper.toDomain
 import com.travelmonk.feature.bookings.domain.repository.BookingRepository
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class BookingRepositoryImpl @Inject constructor(
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : BookingRepository {
-    override suspend fun getBookings(): DataResult<List<Booking>> =
-        withContext(ioDispatcher) {
-            // TODO: Replace with real API call when backend is integrated:
-            // DataResult.Success(bookingsApi.getBookings().map { it.toDomain() })
-            DataResult.Success(fakeBookings())
-        }
+    override fun getBookings(): Flow<DataResult<List<Booking>>> = flow {
+        // TODO: Replace with real API call when backend is integrated:
+        // emit(DataResult.Success(bookingsApi.getBookings().map { it.toDomain() }))
+        emit(DataResult.Success(fakeBookings()))
+    }.flowOn(ioDispatcher)
 
     private fun fakeBookings(): List<Booking> = listOf(
         BookingDto("1", "FLIGHT", "SFO to JFK", "Oct 24, 2024", "CONFIRMED", "$450").toDomain(),

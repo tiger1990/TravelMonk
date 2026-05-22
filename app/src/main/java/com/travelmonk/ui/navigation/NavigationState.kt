@@ -17,12 +17,6 @@ import androidx.navigation3.runtime.serialization.NavKeySerializer
 import androidx.savedstate.compose.serialization.serializers.MutableStateSerializer
 import com.travelmonk.core.navigation.NavTab
 import com.travelmonk.core.navigation.TravelNavKey
-import com.travelmonk.feature.bookingsapi.navigation.BookingNavKey
-import com.travelmonk.feature.experiencesapi.navigation.ExperienceNavKey
-import com.travelmonk.feature.homeapi.navigation.HomeNavKey
-import com.travelmonk.feature.servicesapi.navigation.ServiceNavKey
-import com.travelmonk.feature.staysapi.navigation.StayNavKey
-import com.travelmonk.feature.transportapi.navigation.TransportNavKey
 import com.travelmonk.navigation.GlobalNavigator
 import com.travelmonk.navigation.NavCommand
 import com.travelmonk.navigation.NavigationRegistry
@@ -130,27 +124,13 @@ class NavigationState(
         if (currentRouteKey == startRoute) listOf(startRoute)
         else listOf(startRoute, currentRouteKey)
 
-    private fun NavTab.toRootKey(): TravelNavKey = when (this) {
-        NavTab.HOME        -> HomeNavKey.Root
-        NavTab.TRANSPORT   -> TransportNavKey.Root
-        NavTab.STAYS       -> StayNavKey.Search
-        NavTab.EXPERIENCES -> ExperienceNavKey.Root
-        NavTab.SERVICES    -> ServiceNavKey.Root
-        NavTab.BOOKINGS    -> BookingNavKey.Root
-    }
+    private fun NavTab.toRootKey(): TravelNavKey =
+        BottomBarItem.all.first { it.navTab == this }.route
 
     // Maps a tab root NavKey back to a BottomBarItem for UI rendering.
-    // The else branch covers deep-linked sub-screens (e.g. FlightNavKey.Results as currentRouteKey
-    // would be unusual but safe to fall back to Home).
-    private fun TravelNavKey.toBottomBarItem(): BottomBarItem = when (this) {
-        HomeNavKey.Root       -> BottomBarItem.Home
-        TransportNavKey.Root  -> BottomBarItem.Transport
-        StayNavKey.Search     -> BottomBarItem.Stays
-        ExperienceNavKey.Root -> BottomBarItem.Experiences
-        ServiceNavKey.Root    -> BottomBarItem.Services
-        BookingNavKey.Root    -> BottomBarItem.Bookings
-        else                  -> BottomBarItem.Home
-    }
+    // Falls back to Home for any deep-linked sub-screen key (e.g. FlightNavKey.Results).
+    private fun TravelNavKey.toBottomBarItem(): BottomBarItem =
+        BottomBarItem.all.firstOrNull { it.route == this } ?: BottomBarItem.Home
 }
 
 /**
@@ -167,7 +147,7 @@ fun rememberNavigationState(
     registry: NavigationRegistry,
     globalNavigator: GlobalNavigator
 ): NavigationState {
-    val startRoute: TravelNavKey = HomeNavKey.Root
+    val startRoute: TravelNavKey = BottomBarItem.Home.route
 
     // rememberSerializable persists the active tab root key through process death.
     // NavKeySerializer handles polymorphic TravelNavKey subtypes via their @Serializable
@@ -179,14 +159,9 @@ fun rememberNavigationState(
     }
 
     // rememberNavBackStack wraps each stack in rememberSaveable — survives process death.
-    val backStacks: Map<TravelNavKey, NavBackStack<NavKey>> = mapOf(
-        HomeNavKey.Root       to rememberNavBackStack(HomeNavKey.Root),
-        TransportNavKey.Root  to rememberNavBackStack(TransportNavKey.Root),
-        StayNavKey.Search     to rememberNavBackStack(StayNavKey.Search),
-        ExperienceNavKey.Root to rememberNavBackStack(ExperienceNavKey.Root),
-        ServiceNavKey.Root    to rememberNavBackStack(ServiceNavKey.Root),
-        BookingNavKey.Root    to rememberNavBackStack(BookingNavKey.Root),
-    )
+    // Built from BottomBarItem.all so NavigationState has zero direct feature nav key imports.
+    val backStacks: Map<TravelNavKey, NavBackStack<NavKey>> =
+        BottomBarItem.all.associate { item -> item.route to rememberNavBackStack(item.route) }
 
     val state = remember(registry) {
         NavigationState(

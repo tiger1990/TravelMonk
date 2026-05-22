@@ -30,3 +30,25 @@
 -keepclassmembers class * {
     @kotlinx.serialization.SerialName <fields>;
 }
+
+# ── Retrofit & Networking ─────────────────────────────────────────────────────
+# Retrofit uses reflection on interface methods and parameters.
+# Signature is needed for GSON/Moshi to handle generic types like List<T>.
+-keepattributes Signature, InnerClasses, EnclosingMethod
+-keepclassmembers,allowobfuscation interface * {
+    @retrofit2.http.* <methods>;
+}
+-dontwarn retrofit2.**
+
+# ── Moshi ─────────────────────────────────────────────────────────────────────
+# Moshi's KotlinJsonAdapter relies on reflection if generated adapters are not used.
+-keepclassmembers class * {
+    @com.squareup.moshi.Json <fields>;
+}
+
+# ── Coil (Image Loading) ──────────────────────────────────────────────────────
+# Coil 3 includes its own consumer rules. We only need to ensure metadata is
+# preserved for its dynamic service loading and reflective features.
+-dontwarn coil.**
+# Keep the Metadata for Kotlin reflections if you use custom transformations/interceptors
+-keepattributes RuntimeVisibleAnnotations,AnnotationDefault

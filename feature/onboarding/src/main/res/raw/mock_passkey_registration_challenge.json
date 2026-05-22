@@ -1,0 +1,23 @@
+{
+  "challenge": "Q1hBTExFTkdFX1JFR0lTVEVS",
+  "rp": {
+    "id": "travelmonk.com",
+    "name": "TravelMonk"
+  },
+  "user": {
+    "id": "ZmFrZV91c2VyX2lk",
+    "name": "john@example.com",
+    "displayName": "John Doe"
+  },
+  "pubKeyCredParams": [
+    { "type": "public-key", "alg": -7 },
+    { "type": "public-key", "alg": -257 }
+  ],
+  "timeout": 60000,
+  "attestation": "none",
+  "authenticatorSelection": {
+    "authenticatorAttachment": "platform",
+    "userVerification": "preferred",
+    "residentKey": "preferred"
+  }
+}

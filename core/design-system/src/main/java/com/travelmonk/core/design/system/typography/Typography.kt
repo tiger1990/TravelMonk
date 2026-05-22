@@ -11,12 +11,15 @@ import androidx.compose.ui.unit.sp
  * Typography scale for the TravelMonk design system.
  *
  * Each slot maps to a specific role in the visual hierarchy:
- *   headlineLarge  — hero titles, splash screens
- *   headlineMedium — section headers, screen titles
- *   titleLarge     — card titles, prominent labels
- *   bodyLarge      — primary readable content
- *   labelMedium    — tab labels, chips, captions
- *   caption        — fine print, metadata, timestamps
+ *   headlineLarge  — hero titles, splash screens              (32sp bold)
+ *   headlineMedium — section headers, screen titles           (28sp bold)
+ *   titleLarge     — card titles, prominent labels            (22sp bold)
+ *   titleMedium    — dialog titles, bottom-sheet headers      (16sp medium)
+ *   bodyLarge      — primary readable content                 (16sp normal)
+ *   bodyMedium     — secondary body, dialog copy              (14sp normal)
+ *   labelLarge     — button labels, dialog actions            (14sp medium)
+ *   labelMedium    — tab labels, chips                        (12sp medium)
+ *   caption        — fine print, metadata, timestamps         (11sp normal)
  *
  * Marked @Immutable so Compose treats the entire object as a stable input
  * and skips recompositions when the reference hasn't changed.
@@ -26,7 +29,10 @@ data class TravelMonkTypography(
     val headlineLarge: TextStyle,
     val headlineMedium: TextStyle,
     val titleLarge: TextStyle,
+    val titleMedium: TextStyle,
     val bodyLarge: TextStyle,
+    val bodyMedium: TextStyle,
+    val labelLarge: TextStyle,
     val labelMedium: TextStyle,
     val caption: TextStyle
 )
@@ -66,12 +72,33 @@ val LocalTravelMonkTypography = staticCompositionLocalOf {
             lineHeight = 28.sp,
             letterSpacing = 0.sp
         ),
+        titleMedium = TextStyle(
+            fontFamily = FontFamily.Default,
+            fontWeight = FontWeight.Medium,
+            fontSize = 16.sp,
+            lineHeight = 24.sp,
+            letterSpacing = 0.15.sp
+        ),
         bodyLarge = TextStyle(
             fontFamily = FontFamily.Default,
             fontWeight = FontWeight.Normal,
             fontSize = 16.sp,
             lineHeight = 24.sp,
             letterSpacing = 0.5.sp
+        ),
+        bodyMedium = TextStyle(
+            fontFamily = FontFamily.Default,
+            fontWeight = FontWeight.Normal,
+            fontSize = 14.sp,
+            lineHeight = 20.sp,
+            letterSpacing = 0.25.sp
+        ),
+        labelLarge = TextStyle(
+            fontFamily = FontFamily.Default,
+            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp,
+            lineHeight = 20.sp,
+            letterSpacing = 0.1.sp
         ),
         labelMedium = TextStyle(
             fontFamily = FontFamily.Default,

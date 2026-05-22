@@ -1,19 +1,24 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-   Sample data extraction rules file; uncomment and customize as necessary.
-   See https://developer.android.com/about/versions/12/backup-restore#xml-changes
-   for details.
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Exclude all session-related files from Cloud Backup and Device Transfer (API 31+).
+
+  Android Keystore keys are hardware-bound — they cannot be restored to another device.
+  Backing up the Tink keyset or DataStore file without the key is useless (undecryptable)
+  and a data leak surface (offline attacks against the ciphertext). Excluding costs nothing.
+
+  travelmonk_tink_prefs.xml   — Tink AES256-GCM keyset, encrypted by the Keystore master key
+  travelmonk_key_meta.xml     — key creation timestamp used for 30-day rotation checks
+  datastore/travelmonk_session.db — encrypted session DataStore (access token, userId, flags)
 -->
 <data-extraction-rules>
     <cloud-backup>
-        <!-- TODO: Use <include> and <exclude> to control what is backed up.
-        <include .../>
-        <exclude .../>
-        -->
+        <exclude domain="sharedpref" path="travelmonk_tink_prefs.xml"/>
+        <exclude domain="sharedpref" path="travelmonk_key_meta.xml"/>
+        <exclude domain="file"       path="datastore/travelmonk_session.db"/>
     </cloud-backup>
-    <!--
     <device-transfer>
-        <include .../>
-        <exclude .../>
+        <exclude domain="sharedpref" path="travelmonk_tink_prefs.xml"/>
+        <exclude domain="sharedpref" path="travelmonk_key_meta.xml"/>
+        <exclude domain="file"       path="datastore/travelmonk_session.db"/>
     </device-transfer>
-    -->
 </data-extraction-rules>

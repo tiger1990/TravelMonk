@@ -13,7 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.travelmonk.core.common.config.FeatureFlags
+import com.travelmonk.core.ui.flags.LocalFeatureFlags
 import com.travelmonk.core.navigation.NavEntryInstallerSet
 import com.travelmonk.navigation.GlobalNavigator
 import com.travelmonk.navigation.NavigationRegistry
@@ -24,8 +24,7 @@ import com.travelmonk.ui.navigation.*
 fun TravelMonkApp(
     globalNavigator: GlobalNavigator,
     registry: NavigationRegistry,
-    navEntryInstallers: NavEntryInstallerSet,
-    featureFlags: FeatureFlags
+    navEntryInstallers: NavEntryInstallerSet
 ) {
     val navigationState = rememberNavigationState(registry, globalNavigator)
 
@@ -39,13 +38,20 @@ fun TravelMonkApp(
         }
     }
 
-    val bottomBarItems = buildList {
-        add(BottomBarItem.Home)
-        if (featureFlags.isTransportEnabled) add(BottomBarItem.Transport)
-        if (featureFlags.isStaysEnabled) add(BottomBarItem.Stays)
-        if (featureFlags.isExperiencesEnabled) add(BottomBarItem.Experiences)
-        if (featureFlags.isServicesEnabled) add(BottomBarItem.Services)
-        add(BottomBarItem.Bookings)
+    // Access flags via CompositionLocal
+    val flags = LocalFeatureFlags.current
+
+    val bottomBarItems = remember(flags) {
+        BottomBarItems(
+            buildList {
+                add(BottomBarItem.Home)
+                if (flags.isTransportEnabled) add(BottomBarItem.Transport)
+                if (flags.isStaysEnabled) add(BottomBarItem.Stays)
+                if (flags.isExperiencesEnabled) add(BottomBarItem.Experiences)
+                if (flags.isServicesEnabled) add(BottomBarItem.Services)
+                add(BottomBarItem.Bookings)
+            }
+        )
     }
 
     Surface(
@@ -56,7 +62,7 @@ fun TravelMonkApp(
             bottomBar = {
                 val currentKey = navigationState.activeBackStack.lastOrNull()
                 // Show bottom bar only when on a root tab destination
-                val isTopLevel = bottomBarItems.any { it.route == currentKey }
+                val isTopLevel = bottomBarItems.items.any { it.route == currentKey }
 
                 if (isTopLevel) {
                     TravelMonkBottomBar(

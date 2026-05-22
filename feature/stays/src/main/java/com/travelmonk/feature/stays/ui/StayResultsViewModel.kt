@@ -14,8 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class StayResultsViewModel @Inject constructor(
     private val searchStaysUseCase: SearchStaysUseCase
-) : BaseViewModel<StayResultsState, StayResultsIntent, StayResultsEffect>() {
-    override fun createInitialState(): StayResultsState = StayResultsState()
+) : BaseViewModel<StayResultsState, StayResultsIntent, StayResultsEffect>(StayResultsState()) {
 
     override fun handleIntent(intent: StayResultsIntent) {
         when (intent) {

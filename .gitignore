@@ -42,3 +42,7 @@ local.properties
 google-services.json
 # If you use flavor-specific secrets
 src/*/google-services.json
+
+.env
+.claude-gemini
+.claude-gemini/*

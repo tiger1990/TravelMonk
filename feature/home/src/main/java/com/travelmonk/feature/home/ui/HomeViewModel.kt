@@ -13,9 +13,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getHomeBannersUseCase: GetHomeBannersUseCase
-) : BaseViewModel<HomeState, HomeIntent, HomeEffect>() {
-
-    override fun createInitialState(): HomeState = HomeState(
+) : BaseViewModel<HomeState, HomeIntent, HomeEffect>(
+    HomeState(
         categories = listOf(
             HomeCategory("Flights", TravelMonkIcons.Flight),
             HomeCategory("Hotels", TravelMonkIcons.Hotel),
@@ -23,9 +22,10 @@ class HomeViewModel @Inject constructor(
             HomeCategory("Yoga", TravelMonkIcons.SelfImprovement)
         )
     )
+) {
 
-    init {
-        onIntent(HomeIntent.LoadHomeData)
+    override suspend fun initialDataLoad() {
+        loadHomeData()
     }
 
     override fun handleIntent(intent: HomeIntent) {
@@ -47,10 +47,12 @@ class HomeViewModel @Inject constructor(
     private fun loadHomeData() {
         viewModelScope.launch {
             setState { copy(isLoading = true, error = null) }
-            when (val result = getHomeBannersUseCase()) {
-                is DataResult.Success -> setState { copy(banners = result.data, isLoading = false) }
-                is DataResult.Error -> setState { copy(isLoading = false, error = result.exception.message) }
-                is DataResult.Loading -> Unit
+            getHomeBannersUseCase().collect { result ->
+                when (result) {
+                    is DataResult.Success -> setState { copy(banners = result.data, isLoading = false) }
+                    is DataResult.Error -> setState { copy(isLoading = false, error = result.exception.message) }
+                    is DataResult.Loading -> Unit
+                }
             }
         }
     }

@@ -16,7 +16,9 @@ interface UiState
 interface UiIntent
 interface UiEffect
 
-abstract class BaseViewModel<S : UiState, I : UiIntent, E : UiEffect> : ViewModel() {
+abstract class BaseViewModel<S : UiState, I : UiIntent, E : UiEffect>(
+    initialState: S
+) : ViewModel() {
 
     init {
         TravelMonkLogger.d(
@@ -25,11 +27,7 @@ abstract class BaseViewModel<S : UiState, I : UiIntent, E : UiEffect> : ViewMode
         )
     }
 
-    private val initialState: S by lazy { createInitialState() }
-    abstract fun createInitialState(): S
-
     private val _uiState = MutableStateFlow(initialState)
-    //val uiState: StateFlow<S> = _uiState.asStateFlow()
 
     val uiState: StateFlow<S> by lazy {
         _uiState.onStart {
@@ -39,22 +37,18 @@ abstract class BaseViewModel<S : UiState, I : UiIntent, E : UiEffect> : ViewMode
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),
-            initialValue = initialState
+            initialValue = _uiState.value
         )
     }
 
     open suspend fun initialDataLoad() {}
 
-    /**
-     *   private val _effect = MutableSharedFlow<E>()
-     *     val effect = _effect.asSharedFlow()
-     */
     // Channel ensures each effect is delivered exactly once — no replay on recomposition
     private val _effect = Channel<E>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
     protected val currentState: S
-        get() = uiState.value
+        get() = _uiState.value
 
     fun onIntent(intent: I) {
         handleIntent(intent)
@@ -63,15 +57,9 @@ abstract class BaseViewModel<S : UiState, I : UiIntent, E : UiEffect> : ViewMode
     protected abstract fun handleIntent(intent: I)
 
     protected fun setState(reduce: S.() -> S) {
-        val newState = currentState.reduce()
-        _uiState.value = newState
+        _uiState.value = currentState.reduce()
     }
 
-    /**
-     * protected suspend fun setEffect(effect: E) {
-     *         _effect.emit(effect)
-     *     }
-     */
     protected suspend fun setEffect(effect: E) {
         _effect.send(effect)
     }

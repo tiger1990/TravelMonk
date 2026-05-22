@@ -1,5 +1,6 @@
 package com.travelmonk.feature.experiences.ui
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.travelmonk.core.common.mvi.BaseViewModel
 import com.travelmonk.core.common.result.DataResult
@@ -14,19 +15,25 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ExperienceViewModel @Inject constructor(
-    private val getExperiencesUseCase: GetExperiencesUseCase
-) : BaseViewModel<ExperienceState, ExperienceIntent, ExperienceEffect>() {
-
-    override fun createInitialState(): ExperienceState = ExperienceState()
+    private val getExperiencesUseCase: GetExperiencesUseCase,
+    private val savedStateHandle: SavedStateHandle
+) : BaseViewModel<ExperienceState, ExperienceIntent, ExperienceEffect>(
+    ExperienceState(
+        selectedCategory = savedStateHandle.get<String>(KEY_SELECTED_CATEGORY)
+            ?.let { name -> ExperienceCategory.entries.firstOrNull { it.name == name } }
+            ?: ExperienceCategory.PACKAGES
+    )
+) {
 
     override suspend fun initialDataLoad() {
-        loadItems(ExperienceCategory.PACKAGES)
+        loadItems(currentState.selectedCategory)
     }
 
     override fun handleIntent(intent: ExperienceIntent) {
         when (intent) {
             is ExperienceIntent.SelectCategory -> {
                 setState { copy(selectedCategory = intent.category) }
+                savedStateHandle[KEY_SELECTED_CATEGORY] = intent.category.name
                 loadItems(intent.category)
             }
             is ExperienceIntent.SelectExperience -> {
@@ -54,5 +61,9 @@ class ExperienceViewModel @Inject constructor(
                 is DataResult.Loading -> Unit
             }
         }
+    }
+
+    companion object {
+        private const val KEY_SELECTED_CATEGORY = "selected_category"
     }
 }
