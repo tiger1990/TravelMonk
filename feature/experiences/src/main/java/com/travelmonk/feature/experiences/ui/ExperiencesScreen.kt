@@ -13,14 +13,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import com.travelmonk.feature.experiences.R
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.travelmonk.core.ui.LocalNavContentPadding
+import com.travelmonk.core.ui.TravelMonkTopBar
 import com.travelmonk.core.ui.utils.LogScreenLifecycle
 import com.travelmonk.core.ui.utils.TravelMonkSnackBarHost
-import com.travelmonk.core.ui.TravelMonkTopBar
 import com.travelmonk.core.design.system.color.TravelYellow
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.model.BookingType
@@ -111,7 +114,7 @@ private fun ExperiencesTopBar(
     TravelMonkTopBar(
         title = {
             Text(
-                text = "Experiences",
+                text = stringResource(R.string.experiences_title),
                 color = TravelMonkTheme.colors.onPrimary,
                 style = TravelMonkTheme.typography.titleLarge
             )
@@ -159,28 +162,32 @@ private fun ExperiencesListContent(
     onIntent: (ExperienceIntent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(TravelMonkTheme.colors.background)
-    ) {
-        if (state.isLoading) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = TravelMonkTheme.colors.primary)
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(TravelMonkTheme.spacing.medium),
-                verticalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)
-            ) {
-                items(state.items, key = { it.id }) { item ->
-                    ExperienceCard(
-                        item = item,
-                        onClick = { onIntent(ExperienceIntent.SelectExperience(item.id)) },
-                        onBook = { onIntent(ExperienceIntent.BookItem(item)) }
-                    )
-                }
+    val bottomPadding = LocalNavContentPadding.current
+
+    if (state.isLoading) {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = TravelMonkTheme.colors.primary)
+        }
+    } else {
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
+            contentPadding = PaddingValues(
+                start = TravelMonkTheme.spacing.medium,
+                end = TravelMonkTheme.spacing.medium,
+                top = TravelMonkTheme.spacing.medium,
+                bottom = TravelMonkTheme.spacing.medium + bottomPadding
+            ),
+            verticalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)
+        ) {
+            items(state.items, key = { it.id }) { item ->
+                ExperienceCard(
+                    item = item,
+                    onClick = { onIntent(ExperienceIntent.SelectExperience(item.id)) },
+                    onBook = { onIntent(ExperienceIntent.BookItem(item)) }
+                )
             }
         }
     }
@@ -260,7 +267,7 @@ fun ExperienceCard(
                         colors = ButtonDefaults.buttonColors(containerColor = TravelMonkTheme.colors.primary),
                         shape = RoundedCornerShape(TravelMonkTheme.radius.small)
                     ) {
-                        Text(text = "Book Now")
+                        Text(text = stringResource(R.string.experiences_book_now))
                     }
                 }
             }

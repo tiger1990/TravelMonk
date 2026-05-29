@@ -36,17 +36,15 @@
 
 ### P0-01 · Zero test coverage
 - **Source:** gaps.md G-02
-- **Where:** All `feature/*/test/` directories are empty; no fake repositories; no ViewModel tests
-- **Fix:** Add `MainDispatcherRule`, fake repositories per feature, ViewModel unit tests for state transitions and effect delivery. Start with: `FlightViewModel`, `HomeViewModel`, `ExperienceViewModel`.
-- **Status:** `[ ]`
+- **Status:** `[~]` Partial
+- **Done:** `core/testing/MainDispatcherRule.kt` exists. `FlightViewModelTest` + `FakeFlightRepository` + `FlightFixtures` written. Onboarding module has 5 tests (OtpViewModel, PhoneEntryViewModel, PasskeyPromptViewModel, VerifyOtpUseCase, OtpRateLimiter, KeyRotationManager, SessionDataSerializer).
+- **Remaining:** `HomeViewModelTest`, `ExperienceViewModel` tests, and 5 other feature VMs (stays, bookings, services, transport) still have empty test directories.
 
 ---
 
-### P0-02 · No R8/ProGuard rules — release build crashes
+### ~~P0-02 · No R8/ProGuard rules — release build crashes~~ ✅ Done
 - **Source:** gaps.md G-04
-- **Where:** No `proguard-rules.pro` entries for Retrofit, Hilt, or kotlinx.serialization
-- **Fix:** Add keep rules for Retrofit interfaces, Hilt generated components, and `@Serializable` classes. Without this, R8 will strip or rename these at release build time causing runtime crashes.
-- **Status:** `[ ]`
+- **Fixed:** `app/proguard-rules.pro` now has comprehensive rules: Navigation3 NavKey FQCN preservation (process-death restore), Hilt annotations, `@SerialName` fields for kotlinx.serialization, Retrofit interface methods, and Coil. Readable stack traces preserved via `SourceFile`/`LineNumberTable`.
 
 ---
 
@@ -64,23 +62,17 @@
 - **Source:** GAP-08
 - **Fixed:** All 5 feature `NavigatorModule.kt` files deleted. Providers consolidated into `app/di/NavigationModule.kt` companion object (Option B applied — app layer resolves cross-feature keys).
 
-### P1-04 · Unsafe mutable cast in `NavigationState`
+### ~~P1-04 · Unsafe mutable cast in `NavigationState`~~ ✅ Done
 - **Source:** gaps.md G-05
-- **Where:** `NavigationState.kt:43` — `(backStack as MutableList<TravelNavKey>).add(key)`
-- **Fix:** Tab stacks are already `SnapshotStateList`. Expose a typed accessor per tab. Remove the cast.
-- **Status:** `[ ]`
+- **Fixed:** `NavigationState` calls `stack.add(key)` and `stack.removeLastOrNull()` directly on `NavBackStack<NavKey>`. The `(backStack as MutableList<TravelNavKey>).add(key)` pattern is gone.
 
-### P1-05 · `BookingConfirmationScreen` lives in app module
+### ~~P1-05 · `BookingConfirmationScreen` lives in app module~~ ✅ Done
 - **Source:** gaps.md G-07
-- **Where:** `TravelEntryProvider.kt:72`
-- **Fix:** Move `BookingConfirmationScreen` into `feature:bookings`. App module should only wire, not own composables.
-- **Status:** `[ ]`
+- **Fixed:** `BookingConfirmationScreen` is now in `feature/bookings/src/main/java/com/travelmonk/feature/bookings/ui/BookingConfirmationScreen.kt`. App module only wires navigation.
 
-### P1-06 · `GlobalNavigator` violates SRP
+### ~~P1-06 · `GlobalNavigator` violates SRP~~ ✅ Done
 - **Source:** gaps.md G-08
-- **Where:** `GlobalNavigator.kt` — implements 5+ navigator interfaces; grows with every feature
-- **Fix:** Replace with a `NavigationBus`-style typed key registry. Features push keys; central handler resolves. GlobalNavigator should not accumulate `override fun navigateTo(...)` per feature.
-- **Status:** `[ ]`
+- **Fixed:** `GlobalNavigator` now only implements `NavigationBus` with `navigate(key, options)` and `back()`. Feature navigator implementations are thin anonymous objects in `app/di/NavigationModule.kt` — each delegates to `NavigationBus`. No feature-specific overrides accumulate in `GlobalNavigator`.
 
 ### P1-07 · No deep link support
 - **Source:** GAP-14, gaps.md G-09
@@ -88,17 +80,13 @@
 - **Fix:** Define URI scheme (`travelmonk://flights/results?from=DEL&to=BOM`). Handle `intent` in `onCreate`/`onNewIntent`. Route parsed path/params to `NavigationBus` as `TravelNavKey`. Add `<intent-filter>` in `AndroidManifest.xml`. Define `DeepLinkHandler` in `core/navigation`.
 - **Status:** `[ ]`
 
-### P1-08 · Domain models defined inside MVI files
+### ~~P1-08 · Domain models defined inside MVI files~~ ✅ Done
 - **Source:** gaps.md G-11
-- **Where:** `ExperienceItem` in `ExperienceMvi.kt`, `BookingItem` in `BookingMvi.kt`
-- **Fix:** Move to `feature/*/domain/model/`. MVI files contain only `State`, `Intent`, `Effect`.
-- **Status:** `[ ]`
+- **Fixed:** `BookingItem` is in `feature/bookings/domain/model/BookingItem.kt` (imported in MVI, not defined there). `ExperienceMvi.kt` uses `Experience` from `feature/experiences/domain/model/`. Both MVI files now contain only `State`, `Intent`, `Effect`.
 
-### P1-09 · All user-visible strings hardcoded in main feature screens
+### ~~P1-09 · All user-visible strings hardcoded in main feature screens~~ ✅ Done
 - **Source:** gaps.md G-12, ArchitectureGaps G-04
-- **Where:** Every feature screen composable — `"Hello Traveler,"`, `"Search Flights"`, `"Where to next?"`, `"Refer & Earn"`, etc. across 7 features
-- **Fix:** Move all user-visible strings to `res/values/strings.xml` in each feature module. Use `stringResource(R.string.*)` in composables.
-- **Status:** `[ ]`
+- **Fixed:** Created `strings.xml` for 6 feature modules (home, flights, stays, experiences, bookings, transport). All user-visible string literals replaced with `stringResource(R.string.*)` across 10 screen composables. Services already had strings.xml.
 
 ### ~~P1-10 · Backwards-compatibility typealias shim in Transport module~~ ✅ Done
 - **Source:** GAP-10
@@ -108,21 +96,17 @@
 
 ## P2 — Medium (Quality & Maintainability)
 
-### P2-01 · Hardcoded color literals violate design system rules
+### ~~P2-01 · Hardcoded color literals violate design system rules~~ ✅ Done
 - **Source:** GAP-11, gaps.md G-16
-- **Where (remaining):** `MyBookingsScreen.kt` (`Color(0xFF4CAF50)`, `Color(0xFFFFA000)`), `ExperiencesScreen.kt` (`Color(0xFFFFC107)`), `FlightSearchScreen.kt` (`Color(0xFFF1F4F8)`)
-- **Partial fix done:** `onImage` + `imageScrim` tokens added to `TravelMonkColors`; `HomeScreen.kt` Color.White/Black replaced. Remaining screens still need tokens (`statusSuccess`, `statusWarning`, `starRating`, `surfaceSubtle`).
-- **Status:** `[~]` Partial — HomeScreen done, 3 screens remain
+- **Fixed:** All four screens now clean. `MyBookingsScreen.kt`, `ExperiencesScreen.kt` (uses `TravelYellow` token from `core.design.system.color`), and `FlightSearchScreen.kt` contain zero `Color(0xFF...)` or `Color.White/Black` literals. `HomeScreen.kt` was already done previously.
 
 ### ~~P2-02 · Repositories return `List<T>` instead of `Flow<List<T>>`~~ ✅ Done
 - **Source:** GAP-13
 - **Fixed:** `BookingRepository`, `HomeRepository`, `ServiceRepository` — `suspend fun` → `Flow<DataResult<List<T>>>`. Implementations use `flow { emit(...) }.flowOn(ioDispatcher)`. Use cases pass through. ViewModels use `.collect { }`. Parameterized searches and mutations kept as `suspend`.
 
-### P2-03 · `core:ui` is empty — no shared components
+### ~~P2-03 · `core:ui` is empty — no shared components~~ ✅ Done
 - **Source:** gaps.md G-15
-- **Where:** `core/ui/` module has zero files
-- **Fix:** Implement `TravelMonkButton`, `TravelMonkCard`, `TravelMonkTextField`. Every feature currently reimplements the same shapes.
-- **Status:** `[ ]`
+- **Fixed:** `core/ui` now has `TravelMonkButton`, `TravelMonkCard`, `TravelMonkTextField`, `TravelMonkTopBar`, `LocalNavContentPadding`, `LocalFeatureFlags`, `LogScreenLifecycle`, `TravelMonkSnackbar`. All features use these shared components.
 
 ### P2-04 · `core:tokens` is an orphaned module
 - **Source:** gaps.md G-17
@@ -130,11 +114,9 @@
 - **Fix:** Move `TravelMonkIcons` into `core:designsystem/icons/`. Features should not depend on two separate design modules.
 - **Status:** `[ ]`
 
-### P2-05 · `setState` unnecessarily wrapped in coroutine
+### ~~P2-05 · `setState` unnecessarily wrapped in coroutine~~ ✅ Done
 - **Source:** gaps.md G-18
-- **Where:** `HomeViewModel.kt:24` — `viewModelScope.launch { setState { copy(isLoading = true) } }`
-- **Fix:** `setState` is a synchronous `MutableStateFlow.value` assignment. Call directly; only `setEffect` (suspend) needs a coroutine.
-- **Status:** `[ ]`
+- **Fixed:** `HomeViewModel` was fully refactored to a reactive `stateIn` pipeline — no manual `setState` calls remain at all. State transitions happen automatically via `map { }` on the use case Flow.
 
 ### P2-06 · Accessibility — `contentDescription = null` throughout
 - **Source:** gaps.md G-21
@@ -146,11 +128,9 @@
 
 ## P3 — Low (Production Polish)
 
-### P3-01 · No build flavors for environment separation
+### ~~P3-01 · No build flavors for environment separation~~ ✅ Done
 - **Source:** gaps.md G-22
-- **Where:** `app/build.gradle.kts` — single config, base URL hardcoded in `NetworkModule`
-- **Fix:** Add `debug` / `staging` / `release` product flavors. Move base URL to `BuildConfig` fields per environment.
-- **Status:** `[ ]`
+- **Fixed:** Added `environment` flavor dimension with 3 flavors (`dev`/`staging`/`production`). Removed the old `staging` build type that conflated environment with build behaviour. 6 variants: devDebug, devRelease, stagingDebug, stagingRelease, productionDebug, productionRelease. `AppConfig` extended with `environment: Environment` enum and `apiTimeoutSeconds: Int`. `NetworkModule` wires timeouts (15s prod / 30s dev+staging). Flavor source sets override `app_name` for dev and staging builds.
 
 ### P3-02 · No crash reporting or analytics
 - **Source:** gaps.md G-23, ArchitectureGaps G-05
@@ -164,17 +144,13 @@
 - **Fix:** Implement Room for at minimum: bookings (offline read), recent searches. Or remove the module to eliminate dead compile graph weight.
 - **Status:** `[ ]`
 
-### P3-04 · `core:common` unnecessarily pulls in Compose
+### ~~P3-04 · `core:common` unnecessarily pulls in Compose~~ ✅ Done
 - **Source:** gaps.md G-25
-- **Where:** `core/common/build.gradle.kts` — depends on `androidx.ui` but `MviBase.kt` has no composables
-- **Fix:** Remove `androidx.ui` dependency. `core:common` only needs `lifecycle-viewmodel-ktx` and `kotlinx-coroutines-core`.
-- **Status:** `[ ]`
+- **Fixed:** `core/common/build.gradle.kts` depends only on `lifecycle-runtime-ktx`, `kotlinx-coroutines-core`, `datastore-preferences`, and `core:logger`. Zero Compose dependencies.
 
-### P3-05 · `TripType.values()` deprecated since Kotlin 1.9
+### ~~P3-05 · `TripType.values()` deprecated since Kotlin 1.9~~ ✅ Done
 - **Source:** gaps.md G-26
-- **Where:** `FlightSearchScreen.kt`
-- **Fix:** Replace with `TripType.entries`.
-- **Status:** `[ ]`
+- **Fixed:** Both `FlightSearchScreen.kt` (line 178) and `FlightViewModel.kt` (line 28) now use `TripType.entries`.
 
 ### P3-06 · No certificate pinning on booking/payment endpoints
 - **Source:** ArchitectureGaps G-03
@@ -188,11 +164,11 @@
 
 | Priority | Total Pending |
 |----------|---------------|
-| P0 — Critical | 2 |
-| P1 — High | 6 |
-| P2 — Medium | 5 |
-| P3 — Low | 6 |
-| **Total** | **19** |
+| P0 — Critical | 1 (partial: test coverage) |
+| P1 — High | 1 |
+| P2 — Medium | 2 |
+| P3 — Low | 2 |
+| **Total** | **6** |
 
 > **Note:** GAP-15 / gaps.md G-14 (LaunchedEffect(Unit) for effect collection) is intentionally excluded — `todo.md` explicitly marks it as a non-gap: `LaunchedEffect(Unit)` is the project-endorsed pattern per `compose-ui-best-practice.md`.
 

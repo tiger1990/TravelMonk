@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -30,14 +29,17 @@ class HomeViewModel @Inject constructor(
 
     // Reactive pipeline: getHomeBannersUseCase() returns a cold Flow<DataResult<T>>.
     //
-    // onStart  → emits Loading immediately; UI never shows an empty frame on first render.
-    // map      → translates each DataResult into a complete HomeState snapshot.
-    // catch    → converts unchecked exceptions to Error state instead of crashing.
+    // map    → translates each DataResult into a complete HomeState snapshot.
+    // catch  → converts unchecked exceptions to Error state instead of crashing.
     // stateIn(WhileSubscribed(5_000)) → keeps the upstream alive through config changes
-    //            (rotation completes well within 5 s). After 5 s of no subscribers the
-    //            upstream stops; on return, onStart re-emits Loading and data is refreshed.
-    //            This is correct behaviour — onStart only emits a state VALUE here, not a
-    //            side-effecting coroutine, so multiple restarts are safe.
+    //          (rotation completes well within 5 s). After 5 s of no subscribers the
+    //          upstream stops; on return the cached value is served immediately and
+    //          the upstream restarts without emitting a Loading flash.
+    //
+    // NOTE: Do NOT add .onStart { emit(loading) } here. stateIn's initialValue already
+    // handles the empty-frame case on first load. onStart would re-fire on every upstream
+    // restart (i.e. every time the user returns after 5 s), replacing the cached success
+    // state with a loading flash before data reloads — visible flicker.
     //
     // Room migration: when Room is added, getHomeBannersUseCase() returns a Room-backed
     // Flow that re-emits on DB writes. Zero ViewModel changes needed at that point.
@@ -58,8 +60,7 @@ class HomeViewModel @Inject constructor(
                 )
             }
         }
-        .onStart { emit(HomeState(categories = staticCategories, isLoading = true)) }
-        .catch  { emit(HomeState(categories = staticCategories, error = it.message)) }
+        .catch { emit(HomeState(categories = staticCategories, error = it.message)) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),

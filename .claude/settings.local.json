@@ -42,7 +42,14 @@
       "Bash(./gradlew :core:common:compileDebugKotlin)",
       "Bash(./gradlew :feature:experiences:compileDebugKotlin)",
       "Bash(./gradlew :feature:flights:compileDebugKotlin :feature:stays:compileDebugKotlin :feature:experiences:compileDebugKotlin :feature:bookings:compileDebugKotlin)",
-      "Bash(./gradlew :feature:bookings:compileDebugKotlin :feature:stays:compileDebugKotlin :feature:onboarding:compileDebugKotlin)"
+      "Bash(./gradlew :feature:bookings:compileDebugKotlin :feature:stays:compileDebugKotlin :feature:onboarding:compileDebugKotlin)",
+      "Bash(./gradlew :feature:flights:compileDebugKotlin)",
+      "Bash(./gradlew :feature:home:compileDebugKotlin :feature:services:compileDebugKotlin :feature:bookings:compileDebugKotlin)",
+      "Bash(./gradlew :feature:experiences:compileDebugKotlin :feature:stays:compileDebugKotlin)",
+      "Bash(./gradlew generateDevDebugBuildConfig generateStagingDebugBuildConfig generateProductionReleaseBuildConfig --no-daemon)",
+      "Bash(./gradlew generateDevDebugBuildConfig --no-daemon)",
+      "Bash(./gradlew :core:network:compileDebugKotlin :feature:bookings:compileDebugKotlin)",
+      "Bash(./gradlew :feature:bookings:clean)"
     ],
     "deny": [
       "Bash(rm -rf:*)",

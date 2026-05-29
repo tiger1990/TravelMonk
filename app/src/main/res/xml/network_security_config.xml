@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Network Security Configuration — TravelMonk (STAGING + PRODUCTION)
+  Layer 1 of the certificate pinning defense-in-depth strategy.
+
+  This is a declarative backstop that operates at the OS level, independently of OkHttp.
+  The OkHttp CertificatePinner (Layer 2) is the primary enforcing control. This layer:
+    - Blocks all cleartext (HTTP) traffic everywhere
+    - Pins the production API host as a redundant safety net
+    - Fails-OPEN after the pin-set expiration date (degrades to system trust, not a brick)
+      while OkHttp fails-CLOSED permanently
+
+  Keep the pin digests here in sync with PinningConfig.kt whenever pins are rotated.
+  ⚠️  PLACEHOLDER digests — replace with real openssl SPKI output before shipping.
+      See documents/certificate_pinning.md for extraction commands.
+-->
+<network-security-config>
+
+    <!-- Block cleartext HTTP everywhere by default. Trust only system CAs. -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!--
+      Production API host — declarative SPKI pin backstop.
+      Expiration degrades to system trust (not a hard block) so a missed rotation
+      does not prevent app updates or emergency access.
+    -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="false">api.travelmonk.com</domain>
+        <pin-set expiration="2027-01-01">
+            <!-- ⚠️ leaf primary SPKI — run: openssl s_client ... | openssl x509 -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64 -->
+            <pin digest="SHA-256">AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</pin>
+            <!-- ⚠️ backup key SPKI (held in reserve for zero-downtime rotation) -->
+            <pin digest="SHA-256">BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=</pin>
+            <!-- ⚠️ intermediate CA SPKI (survives leaf cert reissuance with same key pair) -->
+            <pin digest="SHA-256">CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC=</pin>
+        </pin-set>
+    </domain-config>
+
+</network-security-config>

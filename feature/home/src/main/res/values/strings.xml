@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_greeting">Hello Traveler,</string>
+    <string name="home_subtitle">Where to next?</string>
+    <string name="home_notifications_cd">Notifications</string>
+    <string name="home_search_cd">Search</string>
+    <string name="home_search_hint">Search destinations, hotels…</string>
+    <string name="home_special_offers">Special Offers</string>
+    <string name="home_categories">Categories</string>
+    <string name="home_refer_earn_title">Refer &amp; Earn</string>
+    <string name="home_refer_earn_desc">Invite friends and get up to $50 credit</string>
+</resources>

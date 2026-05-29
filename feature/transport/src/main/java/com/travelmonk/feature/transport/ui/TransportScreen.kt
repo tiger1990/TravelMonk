@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -102,7 +103,7 @@ private fun TransportTopBar(
     TravelMonkTopBar(
         title = {
             Text(
-                text = "Transport",
+                text = stringResource(R.string.transport_title),
                 color = TravelMonkTheme.colors.onPrimary,
                 style = TravelMonkTheme.typography.titleLarge
             )

@@ -8,6 +8,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import com.travelmonk.core.network.di.PinnedRetrofit
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
@@ -29,7 +30,7 @@ internal abstract class BookingModule {
     companion object {
         @Provides
         @Singleton
-        fun provideBookingsApi(retrofit: Retrofit): BookingsApi {
+        fun provideBookingsApi(@PinnedRetrofit retrofit: Retrofit): BookingsApi {
             return retrofit.create(BookingsApi::class.java)
         }
     }

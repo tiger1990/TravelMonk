@@ -1,6 +1,7 @@
 package com.travelmonk.di
 
 import com.travelmonk.core.model.BookingType
+import com.travelmonk.core.navigation.NavOptions
 import com.travelmonk.core.navigation.NavigationBus
 import com.travelmonk.feature.bookingsapi.navigation.BookingNavKey
 import com.travelmonk.feature.experiencesapi.navigation.ExperienceNavKey
@@ -50,7 +51,7 @@ internal abstract class NavigationModule {
             override fun navigateTo(key: FlightNavKey) = bus.navigate(key)
             override fun back() = bus.back()
             override fun navigateToBookingConfirmation(type: BookingType, title: String) =
-                bus.navigate(BookingNavKey.Confirmation(type, title))
+                bus.navigate(BookingNavKey.Confirmation(type, title), NavOptions(popCurrentTabToRoot = true))
         }
 
         @Provides
@@ -61,7 +62,7 @@ internal abstract class NavigationModule {
             override fun navigateToExperienceDetail(experienceId: String) =
                 bus.navigate(ExperienceNavKey.Details(experienceId))
             override fun navigateToBookingConfirmation(type: BookingType, title: String) =
-                bus.navigate(BookingNavKey.Confirmation(type, title))
+                bus.navigate(BookingNavKey.Confirmation(type, title), NavOptions(popCurrentTabToRoot = true))
         }
 
         @Provides
@@ -71,7 +72,7 @@ internal abstract class NavigationModule {
             override fun back() = bus.back()
             override fun navigateToStayDetail(stayId: String) = bus.navigate(StayNavKey.Details(stayId))
             override fun navigateToBookingConfirmation(type: BookingType, title: String) =
-                bus.navigate(BookingNavKey.Confirmation(type, title))
+                bus.navigate(BookingNavKey.Confirmation(type, title), NavOptions(popCurrentTabToRoot = true))
         }
 
         @Provides
@@ -80,7 +81,7 @@ internal abstract class NavigationModule {
             override fun navigateTo(key: ServiceNavKey) = bus.navigate(key)
             override fun back() = bus.back()
             override fun navigateToBookingConfirmation(type: BookingType, title: String) =
-                bus.navigate(BookingNavKey.Confirmation(type, title))
+                bus.navigate(BookingNavKey.Confirmation(type, title), NavOptions(popCurrentTabToRoot = true))
         }
     }
 }

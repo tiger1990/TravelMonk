@@ -41,34 +41,74 @@ android {
         buildConfig = true
     }
 
+    flavorDimensions += "environment"
+
+    /**
+     * Just for example how free and paid product flavor are build
+     *  // Define flavor dimensions to group your flavors
+     *     flavorDimensions += "tier"
+     *     // Build type will have tier:
+     *     // free and paid freeDebug, freeRelease || paidDebug, paidRelease
+     *     productFlavors {
+     *         create("free") {
+     *             dimension = "tier"
+     *             // Different package name for the free version
+     *             applicationIdSuffix = ".free"
+     *             versionNameSuffix = "-free"
+     *         }
+     *
+     *         create("paid") {
+     *             dimension = "tier"
+     *             // Different package name for the paid version
+     *             applicationIdSuffix = ".paid"
+     *             versionNameSuffix = "-paid"
+     *         }
+     *     }
+     */
+
+    productFlavors {
+        create("dev") {
+            dimension = "environment"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            buildConfigField("String", "BASE_URL",            "\"https://dev-api.travelmonk.com/\"")
+            buildConfigField("String", "ENVIRONMENT",         "\"DEV\"")
+            buildConfigField("int",    "API_TIMEOUT_SECONDS", "30")
+        }
+        create("staging") {
+            dimension = "environment"
+            applicationIdSuffix = ".staging"
+            versionNameSuffix = "-staging"
+            buildConfigField("String", "BASE_URL",            "\"https://staging-api.travelmonk.com/\"")
+            buildConfigField("String", "ENVIRONMENT",         "\"STAGING\"")
+            buildConfigField("int",    "API_TIMEOUT_SECONDS", "30")
+            // Readable symbols on stagingRelease so QA can parse crash logs
+            proguardFiles("proguard-staging.pro")
+        }
+        create("production") {
+            dimension = "environment"
+            // No applicationIdSuffix — production is the canonical Play Store ID
+            buildConfigField("String", "BASE_URL",            "\"https://api.travelmonk.com/\"")
+            buildConfigField("String", "ENVIRONMENT",         "\"PRODUCTION\"")
+            buildConfigField("int",    "API_TIMEOUT_SECONDS", "15")
+        }
+    }
+
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
-            versionNameSuffix = "-DEBUG"
-            buildConfigField("String", "BASE_URL", "\"https://dev-api.travelmonk.com/\"")
+            versionNameSuffix   = "-DEBUG"
+            isDebuggable        = true
         }
-
-        create("staging") {
-            initWith(getByName("release"))
-            applicationIdSuffix = ".staging"
-            matchingFallbacks += listOf("release")
-            buildConfigField("String", "BASE_URL", "\"https://staging-api.travelmonk.com/\"")
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
-                "proguard-staging.pro"
-            )
-        }
-
         release {
-            isMinifyEnabled = true
+            isMinifyEnabled   = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig     = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
-            buildConfigField("String", "BASE_URL", "\"https://api.travelmonk.com/\"")
         }
+        // staging BUILD TYPE removed — environment is now the "environment" product flavor
     }
 
     packaging {

@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.travelmonk.core.ui.LocalNavContentPadding
 import com.travelmonk.core.ui.flags.LocalFeatureFlags
 import com.travelmonk.core.navigation.NavEntryInstallerSet
 import com.travelmonk.navigation.GlobalNavigator
@@ -73,15 +74,27 @@ fun TravelMonkApp(
                 }
             }
         ) { innerPadding ->
+            CompositionLocalProvider(LocalNavContentPadding provides innerPadding.calculateBottomPadding()) {
             NavDisplay(
                 entries = navigationState.toDecoratedEntries(entryProvider),
                 // To achieve the glass effect, we ignore bottom padding so content flows behind the bar.
                 // We keep top padding for the status/top bar area.
                 modifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
                 onBack = { navigationState.pop() },
+                // Tab switches (tapping a bottom bar item) should cross-fade — not slide.
+                // Sliding is only correct for forward push-navigation within a tab.
+                // We detect a tab switch by checking if the incoming top key is a root tab destination.
                 transitionSpec = {
-                    (slideInHorizontally(tween(300)) { it / 4 } + fadeIn(tween(300))) togetherWith
-                            (slideOutHorizontally(tween(300)) { -it / 4 } + fadeOut(tween(300)))
+                    val toKey = targetState.key
+                    val isTabSwitch = bottomBarItems.items.any { it.route == toKey }
+                    if (isTabSwitch) {
+                        // Peer-level transition: fade out old tab, fade in new tab
+                        fadeIn(tween(220)) togetherWith fadeOut(tween(180))
+                    } else {
+                        // Forward push within a tab: slide in from right
+                        (slideInHorizontally(tween(300)) { it / 4 } + fadeIn(tween(300))) togetherWith
+                                (slideOutHorizontally(tween(300)) { -it / 4 } + fadeOut(tween(300)))
+                    }
                 },
                 popTransitionSpec = {
                     (slideInHorizontally(tween(300)) { -it / 4 } + fadeIn(tween(300))) togetherWith
@@ -93,6 +106,7 @@ fun TravelMonkApp(
                 }
                 // try this: https://proandroiddev.com/nested-routes-with-navigation-3-af0cd8223986
             )
+            } // CompositionLocalProvider
         }
     }
 }

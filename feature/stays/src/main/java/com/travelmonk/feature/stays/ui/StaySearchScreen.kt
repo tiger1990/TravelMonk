@@ -15,14 +15,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import com.travelmonk.feature.stays.R
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
+import com.travelmonk.core.ui.LocalNavContentPadding
+import com.travelmonk.core.ui.TravelMonkTopBar
 import com.travelmonk.core.ui.utils.LogScreenLifecycle
 import com.travelmonk.core.ui.utils.TravelMonkSnackBarHost
-import com.travelmonk.core.ui.TravelMonkTopBar
 import com.travelmonk.core.design.system.color.TravelYellow
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.tokens.TravelMonkIcons
@@ -95,7 +98,7 @@ private fun StaySearchTopBar() {
     TravelMonkTopBar(
         title = {
             Text(
-                text = "Find your stay",
+                text = stringResource(R.string.stays_title),
                 style = TravelMonkTheme.typography.headlineMedium,
                 color = TravelMonkTheme.colors.onPrimary
             )
@@ -124,7 +127,7 @@ private fun StaySearchTopBar() {
                     )
                     Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.small))
                     Text(
-                        text = "Search for hotel, apartment...",
+                        text = stringResource(R.string.stays_search_hint),
                         color = TravelMonkTheme.colors.onSurfaceVariant,
                         style = TravelMonkTheme.typography.labelMedium
                     )
@@ -143,11 +146,18 @@ private fun StaySearchListContent(
     onIntent: (StayIntent) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val bottomPadding = LocalNavContentPadding.current
+
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
             .background(TravelMonkTheme.colors.background),
-        contentPadding = PaddingValues(TravelMonkTheme.spacing.large),
+        contentPadding = PaddingValues(
+            start = TravelMonkTheme.spacing.large,
+            end = TravelMonkTheme.spacing.large,
+            top = TravelMonkTheme.spacing.large,
+            bottom = TravelMonkTheme.spacing.large + bottomPadding
+        ),
         verticalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)
     ) {
         item(key = "stay_type_tabs") {
@@ -155,7 +165,7 @@ private fun StaySearchListContent(
         }
         item(key = "popular_section") {
             Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
-            SectionHeader(title = "Popular Destinations")
+            SectionHeader(title = stringResource(R.string.stays_popular_destinations))
             Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
             LazyRow(horizontalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)) {
                 items(listOf("Bali", "Paris", "Dubai", "New York"), key = { it }) { city ->
@@ -165,7 +175,7 @@ private fun StaySearchListContent(
         }
         item(key = "recommended_header") {
             Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
-            SectionHeader(title = "Recommended Stays")
+            SectionHeader(title = stringResource(R.string.stays_recommended))
         }
         item(key = "grand_oberoi") {
             StayItem(
@@ -245,7 +255,7 @@ private fun SectionHeader(title: String) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(text = title, style = TravelMonkTheme.typography.titleLarge)
-        Text(text = "View all", color = TravelMonkTheme.colors.primary, style = TravelMonkTheme.typography.labelMedium)
+        Text(text = stringResource(R.string.stays_view_all), color = TravelMonkTheme.colors.primary, style = TravelMonkTheme.typography.labelMedium)
     }
 }
 
@@ -329,9 +339,9 @@ private fun StayItem(title: String, location: String, price: String, rating: Str
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(text = title, style = TravelMonkTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                     Text(
-                        text = "$price / night", 
-                        color = TravelMonkTheme.colors.primary, 
-                        style = TravelMonkTheme.typography.bodyLarge, 
+                        text = stringResource(R.string.stays_price_per_night, price),
+                        color = TravelMonkTheme.colors.primary,
+                        style = TravelMonkTheme.typography.bodyLarge,
                         fontWeight = FontWeight.ExtraBold
                     )
                 }

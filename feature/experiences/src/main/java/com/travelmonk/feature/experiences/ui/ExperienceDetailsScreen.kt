@@ -13,7 +13,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import com.travelmonk.feature.experiences.R
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -152,7 +154,7 @@ private fun ExperienceDetailsScrollableContent(
             ) {
                 Icon(
                     painter = painterResource(id = TravelMonkIcons.ArrowBack),
-                    contentDescription = "Back",
+                    contentDescription = stringResource(R.string.experiences_navigate_back_cd),
                     tint = TravelMonkTheme.colors.onSurface
                 )
             }
@@ -210,7 +212,7 @@ private fun ExperienceDetailsScrollableContent(
             )
 
             Text(
-                text = "Overview",
+                text = stringResource(R.string.experiences_overview),
                 style = TravelMonkTheme.typography.titleLarge,
                 color = TravelMonkTheme.colors.onBackground
             )
@@ -218,7 +220,7 @@ private fun ExperienceDetailsScrollableContent(
             Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.small))
 
             Text(
-                text = experience.description.ifEmpty { "Discover the breathtaking beauty and rich culture of this incredible destination. This experience offers a unique blend of adventure and relaxation, perfect for travelers seeking something extraordinary." },
+                text = experience.description.ifEmpty { stringResource(R.string.experiences_description_fallback) },
                 style = TravelMonkTheme.typography.bodyLarge,
                 color = TravelMonkTheme.colors.onSurfaceVariant
             )
@@ -248,7 +250,7 @@ private fun ExperienceDetailsBottomBar(
         ) {
             Column {
                 Text(
-                    text = "Total Price",
+                    text = stringResource(R.string.experiences_total_price),
                     style = TravelMonkTheme.typography.labelMedium,
                     color = TravelMonkTheme.colors.onSurfaceVariant
                 )
@@ -261,7 +263,7 @@ private fun ExperienceDetailsBottomBar(
             }
             
             TravelMonkButton(
-                text = "Book Now",
+                text = stringResource(R.string.experiences_book_now),
                 onClick = onBookNow,
                 modifier = Modifier.width(TravelMonkTheme.dimensions.bookingButtonWidth)
             )

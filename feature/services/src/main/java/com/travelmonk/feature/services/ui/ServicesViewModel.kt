@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
@@ -37,8 +36,10 @@ class ServicesViewModel @Inject constructor(
     // _selectedService has an immediate initial value (null), so combine() only
     // blocks on the first emission from getServicesUseCase().
     //
-    // onStart → immediately emits Loading so the UI never shows an empty frame.
     // catch   → converts unchecked pipeline exceptions into an empty non-loading state.
+    // stateIn initialValue covers the initial loading frame — do NOT add .onStart here.
+    // onStart would re-fire on every upstream restart (user returns after 5 s), replacing
+    // the cached success state with a loading flash before data reloads — visible flicker.
     //
     // Room migration: getServicesUseCase() will return a Room-backed Flow; combine()
     // handles it transparently, re-emitting on every DB change with the current selection.
@@ -55,8 +56,7 @@ class ServicesViewModel @Inject constructor(
             is DataResult.Loading -> ServicesState(isLoading = true, selectedService = selectedService)
         }
     }
-    .onStart { emit(ServicesState(isLoading = true)) }
-    .catch  { emit(ServicesState()) }
+    .catch { emit(ServicesState()) }
     .stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),

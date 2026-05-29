@@ -15,7 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import com.travelmonk.feature.stays.R
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -132,7 +134,7 @@ private fun StayResultsTopBar(
         title = {
             Column {
                 Text(
-                    text = "Search Results",
+                    text = stringResource(R.string.stays_search_results),
                     style = TravelMonkTheme.typography.titleLarge,
                     color = TravelMonkTheme.colors.onPrimary
                 )
@@ -147,7 +149,7 @@ private fun StayResultsTopBar(
             IconButton(onClick = onBackClick) {
                 Icon(
                     painter = painterResource(id = TravelMonkIcons.ArrowBack),
-                    contentDescription = "Back",
+                    contentDescription = stringResource(R.string.stays_navigate_back_cd),
                     tint = TravelMonkTheme.colors.onPrimary
                 )
             }
@@ -197,7 +199,7 @@ private fun StayItem(
                 ) {
                     Icon(
                         painter = painterResource(id = TravelMonkIcons.Star), // Using Search as placeholder for Favorite
-                        contentDescription = "Favorite",
+                        contentDescription = stringResource(R.string.stays_favorite_cd),
                         tint = TravelMonkTheme.colors.primary,
                         modifier = Modifier.size(TravelMonkTheme.dimensions.iconMedium)
                     )
@@ -259,7 +261,7 @@ private fun StayItem(
                     )
                     Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.extraSmall))
                     Text(
-                        text = "/night",
+                        text = stringResource(R.string.stays_per_night),
                         style = TravelMonkTheme.typography.labelMedium,
                         color = TravelMonkTheme.colors.onSurfaceVariant,
                         modifier = Modifier.padding(bottom = TravelMonkTheme.spacing.extraSmall)

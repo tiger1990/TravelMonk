@@ -7,7 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.travelmonk.feature.bookings.R
 import android.content.res.Configuration
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.model.BookingType
@@ -44,12 +46,12 @@ fun BookingConfirmationContent(
             )
             Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
             Text(
-                text = "${type.name.lowercase().replaceFirstChar { it.uppercase() }} Booked Successfully!",
+                text = stringResource(R.string.bookings_booked_successfully, type.name.lowercase().replaceFirstChar { it.uppercase() }),
                 style = TravelMonkTheme.typography.titleLarge,
                 color = TravelMonkTheme.colors.onBackground
             )
             Text(
-                text = "Confirmed with $title",
+                text = stringResource(R.string.bookings_confirmed_with, title),
                 style = TravelMonkTheme.typography.bodyLarge,
                 color = TravelMonkTheme.colors.onSurfaceVariant
             )
@@ -58,7 +60,7 @@ fun BookingConfirmationContent(
                 onClick = onDone,
                 colors = ButtonDefaults.buttonColors(containerColor = TravelMonkTheme.colors.primary)
             ) {
-                Text("View My Bookings", color = TravelMonkTheme.colors.onPrimary)
+                Text(stringResource(R.string.bookings_view_my_bookings), color = TravelMonkTheme.colors.onPrimary)
             }
         }
     }

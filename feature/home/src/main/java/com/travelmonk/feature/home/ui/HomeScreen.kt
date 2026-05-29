@@ -13,11 +13,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
+import com.travelmonk.feature.home.R
 import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.core.ui.TravelMonkTopBar
 import com.travelmonk.core.ui.utils.LogScreenLifecycle
@@ -70,12 +72,12 @@ fun HomeContent(
                 title = {
                     Column {
                         Text(
-                            text = "Hello Traveler,",
+                            text = stringResource(R.string.home_greeting),
                             color = TravelMonkTheme.colors.onPrimary.copy(alpha = 0.8f),
                             style = TravelMonkTheme.typography.bodyLarge
                         )
                         Text(
-                            text = "Where to next?",
+                            text = stringResource(R.string.home_subtitle),
                             style = TravelMonkTheme.typography.headlineMedium
                         )
                     }
@@ -85,7 +87,7 @@ fun HomeContent(
                     IconButton(onClick = {}) {
                         Icon(
                             painter = painterResource(TravelMonkIcons.Notifications),
-                            contentDescription = "Notifications",
+                            contentDescription = stringResource(R.string.home_notifications_cd),
                             tint = TravelMonkTheme.colors.onPrimary,
                             modifier = Modifier.size(TravelMonkTheme.dimensions.iconMedium)
                         )
@@ -109,12 +111,12 @@ fun HomeContent(
                         ) {
                             Icon(
                                 painter = painterResource(TravelMonkIcons.Search),
-                                contentDescription = "Search",
+                                contentDescription = stringResource(R.string.home_search_cd),
                                 tint = TravelMonkTheme.colors.onSurfaceVariant
                             )
                             Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.small))
                             Text(
-                                text = "Search destinations, hotels...",
+                                text = stringResource(R.string.home_search_hint),
                                 color = TravelMonkTheme.colors.onSurfaceVariant
                             )
                         }
@@ -146,7 +148,7 @@ fun HomeContent(
 fun BannerSection(banners: ImmutableList<HomeBanner>, onBannerClick: (String) -> Unit) {
     Column {
         Text(
-            text = "Special Offers",
+            text = stringResource(R.string.home_special_offers),
             style = TravelMonkTheme.typography.titleLarge,
             modifier = Modifier.padding(horizontal = TravelMonkTheme.spacing.large)
         )
@@ -193,7 +195,7 @@ fun BannerSection(banners: ImmutableList<HomeBanner>, onBannerClick: (String) ->
 @Composable
 fun CategorySection(categories: ImmutableList<HomeCategory>) {
     Column(modifier = Modifier.padding(TravelMonkTheme.spacing.large)) {
-        Text(text = "Categories", style = TravelMonkTheme.typography.titleLarge)
+        Text(text = stringResource(R.string.home_categories), style = TravelMonkTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             categories.forEach { category ->
@@ -230,8 +232,8 @@ fun PromoSection() {
             Icon(painter = painterResource(TravelMonkIcons.CardGiftCard), contentDescription = null, tint = TravelMonkTheme.colors.primary, modifier = Modifier.size(40.dp))
             Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.medium))
             Column {
-                Text(text = "Refer & Earn", style = TravelMonkTheme.typography.titleLarge)
-                Text(text = "Invite friends and get up to $50 credit", style = TravelMonkTheme.typography.bodyLarge)
+                Text(text = stringResource(R.string.home_refer_earn_title), style = TravelMonkTheme.typography.titleLarge)
+                Text(text = stringResource(R.string.home_refer_earn_desc), style = TravelMonkTheme.typography.bodyLarge)
             }
         }
     }

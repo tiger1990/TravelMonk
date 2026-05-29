@@ -45,7 +45,7 @@ class BookingViewModel @Inject constructor(
     // cancel + refresh cycle.
     //
     // Pipeline: drop(1) skips the MutableStateFlow's initial 0 so debounce never fires on
-    // first subscription. onStart re-injects 0 immediately — initial load is instant.
+    // first subscription. The INNER onStart re-injects 0 immediately — initial load is instant.
     // debounce(300) only affects manual refresh signals (value ≥ 1): rapid pull-to-refresh
     // taps are collapsed and only the last emission within 300 ms triggers a re-fetch.
     //
@@ -56,6 +56,11 @@ class BookingViewModel @Inject constructor(
     // Sequence for manual refresh:
     //   _refreshSignal++ (value = 1) → drop(1) lets it through → debounce(300) waits →
     //   flatMapLatest cancels previous stream and re-fetches.
+    //
+    // NOTE: Do NOT add an outer .onStart { emit(BookingState(isLoading)) } after flatMapLatest.
+    // stateIn's initialValue already handles the initial loading frame. An outer onStart
+    // would re-fire on every upstream restart (user returns after 5 s), replacing the cached
+    // success state with a loading flash — visible flicker.
     //
     // Room migration: unchanged — _refreshSignal remains as a pull-to-refresh escape hatch.
     override val uiState: StateFlow<BookingState> = _refreshSignal
@@ -87,8 +92,7 @@ class BookingViewModel @Inject constructor(
                     }
                 }
         }
-        .onStart { emit(BookingState(isLoading = true)) }
-        .catch  { emit(BookingState(error = it.message)) }
+        .catch { emit(BookingState(error = it.message)) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),

@@ -15,7 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import com.travelmonk.feature.flights.R
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -55,8 +57,8 @@ fun FlightSearchScreen(
             TravelMonkTopBar(
                 title = {
                     Column {
-                        Text("Search Flights", style = TravelMonkTheme.typography.titleLarge)
-                        Text("Where are you going today?", style = TravelMonkTheme.typography.bodyLarge)
+                        Text(stringResource(R.string.flights_search), style = TravelMonkTheme.typography.titleLarge)
+                        Text(stringResource(R.string.flights_search_subtitle), style = TravelMonkTheme.typography.bodyLarge)
                     }
                 },
                 containerColor = TravelMonkTheme.colors.primary,
@@ -64,7 +66,7 @@ fun FlightSearchScreen(
                     IconButton(onClick = navigator::back) {
                         Icon(
                             painter = painterResource(TravelMonkIcons.ArrowBack),
-                            contentDescription = "Navigate back",
+                            contentDescription = stringResource(R.string.flights_navigate_back_cd),
                             tint = TravelMonkTheme.colors.onPrimary
                         )
                     }
@@ -115,9 +117,9 @@ fun FlightSearchContent(
 
                     Box(modifier = Modifier.fillMaxWidth()) {
                         Column {
-                            LocationField(label = "From", city = state.fromCity, code = state.fromCode, icon = TravelMonkIcons.FlightTakeoff)
+                            LocationField(label = stringResource(R.string.flights_from_label), city = state.fromCity, code = state.fromCode, icon = TravelMonkIcons.FlightTakeoff)
                             HorizontalDivider(modifier = Modifier.padding(vertical = TravelMonkTheme.spacing.small))
-                            LocationField(label = "To", city = state.toCity, code = state.toCode, icon = TravelMonkIcons.FlightLand)
+                            LocationField(label = stringResource(R.string.flights_to_label), city = state.toCity, code = state.toCode, icon = TravelMonkIcons.FlightLand)
                         }
 
                         FloatingActionButton(
@@ -131,7 +133,7 @@ fun FlightSearchContent(
                             elevation = FloatingActionButtonDefaults.elevation(TravelMonkTheme.dimensions.cardElevation)
                         ) {
                             Icon(painter = painterResource(TravelMonkIcons.Swap_Vert),
-                                contentDescription = "Swap",
+                                contentDescription = stringResource(R.string.flights_swap_cities_cd),
                                 tint = TravelMonkTheme.colors.onPrimary)
                         }
                     }
@@ -139,9 +141,9 @@ fun FlightSearchContent(
                     Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.large))
 
                     Row(modifier = Modifier.fillMaxWidth()) {
-                        SearchInfoCard(label = "Departure", value = state.departureDate, icon = TravelMonkIcons.CalendarToday, modifier = Modifier.weight(1f))
+                        SearchInfoCard(label = stringResource(R.string.flights_departure_label), value = state.departureDate, icon = TravelMonkIcons.CalendarToday, modifier = Modifier.weight(1f))
                         Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.medium))
-                        SearchInfoCard(label = "Passengers", value = "${state.passengers} Adult", icon = TravelMonkIcons.Person, modifier = Modifier.weight(1f))
+                        SearchInfoCard(label = stringResource(R.string.flights_passengers_label), value = stringResource(R.string.flights_passenger_count, state.passengers), icon = TravelMonkIcons.Person, modifier = Modifier.weight(1f))
                     }
 
                     Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.large))
@@ -157,7 +159,7 @@ fun FlightSearchContent(
                         if (state.isLoading) {
                             CircularProgressIndicator(modifier = Modifier.size(TravelMonkTheme.dimensions.iconMedium), color = TravelMonkTheme.colors.onPrimary)
                         } else {
-                            Text("Search Flights", style = TravelMonkTheme.typography.titleLarge)
+                            Text(stringResource(R.string.flights_search), style = TravelMonkTheme.typography.titleLarge)
                         }
                     }
                 }

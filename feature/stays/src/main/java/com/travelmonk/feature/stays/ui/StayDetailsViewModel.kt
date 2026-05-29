@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -46,8 +45,11 @@ class StayDetailsViewModel @Inject constructor(
                     }
                 }
         }
-        .onStart { emit(StayDetailsState(isLoading = true)) }
-        .catch   { t -> emit(StayDetailsState(error = t.message)) }
+        // NOTE: No .onStart here. stateIn's initialValue covers the initial loading frame.
+        // onStart re-fires on every upstream restart (app returns after 5 s): because
+        // _stayIdSignal is a MutableSharedFlow with no replay, flatMapLatest receives
+        // no new ID after restart, leaving the UI stuck on loading forever.
+        .catch { t -> emit(StayDetailsState(error = t.message)) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),

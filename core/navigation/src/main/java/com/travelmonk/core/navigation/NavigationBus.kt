@@ -7,6 +7,6 @@ package com.travelmonk.core.navigation
  * @Provides adapter in NavigationModule; no changes here.
  */
 interface NavigationBus {
-    fun navigate(key: TravelNavKey)
+    fun navigate(key: TravelNavKey, options: NavOptions = NavOptions.Default)
     fun back()
 }

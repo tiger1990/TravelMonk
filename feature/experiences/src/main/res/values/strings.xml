@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="experiences_title">Experiences</string>
+    <string name="experiences_book_now">Book Now</string>
+    <string name="experiences_overview">Overview</string>
+    <string name="experiences_total_price">Total Price</string>
+    <string name="experiences_navigate_back_cd">Back</string>
+    <string name="experiences_description_fallback">Discover the breathtaking beauty and rich culture of this incredible destination. This experience offers a unique blend of adventure and relaxation, perfect for travelers seeking something extraordinary.</string>
+</resources>

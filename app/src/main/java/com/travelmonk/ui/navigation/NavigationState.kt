@@ -15,6 +15,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.runtime.serialization.NavKeySerializer
 import androidx.savedstate.compose.serialization.serializers.MutableStateSerializer
+import com.travelmonk.core.navigation.NavOptions
 import com.travelmonk.core.navigation.NavTab
 import com.travelmonk.core.navigation.TravelNavKey
 import com.travelmonk.navigation.GlobalNavigator
@@ -59,17 +60,27 @@ class NavigationState(
 
     /**
      * Navigates to [key]:
-     *  1. Resolves which tab owns the key (via registry)
-     *  2. Switches to that tab's root if different from the current one
-     *  3. Pushes [key] onto that tab's back stack (deduplicated at top)
+     *  1. If [options.popCurrentTabToRoot] is true, clears the active tab's back stack
+     *     to its root before switching — use for terminal cross-tab actions (booking).
+     *  2. Resolves which tab owns the key (via registry) and switches to it.
+     *  3. Pushes [key] onto that tab's back stack, respecting [options.singleTop].
      */
-    fun navigateTo(key: TravelNavKey) {
+    fun navigateTo(key: TravelNavKey, options: NavOptions = NavOptions.Default) {
+        if (options.popCurrentTabToRoot) {
+            val currentStack = backStacks[currentRouteKey]
+            if (currentStack != null) {
+                while (currentStack.size > 1) currentStack.removeLastOrNull()
+            }
+        }
         val destination = registry.resolve(key)
         if (destination != null) {
             currentRouteKey = destination.navTab.toRootKey()
         }
         val stack = backStacks[currentRouteKey] ?: return
-        if (stack.lastOrNull() != key) stack.add(key)
+        val isAlreadyTop = stack.lastOrNull() == key
+        if (!isAlreadyTop || !options.singleTop) {
+            if (!isAlreadyTop) stack.add(key)
+        }
     }
 
     fun pop() {
@@ -177,7 +188,7 @@ fun rememberNavigationState(
     LaunchedEffect(state, globalNavigator) {
         globalNavigator.navEvents.collect { command ->
             when (command) {
-                is NavCommand.Navigate -> state.navigateTo(command.key)
+                is NavCommand.Navigate -> state.navigateTo(command.key, command.options)
                 is NavCommand.Back     -> state.pop()
             }
         }

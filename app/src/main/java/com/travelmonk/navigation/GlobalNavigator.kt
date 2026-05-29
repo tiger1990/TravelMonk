@@ -1,5 +1,6 @@
 package com.travelmonk.navigation
 
+import com.travelmonk.core.navigation.NavOptions
 import com.travelmonk.core.navigation.NavigationBus
 import com.travelmonk.core.navigation.TravelNavKey
 import androidx.compose.runtime.Stable
@@ -10,7 +11,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 sealed interface NavCommand {
-    data class Navigate(val key: TravelNavKey) : NavCommand
+    data class Navigate(val key: TravelNavKey, val options: NavOptions = NavOptions.Default) : NavCommand
     data object Back : NavCommand
 }
 
@@ -40,8 +41,8 @@ class GlobalNavigator @Inject constructor() : NavigationBus {
     )
     val navEvents = _navEvents.asSharedFlow()
 
-    override fun navigate(key: TravelNavKey) {
-        _navEvents.tryEmit(NavCommand.Navigate(key))
+    override fun navigate(key: TravelNavKey, options: NavOptions) {
+        _navEvents.tryEmit(NavCommand.Navigate(key, options))
     }
 
     override fun back() {

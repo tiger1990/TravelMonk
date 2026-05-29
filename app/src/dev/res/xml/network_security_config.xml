@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Network Security Configuration — DEV flavor ONLY.
+  Overrides app/src/main/res/xml/network_security_config.xml for the dev build flavor.
+
+  Allows user-installed CA certificates so Charles Proxy and mitmproxy work locally.
+  This file MUST NOT exist in staging or production flavors.
+  The OkHttp CertificatePinner is also a no-op in DEV (PinningConfig returns empty config).
+-->
+<network-security-config>
+
+    <base-config cleartextTrafficPermitted="false" />
+
+    <!-- Trust user-installed CAs (e.g. Charles Proxy root cert) in DEV builds only. -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="user" />
+            <certificates src="system" />
+        </trust-anchors>
+    </debug-overrides>
+
+</network-security-config>

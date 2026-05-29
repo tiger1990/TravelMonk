@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="stays_title">Find your stay</string>
+    <string name="stays_search_hint">Search for hotel, apartment…</string>
+    <string name="stays_popular_destinations">Popular Destinations</string>
+    <string name="stays_recommended">Recommended Stays</string>
+    <string name="stays_view_all">View all</string>
+    <string name="stays_price_per_night">%1$s / night</string>
+    <string name="stays_per_night">/night</string>
+    <string name="stays_search_results">Search Results</string>
+    <string name="stays_navigate_back_cd">Back</string>
+    <string name="stays_favorite_cd">Favorite</string>
+    <string name="stays_about_this_stay">About this stay</string>
+    <string name="stays_description_placeholder">Experience ultimate luxury and comfort at %1$s. Located in the heart of %2$s, this property offers stunning views and world-class amenities to make your stay unforgettable.</string>
+    <string name="stays_facilities">Facilities</string>
+    <string name="stays_facility_wifi">Free WiFi</string>
+    <string name="stays_facility_pool">Pool</string>
+    <string name="stays_facility_spa">Spa</string>
+    <string name="stays_price_per_night_label">Price per night</string>
+    <string name="stays_book_now">Book Now</string>
+</resources>
