@@ -152,7 +152,7 @@ private fun StayDetailsScrollableContent(
             ) {
                 Icon(
                     painter = painterResource(id = TravelMonkIcons.ArrowBack),
-                    contentDescription = stringResource(R.string.stays_navigate_back_cd),
+                    contentDescription = stringResource(R.string.feature_stays_navigate_back_cd),
                     tint = TravelMonkTheme.colors.onSurface
                 )
             }
@@ -199,7 +199,7 @@ private fun StayDetailsScrollableContent(
             )
 
             Text(
-                text = stringResource(R.string.stays_about_this_stay),
+                text = stringResource(R.string.feature_stays_about_this_stay),
                 style = TravelMonkTheme.typography.titleLarge,
                 color = TravelMonkTheme.colors.onBackground
             )
@@ -207,7 +207,7 @@ private fun StayDetailsScrollableContent(
             Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.small))
 
             Text(
-                text = stringResource(R.string.stays_description_placeholder, stay.title, stay.location),
+                text = stringResource(R.string.feature_stays_description_placeholder, stay.title, stay.location),
                 style = TravelMonkTheme.typography.bodyLarge,
                 color = TravelMonkTheme.colors.onSurfaceVariant
             )
@@ -216,7 +216,7 @@ private fun StayDetailsScrollableContent(
 
             // Facilities Placeholder
             Text(
-                text = stringResource(R.string.stays_facilities),
+                text = stringResource(R.string.feature_stays_facilities),
                 style = TravelMonkTheme.typography.titleLarge,
                 color = TravelMonkTheme.colors.onBackground
             )
@@ -227,9 +227,9 @@ private fun StayDetailsScrollableContent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)
             ) {
-                FacilityItem(icon = TravelMonkIcons.Search, label = stringResource(R.string.stays_facility_wifi))
-                FacilityItem(icon = TravelMonkIcons.Search, label = stringResource(R.string.stays_facility_pool))
-                FacilityItem(icon = TravelMonkIcons.Search, label = stringResource(R.string.stays_facility_spa))
+                FacilityItem(icon = TravelMonkIcons.Search, label = stringResource(R.string.feature_stays_facility_wifi))
+                FacilityItem(icon = TravelMonkIcons.Search, label = stringResource(R.string.feature_stays_facility_pool))
+                FacilityItem(icon = TravelMonkIcons.Search, label = stringResource(R.string.feature_stays_facility_spa))
             }
             
             Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.large))
@@ -277,7 +277,7 @@ private fun StayDetailsBottomBar(
         ) {
             Column {
                 Text(
-                    text = stringResource(R.string.stays_price_per_night_label),
+                    text = stringResource(R.string.feature_stays_price_per_night_label),
                     style = TravelMonkTheme.typography.labelMedium,
                     color = TravelMonkTheme.colors.onSurfaceVariant
                 )
@@ -290,7 +290,7 @@ private fun StayDetailsBottomBar(
             }
             
             TravelMonkButton(
-                text = stringResource(R.string.stays_book_now),
+                text = stringResource(R.string.feature_stays_book_now),
                 onClick = onBookNow,
                 modifier = Modifier.width(TravelMonkTheme.dimensions.bookingButtonWidth)
             )

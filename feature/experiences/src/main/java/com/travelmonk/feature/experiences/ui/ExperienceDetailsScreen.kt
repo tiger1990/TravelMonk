@@ -154,7 +154,7 @@ private fun ExperienceDetailsScrollableContent(
             ) {
                 Icon(
                     painter = painterResource(id = TravelMonkIcons.ArrowBack),
-                    contentDescription = stringResource(R.string.experiences_navigate_back_cd),
+                    contentDescription = stringResource(R.string.feature_experiences_navigate_back_cd),
                     tint = TravelMonkTheme.colors.onSurface
                 )
             }
@@ -212,7 +212,7 @@ private fun ExperienceDetailsScrollableContent(
             )
 
             Text(
-                text = stringResource(R.string.experiences_overview),
+                text = stringResource(R.string.feature_experiences_overview),
                 style = TravelMonkTheme.typography.titleLarge,
                 color = TravelMonkTheme.colors.onBackground
             )
@@ -220,7 +220,7 @@ private fun ExperienceDetailsScrollableContent(
             Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.small))
 
             Text(
-                text = experience.description.ifEmpty { stringResource(R.string.experiences_description_fallback) },
+                text = experience.description.ifEmpty { stringResource(R.string.feature_experiences_description_fallback) },
                 style = TravelMonkTheme.typography.bodyLarge,
                 color = TravelMonkTheme.colors.onSurfaceVariant
             )
@@ -250,7 +250,7 @@ private fun ExperienceDetailsBottomBar(
         ) {
             Column {
                 Text(
-                    text = stringResource(R.string.experiences_total_price),
+                    text = stringResource(R.string.feature_experiences_total_price),
                     style = TravelMonkTheme.typography.labelMedium,
                     color = TravelMonkTheme.colors.onSurfaceVariant
                 )
@@ -263,7 +263,7 @@ private fun ExperienceDetailsBottomBar(
             }
             
             TravelMonkButton(
-                text = stringResource(R.string.experiences_book_now),
+                text = stringResource(R.string.feature_experiences_book_now),
                 onClick = onBookNow,
                 modifier = Modifier.width(TravelMonkTheme.dimensions.bookingButtonWidth)
             )

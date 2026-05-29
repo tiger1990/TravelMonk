@@ -95,7 +95,7 @@ fun FlightResultsContent(
                             style = TravelMonkTheme.typography.titleLarge
                         )
                         Text(
-                            text = stringResource(R.string.flights_date_passenger_placeholder),
+                            text = stringResource(R.string.feature_flights_date_passenger_placeholder),
                             color = TravelMonkTheme.colors.onPrimary.copy(alpha = 0.8f),
                             style = TravelMonkTheme.typography.caption
                         )
@@ -106,7 +106,7 @@ fun FlightResultsContent(
                     IconButton(onClick = onBack) {
                         Icon(
                             painter = painterResource(TravelMonkIcons.ArrowBack),
-                            contentDescription = stringResource(R.string.flights_navigate_back_cd),
+                            contentDescription = stringResource(R.string.feature_flights_navigate_back_cd),
                             tint = TravelMonkTheme.colors.onPrimary
                         )
                     }
@@ -129,7 +129,7 @@ fun FlightResultsContent(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = stringResource(R.string.flights_no_results),
+                    text = stringResource(R.string.feature_flights_no_results),
                     style = TravelMonkTheme.typography.bodyLarge,
                     color = TravelMonkTheme.colors.onSurfaceVariant
                 )
@@ -189,7 +189,7 @@ fun FlightTicketCard(flight: Flight, onBook: (String) -> Unit) {
             ) {
                 Column {
                     Text(text = flight.departureTime, style = TravelMonkTheme.typography.headlineMedium)
-                    Text(text = stringResource(R.string.flights_departure_abbr), color = TravelMonkTheme.colors.onSurfaceVariant, style = TravelMonkTheme.typography.caption)
+                    Text(text = stringResource(R.string.feature_flights_departure_abbr), color = TravelMonkTheme.colors.onSurfaceVariant, style = TravelMonkTheme.typography.caption)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(text = flight.duration, style = TravelMonkTheme.typography.caption, color = TravelMonkTheme.colors.onSurfaceVariant)
@@ -198,7 +198,7 @@ fun FlightTicketCard(flight: Flight, onBook: (String) -> Unit) {
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(text = flight.arrivalTime, style = TravelMonkTheme.typography.headlineMedium)
-                    Text(text = stringResource(R.string.flights_arrival_abbr), color = TravelMonkTheme.colors.onSurfaceVariant, style = TravelMonkTheme.typography.caption)
+                    Text(text = stringResource(R.string.feature_flights_arrival_abbr), color = TravelMonkTheme.colors.onSurfaceVariant, style = TravelMonkTheme.typography.caption)
                 }
             }
 
@@ -213,7 +213,7 @@ fun FlightTicketCard(flight: Flight, onBook: (String) -> Unit) {
                 ),
                 shape = RoundedCornerShape(TravelMonkTheme.radius.small)
             ) {
-                Text(stringResource(R.string.flights_select_button), style = TravelMonkTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.feature_flights_select_button), style = TravelMonkTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
             }
         }
     }

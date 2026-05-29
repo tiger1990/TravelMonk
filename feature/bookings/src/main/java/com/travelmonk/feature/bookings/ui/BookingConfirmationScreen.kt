@@ -46,12 +46,12 @@ fun BookingConfirmationContent(
             )
             Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
             Text(
-                text = stringResource(R.string.bookings_booked_successfully, type.name.lowercase().replaceFirstChar { it.uppercase() }),
+                text = stringResource(R.string.feature_bookings_booked_successfully, type.name.lowercase().replaceFirstChar { it.uppercase() }),
                 style = TravelMonkTheme.typography.titleLarge,
                 color = TravelMonkTheme.colors.onBackground
             )
             Text(
-                text = stringResource(R.string.bookings_confirmed_with, title),
+                text = stringResource(R.string.feature_bookings_confirmed_with, title),
                 style = TravelMonkTheme.typography.bodyLarge,
                 color = TravelMonkTheme.colors.onSurfaceVariant
             )
@@ -60,7 +60,7 @@ fun BookingConfirmationContent(
                 onClick = onDone,
                 colors = ButtonDefaults.buttonColors(containerColor = TravelMonkTheme.colors.primary)
             ) {
-                Text(stringResource(R.string.bookings_view_my_bookings), color = TravelMonkTheme.colors.onPrimary)
+                Text(stringResource(R.string.feature_bookings_view_my_bookings), color = TravelMonkTheme.colors.onPrimary)
             }
         }
     }

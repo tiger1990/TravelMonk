@@ -134,7 +134,7 @@ private fun StayResultsTopBar(
         title = {
             Column {
                 Text(
-                    text = stringResource(R.string.stays_search_results),
+                    text = stringResource(R.string.feature_stays_search_results),
                     style = TravelMonkTheme.typography.titleLarge,
                     color = TravelMonkTheme.colors.onPrimary
                 )
@@ -149,7 +149,7 @@ private fun StayResultsTopBar(
             IconButton(onClick = onBackClick) {
                 Icon(
                     painter = painterResource(id = TravelMonkIcons.ArrowBack),
-                    contentDescription = stringResource(R.string.stays_navigate_back_cd),
+                    contentDescription = stringResource(R.string.feature_stays_navigate_back_cd),
                     tint = TravelMonkTheme.colors.onPrimary
                 )
             }
@@ -199,7 +199,7 @@ private fun StayItem(
                 ) {
                     Icon(
                         painter = painterResource(id = TravelMonkIcons.Star), // Using Search as placeholder for Favorite
-                        contentDescription = stringResource(R.string.stays_favorite_cd),
+                        contentDescription = stringResource(R.string.feature_stays_favorite_cd),
                         tint = TravelMonkTheme.colors.primary,
                         modifier = Modifier.size(TravelMonkTheme.dimensions.iconMedium)
                     )
@@ -261,7 +261,7 @@ private fun StayItem(
                     )
                     Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.extraSmall))
                     Text(
-                        text = stringResource(R.string.stays_per_night),
+                        text = stringResource(R.string.feature_stays_per_night),
                         style = TravelMonkTheme.typography.labelMedium,
                         color = TravelMonkTheme.colors.onSurfaceVariant,
                         modifier = Modifier.padding(bottom = TravelMonkTheme.spacing.extraSmall)

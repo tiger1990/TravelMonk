@@ -72,12 +72,12 @@ fun HomeContent(
                 title = {
                     Column {
                         Text(
-                            text = stringResource(R.string.home_greeting),
+                            text = stringResource(R.string.feature_home_greeting),
                             color = TravelMonkTheme.colors.onPrimary.copy(alpha = 0.8f),
                             style = TravelMonkTheme.typography.bodyLarge
                         )
                         Text(
-                            text = stringResource(R.string.home_subtitle),
+                            text = stringResource(R.string.feature_home_subtitle),
                             style = TravelMonkTheme.typography.headlineMedium
                         )
                     }
@@ -87,7 +87,7 @@ fun HomeContent(
                     IconButton(onClick = {}) {
                         Icon(
                             painter = painterResource(TravelMonkIcons.Notifications),
-                            contentDescription = stringResource(R.string.home_notifications_cd),
+                            contentDescription = stringResource(R.string.feature_home_notifications_cd),
                             tint = TravelMonkTheme.colors.onPrimary,
                             modifier = Modifier.size(TravelMonkTheme.dimensions.iconMedium)
                         )
@@ -111,12 +111,12 @@ fun HomeContent(
                         ) {
                             Icon(
                                 painter = painterResource(TravelMonkIcons.Search),
-                                contentDescription = stringResource(R.string.home_search_cd),
+                                contentDescription = stringResource(R.string.feature_home_search_cd),
                                 tint = TravelMonkTheme.colors.onSurfaceVariant
                             )
                             Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.small))
                             Text(
-                                text = stringResource(R.string.home_search_hint),
+                                text = stringResource(R.string.feature_home_search_hint),
                                 color = TravelMonkTheme.colors.onSurfaceVariant
                             )
                         }
@@ -148,7 +148,7 @@ fun HomeContent(
 fun BannerSection(banners: ImmutableList<HomeBanner>, onBannerClick: (String) -> Unit) {
     Column {
         Text(
-            text = stringResource(R.string.home_special_offers),
+            text = stringResource(R.string.feature_home_special_offers),
             style = TravelMonkTheme.typography.titleLarge,
             modifier = Modifier.padding(horizontal = TravelMonkTheme.spacing.large)
         )
@@ -195,7 +195,7 @@ fun BannerSection(banners: ImmutableList<HomeBanner>, onBannerClick: (String) ->
 @Composable
 fun CategorySection(categories: ImmutableList<HomeCategory>) {
     Column(modifier = Modifier.padding(TravelMonkTheme.spacing.large)) {
-        Text(text = stringResource(R.string.home_categories), style = TravelMonkTheme.typography.titleLarge)
+        Text(text = stringResource(R.string.feature_home_categories), style = TravelMonkTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             categories.forEach { category ->
@@ -232,8 +232,8 @@ fun PromoSection() {
             Icon(painter = painterResource(TravelMonkIcons.CardGiftCard), contentDescription = null, tint = TravelMonkTheme.colors.primary, modifier = Modifier.size(40.dp))
             Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.medium))
             Column {
-                Text(text = stringResource(R.string.home_refer_earn_title), style = TravelMonkTheme.typography.titleLarge)
-                Text(text = stringResource(R.string.home_refer_earn_desc), style = TravelMonkTheme.typography.bodyLarge)
+                Text(text = stringResource(R.string.feature_home_refer_earn_title), style = TravelMonkTheme.typography.titleLarge)
+                Text(text = stringResource(R.string.feature_home_refer_earn_desc), style = TravelMonkTheme.typography.bodyLarge)
             }
         }
     }

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="flights_search">Search Flights</string>
-    <string name="flights_search_subtitle">Where are you going today?</string>
-    <string name="flights_navigate_back_cd">Navigate back</string>
-    <string name="flights_swap_cities_cd">Swap cities</string>
-    <string name="flights_from_label">From</string>
-    <string name="flights_to_label">To</string>
-    <string name="flights_departure_label">Departure</string>
-    <string name="flights_passengers_label">Passengers</string>
-    <string name="flights_passenger_count">%d Adult</string>
-    <string name="flights_no_results">No flights found</string>
-    <string name="flights_date_passenger_placeholder">Oct 24 • 1 Passenger</string>
-    <string name="flights_departure_abbr">Dep</string>
-    <string name="flights_arrival_abbr">Arr</string>
-    <string name="flights_select_button">Select Flight</string>
+    <string name="feature_flights_search">Search Flights</string>
+    <string name="feature_flights_search_subtitle">Where are you going today?</string>
+    <string name="feature_flights_navigate_back_cd">Navigate back</string>
+    <string name="feature_flights_swap_cities_cd">Swap cities</string>
+    <string name="feature_flights_from_label">From</string>
+    <string name="feature_flights_to_label">To</string>
+    <string name="feature_flights_departure_label">Departure</string>
+    <string name="feature_flights_passengers_label">Passengers</string>
+    <string name="feature_flights_passenger_count">%d Adult</string>
+    <string name="feature_flights_no_results">No flights found</string>
+    <string name="feature_flights_date_passenger_placeholder">Oct 24 • 1 Passenger</string>
+    <string name="feature_flights_departure_abbr">Dep</string>
+    <string name="feature_flights_arrival_abbr">Arr</string>
+    <string name="feature_flights_select_button">Select Flight</string>
 </resources>

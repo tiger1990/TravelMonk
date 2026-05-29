@@ -98,7 +98,7 @@ private fun StaySearchTopBar() {
     TravelMonkTopBar(
         title = {
             Text(
-                text = stringResource(R.string.stays_title),
+                text = stringResource(R.string.feature_stays_title),
                 style = TravelMonkTheme.typography.headlineMedium,
                 color = TravelMonkTheme.colors.onPrimary
             )
@@ -127,7 +127,7 @@ private fun StaySearchTopBar() {
                     )
                     Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.small))
                     Text(
-                        text = stringResource(R.string.stays_search_hint),
+                        text = stringResource(R.string.feature_stays_search_hint),
                         color = TravelMonkTheme.colors.onSurfaceVariant,
                         style = TravelMonkTheme.typography.labelMedium
                     )
@@ -165,7 +165,7 @@ private fun StaySearchListContent(
         }
         item(key = "popular_section") {
             Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
-            SectionHeader(title = stringResource(R.string.stays_popular_destinations))
+            SectionHeader(title = stringResource(R.string.feature_stays_popular_destinations))
             Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
             LazyRow(horizontalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)) {
                 items(listOf("Bali", "Paris", "Dubai", "New York"), key = { it }) { city ->
@@ -175,7 +175,7 @@ private fun StaySearchListContent(
         }
         item(key = "recommended_header") {
             Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
-            SectionHeader(title = stringResource(R.string.stays_recommended))
+            SectionHeader(title = stringResource(R.string.feature_stays_recommended))
         }
         item(key = "grand_oberoi") {
             StayItem(
@@ -255,7 +255,7 @@ private fun SectionHeader(title: String) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(text = title, style = TravelMonkTheme.typography.titleLarge)
-        Text(text = stringResource(R.string.stays_view_all), color = TravelMonkTheme.colors.primary, style = TravelMonkTheme.typography.labelMedium)
+        Text(text = stringResource(R.string.feature_stays_view_all), color = TravelMonkTheme.colors.primary, style = TravelMonkTheme.typography.labelMedium)
     }
 }
 
@@ -339,7 +339,7 @@ private fun StayItem(title: String, location: String, price: String, rating: Str
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(text = title, style = TravelMonkTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                     Text(
-                        text = stringResource(R.string.stays_price_per_night, price),
+                        text = stringResource(R.string.feature_stays_price_per_night, price),
                         color = TravelMonkTheme.colors.primary,
                         style = TravelMonkTheme.typography.bodyLarge,
                         fontWeight = FontWeight.ExtraBold

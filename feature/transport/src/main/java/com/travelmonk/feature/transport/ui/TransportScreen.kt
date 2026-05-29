@@ -103,7 +103,7 @@ private fun TransportTopBar(
     TravelMonkTopBar(
         title = {
             Text(
-                text = stringResource(R.string.transport_title),
+                text = stringResource(R.string.feature_transport_title),
                 color = TravelMonkTheme.colors.onPrimary,
                 style = TravelMonkTheme.typography.titleLarge
             )

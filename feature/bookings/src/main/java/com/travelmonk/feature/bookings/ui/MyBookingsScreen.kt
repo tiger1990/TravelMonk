@@ -41,7 +41,7 @@ fun MyBookingsScreen(
     Scaffold(
         topBar = {
             TravelMonkTopBar(
-                title = { Text(stringResource(R.string.bookings_my_bookings)) },
+                title = { Text(stringResource(R.string.feature_bookings_my_bookings)) },
                 containerColor = TravelMonkTheme.colors.primary
             )
         },

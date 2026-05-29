@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="bookings_my_bookings">My Bookings</string>
-    <string name="bookings_booked_successfully">%1$s Booked Successfully!</string>
-    <string name="bookings_confirmed_with">Confirmed with %1$s</string>
-    <string name="bookings_view_my_bookings">View My Bookings</string>
+    <string name="feature_bookings_my_bookings">My Bookings</string>
+    <string name="feature_bookings_booked_successfully">%1$s Booked Successfully!</string>
+    <string name="feature_bookings_confirmed_with">Confirmed with %1$s</string>
+    <string name="feature_bookings_view_my_bookings">View My Bookings</string>
 </resources>

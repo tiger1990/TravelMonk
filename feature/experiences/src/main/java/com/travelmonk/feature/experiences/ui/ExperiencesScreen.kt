@@ -114,7 +114,7 @@ private fun ExperiencesTopBar(
     TravelMonkTopBar(
         title = {
             Text(
-                text = stringResource(R.string.experiences_title),
+                text = stringResource(R.string.feature_experiences_title),
                 color = TravelMonkTheme.colors.onPrimary,
                 style = TravelMonkTheme.typography.titleLarge
             )
@@ -267,7 +267,7 @@ fun ExperienceCard(
                         colors = ButtonDefaults.buttonColors(containerColor = TravelMonkTheme.colors.primary),
                         shape = RoundedCornerShape(TravelMonkTheme.radius.small)
                     ) {
-                        Text(text = stringResource(R.string.experiences_book_now))
+                        Text(text = stringResource(R.string.feature_experiences_book_now))
                     }
                 }
             }
