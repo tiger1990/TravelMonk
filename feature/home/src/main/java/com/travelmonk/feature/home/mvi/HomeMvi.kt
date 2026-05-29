@@ -1,30 +1,35 @@
 package com.travelmonk.feature.home.mvi
 
 import androidx.annotation.DrawableRes
+import androidx.compose.runtime.Immutable
 import com.travelmonk.core.common.mvi.UiEffect
 import com.travelmonk.core.common.mvi.UiIntent
 import com.travelmonk.core.common.mvi.UiState
 import com.travelmonk.feature.home.domain.model.HomeBanner
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
+@Immutable
 data class HomeCategory(
     val label: String,
-    @DrawableRes val icon: Int
+    @param:DrawableRes val icon: Int
 )
 
+@Immutable
 data class HomeState(
-    val banners: List<HomeBanner> = emptyList(),
-    val categories: List<HomeCategory> = emptyList(),
+    val banners: ImmutableList<HomeBanner> = persistentListOf(),
+    val categories: ImmutableList<HomeCategory> = persistentListOf(),
     val isLoading: Boolean = false,
     val error: String? = null
 ) : UiState
 
-sealed class HomeIntent : UiIntent {
-    data object LoadHomeData : HomeIntent()
-    data class OnBannerClick(val bannerId: String) : HomeIntent()
-    data object OnSearchClick : HomeIntent()
+sealed interface HomeIntent : UiIntent {
+    data object LoadHomeData : HomeIntent
+    data class OnBannerClick(val bannerId: String) : HomeIntent
+    data object OnSearchClick : HomeIntent
 }
 
-sealed class HomeEffect : UiEffect {
-    data class NavigateToDetails(val id: String) : HomeEffect()
-    data object NavigateToGlobalSearch : HomeEffect()
+sealed interface HomeEffect : UiEffect {
+    data class NavigateToDetails(val id: String) : HomeEffect
+    data object NavigateToGlobalSearch : HomeEffect
 }

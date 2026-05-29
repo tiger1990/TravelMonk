@@ -7,6 +7,10 @@ import com.travelmonk.core.common.result.DataResult
 import com.travelmonk.feature.stays.domain.usecase.SearchStaysUseCase
 import com.travelmonk.feature.stays.mvi.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,6 +27,36 @@ class StayViewModel @Inject constructor(
     )
 ) {
 
+    // Each emission carries the search location; flatMapLatest auto-cancels any
+    // in-flight searchStaysUseCase call when SearchStays fires again — no manual Job needed.
+    // G7: DROP_OLDEST ensures the latest search always wins when emissions arrive faster than the consumer
+    private val _searchTrigger = MutableSharedFlow<String>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
+    init {
+        viewModelScope.launch {
+            _searchTrigger
+                .flatMapLatest { location ->
+                    flow {
+                        emit(DataResult.Loading)
+                        emit(searchStaysUseCase(location))
+                    }
+                }
+                .collect { result ->
+                    when (result) {
+                        is DataResult.Loading -> setState { copy(isLoading = true, error = null) }
+                        is DataResult.Success -> {
+                            setState { copy(isLoading = false) }
+                            setEffect(StayEffect.NavigateToResults(currentState.location))
+                        }
+                        is DataResult.Error -> {
+                            setState { copy(isLoading = false, error = result.exception.message) }
+                            setEffect(StayEffect.ShowError(result.exception.message ?: "Failed to search stays"))
+                        }
+                    }
+                }
+        }
+    }
+
     override fun handleIntent(intent: StayIntent) {
         when (intent) {
             is StayIntent.ChangeStayType -> {
@@ -33,22 +67,7 @@ class StayViewModel @Inject constructor(
                 setState { copy(location = intent.location) }
                 savedStateHandle[KEY_LOCATION] = intent.location
             }
-            is StayIntent.SearchStays -> {
-                viewModelScope.launch {
-                    setState { copy(isLoading = true) }
-                    when (val result = searchStaysUseCase(currentState.location)) {
-                        is DataResult.Success -> {
-                            setState { copy(isLoading = false) }
-                            setEffect(StayEffect.NavigateToResults(currentState.location))
-                        }
-                        is DataResult.Error -> {
-                            setState { copy(isLoading = false, error = result.exception.message) }
-                            setEffect(StayEffect.ShowError(result.exception.message ?: "Failed to search stays"))
-                        }
-                        is DataResult.Loading -> Unit
-                    }
-                }
-            }
+            is StayIntent.SearchStays -> _searchTrigger.tryEmit(currentState.location)
         }
     }
 

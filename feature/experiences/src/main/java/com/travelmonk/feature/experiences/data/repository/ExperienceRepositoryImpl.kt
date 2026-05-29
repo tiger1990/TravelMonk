@@ -9,32 +9,41 @@ import com.travelmonk.feature.experiences.domain.model.Experience
 import com.travelmonk.feature.experiences.domain.model.ExperienceCategory
 import com.travelmonk.feature.experiences.domain.repository.ExperienceRepository
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class ExperienceRepositoryImpl @Inject constructor(
     private val experiencesApi: ExperiencesApi,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ExperienceRepository {
-    override suspend fun getExperiences(category: ExperienceCategory): DataResult<List<Experience>> =
-        withContext(ioDispatcher) {
-            // TODO: Replace with real API call when backend is integrated:
-            // DataResult.Success(experiencesApi.getExperiences(category.name).map { it.toDomain() })
-            DataResult.Success(fakeExperiences(category))
-        }
 
-    override suspend fun getExperienceById(id: String): DataResult<Experience> =
-        withContext(ioDispatcher) {
-            val experience = ExperienceCategory.entries
-                .flatMap { fakeExperiences(it) }
-                .find { it.id == id }
-            
-            if (experience != null) {
-                DataResult.Success(experience)
-            } else {
-                DataResult.Error(Exception("Experience with id $id not found"))
-            }
+    // Emits Loading immediately so the UI shows a spinner without any explicit setState().
+    // The Success emission follows on the IO dispatcher via flowOn().
+    //
+    // Room migration: replace the flow{} block with:
+    //   dao.getExperiences(category).map { DataResult.Success(it.map { e -> e.toDomain() }) }
+    override fun getExperiences(category: ExperienceCategory): Flow<DataResult<List<Experience>>> = flow {
+        emit(DataResult.Loading)
+        // TODO: Replace with real API call when backend is integrated:
+        // emit(DataResult.Success(experiencesApi.getExperiences(category.name).map { it.toDomain() }))
+        emit(DataResult.Success(fakeExperiences(category)))
+    }.flowOn(ioDispatcher)
+
+    override fun getExperienceById(id: String): Flow<DataResult<Experience>> = flow {
+        emit(DataResult.Loading)
+        // TODO: Replace with real API call when backend is integrated:
+        // emit(DataResult.Success(experiencesApi.getExperienceById(id).toDomain()))
+        val experience = ExperienceCategory.entries
+            .flatMap { fakeExperiences(it) }
+            .find { it.id == id }
+        if (experience != null) {
+            emit(DataResult.Success(experience))
+        } else {
+            emit(DataResult.Error(Exception("Experience with id $id not found")))
         }
+    }.flowOn(ioDispatcher)
 
     private fun fakeExperiences(category: ExperienceCategory): List<Experience> = when (category) {
         ExperienceCategory.PACKAGES -> listOf(

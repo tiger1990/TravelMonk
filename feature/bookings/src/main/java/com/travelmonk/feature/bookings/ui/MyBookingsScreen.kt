@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.collections.immutable.persistentListOf
 import com.travelmonk.core.design.system.color.WarningAmber
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.model.BookingType
@@ -137,7 +138,7 @@ private fun MyBookingsContentPreview() {
     TravelMonkTheme {
         MyBookingsContent(
             state = BookingState(
-                bookings = listOf(
+                bookings = persistentListOf(
                     BookingItem("1", BookingType.FLIGHT, "SFO → JFK", "Oct 24, 2024", "Confirmed", "$120"),
                     BookingItem("2", BookingType.HOTEL, "The Grand Oberoi", "Nov 5, 2024", "Pending", "$240")
                 )

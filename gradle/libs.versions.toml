@@ -17,6 +17,7 @@ ksp        = "2.3.6"   # Kotlin Symbol Processing — must match kotlin version
 kotlin                 = "2.3.21"
 kotlinxCoroutines      = "1.11.0"
 kotlinxSerializationCore = "1.11.0"
+kotlinxCollectionsImmutable = "0.3.7"
 
 # ── AndroidX Core ─────────────────────────────────────────────────────────────
 coreKtx         = "1.18.0"
@@ -164,6 +165,9 @@ kotlinx-coroutines-test    = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 # ── Serialization ─────────────────────────────────────────────────────────────
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerializationCore" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationCore" }  # JSON format
+
+# ── Immutable Collections ─────────────────────────────────────────────────────
+kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }  # ImmutableList/PersistentList for Compose stability
 
 # ── DataStore ─────────────────────────────────────────────────────────────────
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }

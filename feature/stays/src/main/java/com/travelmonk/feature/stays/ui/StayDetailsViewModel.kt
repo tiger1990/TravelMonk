@@ -8,6 +8,16 @@ import com.travelmonk.feature.stays.mvi.StayDetailsEffect
 import com.travelmonk.feature.stays.mvi.StayDetailsIntent
 import com.travelmonk.feature.stays.mvi.StayDetailsState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,9 +26,37 @@ class StayDetailsViewModel @Inject constructor(
     private val getStayDetailsUseCase: GetStayDetailsUseCase
 ) : BaseViewModel<StayDetailsState, StayDetailsIntent, StayDetailsEffect>(StayDetailsState()) {
 
+    // G3: MutableSharedFlow re-emits the same stayId on retry-after-error — MutableStateFlow would
+    // silently drop it via distinctUntilChanged when the value hasn't changed.
+    private val _stayIdSignal = MutableSharedFlow<String>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
+    override val uiState: StateFlow<StayDetailsState> = _stayIdSignal
+        .flatMapLatest { stayId ->
+            getStayDetailsUseCase(stayId)
+                .onEach { result ->
+                    if (result is DataResult.Error) {
+                        setEffect(StayDetailsEffect.ShowError(result.exception.message ?: "An error occurred"))
+                    }
+                }
+                .map { result ->
+                    when (result) {
+                        is DataResult.Loading  -> StayDetailsState(isLoading = true)
+                        is DataResult.Success  -> StayDetailsState(stay = result.data, isLoading = false)
+                        is DataResult.Error    -> StayDetailsState(isLoading = false, error = result.exception.message)
+                    }
+                }
+        }
+        .onStart { emit(StayDetailsState(isLoading = true)) }
+        .catch   { t -> emit(StayDetailsState(error = t.message)) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = StayDetailsState(isLoading = true)
+        )
+
     override fun handleIntent(intent: StayDetailsIntent) {
         when (intent) {
-            is StayDetailsIntent.LoadDetails -> loadStayDetails(intent.stayId)
+            is StayDetailsIntent.LoadDetails -> _stayIdSignal.tryEmit(intent.stayId)
             is StayDetailsIntent.BookNow -> {
                 currentState.stay?.let {
                     viewModelScope.launch {
@@ -28,29 +66,6 @@ class StayDetailsViewModel @Inject constructor(
             }
             is StayDetailsIntent.ToggleFavorite -> {
                 // Handle favorite toggle logic
-            }
-        }
-    }
-
-    private fun loadStayDetails(stayId: String) {
-        viewModelScope.launch {
-            setState { copy(isLoading = true, error = null) }
-            when (val result = getStayDetailsUseCase(stayId)) {
-                is DataResult.Success -> {
-                    setState { copy(stay = result.data, isLoading = false) }
-                }
-                is DataResult.Error -> {
-                    setState { 
-                        copy(
-                            isLoading = false, 
-                            error = result.exception.message ?: "Failed to load stay details" 
-                        ) 
-                    }
-                    setEffect(StayDetailsEffect.ShowError(result.exception.message ?: "An error occurred"))
-                }
-                is DataResult.Loading -> {
-                    setState { copy(isLoading = true) }
-                }
             }
         }
     }

@@ -11,6 +11,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileOutputStream
+import java.nio.file.Files
 
 /**
  * Manages log file I/O with a three-directory rotation pattern.
@@ -112,7 +113,9 @@ class LogFileManager(context: Context) {
      */
     private fun enforceRetention() {
         val pendingFiles = getPendingFilesInternal()
-        val uploadingCount = uploadingDir.listFiles()?.size ?: 0
+        val uploadingCount = if (uploadingDir.exists()) {
+            Files.newDirectoryStream(uploadingDir.toPath()).use { it.count() }
+        } else 0
         val totalCount = pendingFiles.size + uploadingCount
         if (totalCount > MAX_PENDING_FILES) {
             pendingFiles.take(totalCount - MAX_PENDING_FILES).forEach { it.delete() }
@@ -148,7 +151,10 @@ class LogFileManager(context: Context) {
      * On startup, move any stuck files from uploading back to pending.
      */
     private fun cleanupOrphanedUploads() {
-        uploadingDir.listFiles()?.forEach { it.renameTo(File(pendingDir, it.name)) }
+        if (!uploadingDir.exists()) return
+        Files.newDirectoryStream(uploadingDir.toPath()).use { stream ->
+            stream.forEach { path -> path.toFile().renameTo(File(pendingDir, path.toFile().name)) }
+        }
     }
 
     /**
@@ -176,9 +182,18 @@ class LogFileManager(context: Context) {
     /**
      * Internal access to pending files without re-acquiring the lock.
      * Must only be called from contexts already holding writeMutex.
+     *
+     * Uses Files.newDirectoryStream().use {} instead of File.listFiles() so the
+     * underlying UnixSecureDirectoryStream is always explicitly closed — File.listFiles()
+     * on API 34+ delegates to Files.list() internally but the stream may escape close()
+     * if the calling coroutine is cancelled before the native call returns.
      */
-    private fun getPendingFilesInternal(): List<File> =
-        pendingDir.listFiles()?.sortedBy { it.lastModified() } ?: emptyList()
+    private fun getPendingFilesInternal(): List<File> {
+        if (!pendingDir.exists()) return emptyList()
+        return Files.newDirectoryStream(pendingDir.toPath()).use { stream ->
+            stream.map { it.toFile() }.sortedBy { it.lastModified() }
+        }
+    }
 
     suspend fun deleteAfterUpload(file: File): Unit = withContext(Dispatchers.IO) {
         writeMutex.withLock {

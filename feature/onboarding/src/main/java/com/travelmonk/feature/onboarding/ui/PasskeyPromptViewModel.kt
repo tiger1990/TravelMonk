@@ -14,6 +14,7 @@ import com.travelmonk.feature.onboarding.mvi.PasskeyPromptEffect
 import com.travelmonk.feature.onboarding.mvi.PasskeyPromptIntent
 import com.travelmonk.feature.onboarding.mvi.PasskeyPromptState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,6 +26,8 @@ class PasskeyPromptViewModel @Inject constructor(
     private val userSessionStore: UserSessionStore,
     private val mockDataSource: PasskeyMockDataSource
 ) : BaseViewModel<PasskeyPromptState, PasskeyPromptIntent, PasskeyPromptEffect>(PasskeyPromptState()) {
+
+    private var passkeyJob: Job? = null
 
     override fun handleIntent(intent: PasskeyPromptIntent) {
         when (intent) {
@@ -47,7 +50,8 @@ class PasskeyPromptViewModel @Inject constructor(
     }
 
     private fun beginRegistration() {
-        viewModelScope.launch {
+        passkeyJob?.cancel()
+        passkeyJob = viewModelScope.launch {
             setState { copy(isLoading = true, error = null) }
             val userId = userSessionStore.sessionFlow.value.userId
             when (val result = passkeyRepository.beginRegistration(userId)) {
@@ -69,13 +73,15 @@ class PasskeyPromptViewModel @Inject constructor(
                             ?: UiText.Res(R.string.feature_onboarding_error_passkey_registration_start)
                     )
                 }
+                // suspend mutation — Loading is not a terminal value; required for exhaustive when.
                 is DataResult.Loading -> Unit
             }
         }
     }
 
     private fun beginAuthentication() {
-        viewModelScope.launch {
+        passkeyJob?.cancel()
+        passkeyJob = viewModelScope.launch {
             setState { copy(isLoading = true, error = null) }
             when (val result = passkeyRepository.beginAuthentication()) {
                 is DataResult.Success -> {
@@ -94,13 +100,15 @@ class PasskeyPromptViewModel @Inject constructor(
                             ?: UiText.Res(R.string.feature_onboarding_error_passkey_auth_start)
                     )
                 }
+                // suspend mutation — Loading is not a terminal value; required for exhaustive when.
                 is DataResult.Loading -> Unit
             }
         }
     }
 
     private fun completeRegistration(attestationJson: String) {
-        viewModelScope.launch {
+        passkeyJob?.cancel()
+        passkeyJob = viewModelScope.launch {
             setState { copy(isLoading = true, error = null) }
             val userId = userSessionStore.sessionFlow.value.userId
             when (val result = passkeyRegistrationUseCase(userId, attestationJson)) {
@@ -116,13 +124,15 @@ class PasskeyPromptViewModel @Inject constructor(
                             ?: UiText.Res(R.string.feature_onboarding_error_passkey_registration_failed)
                     )
                 }
+                // suspend mutation — Loading is not a terminal value; required for exhaustive when.
                 is DataResult.Loading -> Unit
             }
         }
     }
 
     private fun completeAuthentication(assertionJson: String) {
-        viewModelScope.launch {
+        passkeyJob?.cancel()
+        passkeyJob = viewModelScope.launch {
             setState { copy(isLoading = true, error = null) }
             when (val result = passkeyAuthUseCase(assertionJson)) {
                 is DataResult.Success -> {
@@ -136,6 +146,7 @@ class PasskeyPromptViewModel @Inject constructor(
                             ?: UiText.Res(R.string.feature_onboarding_error_passkey_auth_failed)
                     )
                 }
+                // suspend mutation — Loading is not a terminal value; required for exhaustive when.
                 is DataResult.Loading -> Unit
             }
         }

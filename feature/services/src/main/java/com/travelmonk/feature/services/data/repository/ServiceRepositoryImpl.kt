@@ -24,11 +24,11 @@ class ServiceRepositoryImpl @Inject constructor(
     }.flowOn(ioDispatcher)
 
     private fun fakeServices(): List<TravelService> = listOf(
-        TravelServiceDto("1", "Maid & Helper", "cleaning", "Daily cleaning & domestic help").toDomain(),
-        TravelServiceDto("2", "Site Visit", "real_estate", "Property & landmark tours").toDomain(),
-        TravelServiceDto("3", "Tour Guide", "person_search", "Expert local storytellers").toDomain(),
-        TravelServiceDto("4", "Local Support", "support", "24/7 travel assistance").toDomain(),
-        TravelServiceDto("5", "Laundry", "laundry", "Wash & Fold services").toDomain(),
-        TravelServiceDto("6", "Car Rental", "car", "Self-drive or chauffeured").toDomain()
+        TravelServiceDto("1", "Maid & Helper", "cleaning_services",     "Daily cleaning & domestic help").toDomain(),
+        TravelServiceDto("2", "Site Visit",    "real_estate_agent",     "Property & landmark tours").toDomain(),
+        TravelServiceDto("3", "Tour Guide",    "person_search",         "Expert local storytellers").toDomain(),
+        TravelServiceDto("4", "Local Support", "support_agent",         "24/7 travel assistance").toDomain(),
+        TravelServiceDto("5", "Laundry",       "local_laundry_service", "Wash & Fold services").toDomain(),
+        TravelServiceDto("6", "Car Rental",    "directions_car",        "Self-drive or chauffeured").toDomain()
     )
 }

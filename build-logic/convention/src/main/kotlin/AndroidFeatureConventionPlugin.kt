@@ -73,6 +73,9 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 // kotlinx.serialization JSON — for serializing data models and nav-key back-stack persistence
                 add("implementation", libs.findLibrary("kotlinx-serialization-json").get())
 
+                // ImmutableList / PersistentList — stable collection types for Compose state
+                add("implementation", libs.findLibrary("kotlinx-collections-immutable").get())
+
                 // Feature test dependencies
                 add("testImplementation", libs.findLibrary("turbine").get())
                 add("testImplementation", libs.findLibrary("mockk").get())

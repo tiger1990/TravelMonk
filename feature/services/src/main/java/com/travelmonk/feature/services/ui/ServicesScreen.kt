@@ -1,5 +1,6 @@
 package com.travelmonk.feature.services.ui
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,11 +13,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
@@ -24,22 +24,14 @@ import com.travelmonk.core.model.BookingType
 import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.core.ui.TravelMonkTopBar
 import com.travelmonk.core.ui.utils.LogScreenLifecycle
+import com.travelmonk.feature.services.R
 import com.travelmonk.feature.services.domain.model.TravelService
 import com.travelmonk.feature.services.mvi.ServicesEffect
 import com.travelmonk.feature.services.mvi.ServicesIntent
-import com.travelmonk.feature.services.mvi.ServicesState
 import com.travelmonk.feature.servicesapi.navigator.ServiceNavigator
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
-private val defaultServices = listOf(
-    TravelService("1", "Maid & Helper",  "cleaning_services",    "Daily cleaning & domestic help"),
-    TravelService("2", "Site Visit",     "real_estate_agent",    "Property & landmark tours"),
-    TravelService("3", "Tour Guide",     "person_search",        "Expert local storytellers"),
-    TravelService("4", "Local Support",  "support_agent",        "24/7 travel assistance"),
-    TravelService("5", "Laundry",        "local_laundry_service","Wash & Fold services"),
-    TravelService("6", "Car Rental",     "directions_car",       "Self-drive or chauffeured")
-)
-
-// Stateful entry point
 @Composable
 fun ServicesScreen(
     navigator: ServiceNavigator,
@@ -61,12 +53,12 @@ fun ServicesScreen(
     Scaffold(
         topBar = {
             TravelMonkTopBar(
-                title = { 
+                title = {
                     Text(
-                        text = "Home Services",
+                        text = stringResource(R.string.feature_services_home_services),
                         color = TravelMonkTheme.colors.onPrimary,
                         style = TravelMonkTheme.typography.titleLarge
-                    ) 
+                    )
                 },
                 containerColor = TravelMonkTheme.colors.primary
             )
@@ -74,19 +66,16 @@ fun ServicesScreen(
         containerColor = TravelMonkTheme.colors.background
     ) { innerPadding ->
         ServicesContent(
-            state = state,
-            services = state.services.ifEmpty { defaultServices },
+            services = state.services,
             onIntent = viewModel::onIntent,
             modifier = Modifier.padding(innerPadding)
         )
     }
 }
 
-// Stateless content — previewable without ViewModel
 @Composable
 fun ServicesContent(
-    state: ServicesState,
-    services: List<TravelService>,
+    services: ImmutableList<TravelService>,
     onIntent: (ServicesIntent) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -110,21 +99,23 @@ fun ServiceCard(service: TravelService, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(140.dp)
+            .height(TravelMonkTheme.dimensions.imageCardHeight)
             .clickable { onClick() },
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(TravelMonkTheme.radius.medium),
         colors = CardDefaults.cardColors(containerColor = TravelMonkTheme.colors.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = TravelMonkTheme.dimensions.cardElevation)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(TravelMonkTheme.spacing.medium),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(TravelMonkTheme.spacing.medium),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
                 painter = painterResource(TravelMonkIcons.byName(service.iconName)),
                 contentDescription = null,
-                modifier = Modifier.size(40.dp),
+                modifier = Modifier.size(TravelMonkTheme.dimensions.iconLarge),
                 tint = TravelMonkTheme.colors.primary
             )
             Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.small))
@@ -138,21 +129,24 @@ fun ServiceCard(service: TravelService, onClick: () -> Unit) {
                 text = service.description,
                 style = TravelMonkTheme.typography.caption,
                 color = TravelMonkTheme.colors.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                lineHeight = 12.sp
+                textAlign = TextAlign.Center
             )
         }
     }
 }
 
 @Preview(name = "Services – Light", showBackground = true)
-@Preview(name = "Services – Dark", showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Services – Dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun ServicesContentPreview() {
     TravelMonkTheme {
         ServicesContent(
-            state = ServicesState(),
-            services = defaultServices,
+            services = persistentListOf(
+                TravelService("1", "Maid & Helper", "cleaning_services", "Daily cleaning & domestic help"),
+                TravelService("2", "Site Visit", "real_estate_agent", "Property & landmark tours"),
+                TravelService("3", "Tour Guide", "person_search", "Expert local storytellers"),
+                TravelService("4", "Local Support", "support_agent", "24/7 travel assistance"),
+            ),
             onIntent = {}
         )
     }

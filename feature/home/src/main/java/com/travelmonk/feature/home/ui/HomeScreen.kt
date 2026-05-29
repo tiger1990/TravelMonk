@@ -13,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -28,6 +27,8 @@ import com.travelmonk.core.design.system.theme.TravelMonkComponentPreviews
 import com.travelmonk.feature.home.domain.model.HomeBanner
 import com.travelmonk.feature.home.mvi.*
 import com.travelmonk.feature.homeapi.navigator.HomeNavigator
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 // Stateful entry point — only this touches hiltViewModel()
 @Composable
@@ -39,11 +40,14 @@ fun HomeScreen(
 
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
+    // rememberUpdatedState ensures the latest navigator reference is used inside the long-lived
+    // LaunchedEffect coroutine, preventing stale captures after recomposition or rotation.
+    val currentNavigator by rememberUpdatedState(navigator)
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 is HomeEffect.NavigateToDetails -> { /* Navigate to details screen when implemented */ }
-                is HomeEffect.NavigateToGlobalSearch -> navigator.navigateToSearch()
+                is HomeEffect.NavigateToGlobalSearch -> currentNavigator.navigateToSearch()
             }
         }
     }
@@ -139,17 +143,17 @@ fun HomeContent(
 }
 
 @Composable
-fun BannerSection(banners: List<HomeBanner>, onBannerClick: (String) -> Unit) {
+fun BannerSection(banners: ImmutableList<HomeBanner>, onBannerClick: (String) -> Unit) {
     Column {
         Text(
             text = "Special Offers",
             style = TravelMonkTheme.typography.titleLarge,
-            modifier = Modifier.padding(horizontal = 24.dp)
+            modifier = Modifier.padding(horizontal = TravelMonkTheme.spacing.large)
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
         LazyRow(
-            contentPadding = PaddingValues(horizontal = 24.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            contentPadding = PaddingValues(horizontal = TravelMonkTheme.spacing.large),
+            horizontalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)
         ) {
             items(banners, key = { it.id }) { banner ->
                 Card(
@@ -174,7 +178,7 @@ fun BannerSection(banners: List<HomeBanner>, onBannerClick: (String) -> Unit) {
                         Column(
                             modifier = Modifier
                                 .align(Alignment.BottomStart)
-                                .padding(16.dp)
+                                .padding(TravelMonkTheme.spacing.medium)
                         ) {
                             Text(text = banner.title, color = TravelMonkTheme.colors.onImage, style = TravelMonkTheme.typography.titleLarge)
                             Text(text = banner.description, color = TravelMonkTheme.colors.onImage.copy(alpha = 0.8f), style = TravelMonkTheme.typography.labelMedium)
@@ -187,22 +191,22 @@ fun BannerSection(banners: List<HomeBanner>, onBannerClick: (String) -> Unit) {
 }
 
 @Composable
-fun CategorySection(categories: List<HomeCategory>) {
-    Column(modifier = Modifier.padding(24.dp)) {
+fun CategorySection(categories: ImmutableList<HomeCategory>) {
+    Column(modifier = Modifier.padding(TravelMonkTheme.spacing.large)) {
         Text(text = "Categories", style = TravelMonkTheme.typography.titleLarge)
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             categories.forEach { category ->
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(
                         modifier = Modifier
-                            .size(60.dp)
+                            .size(TravelMonkTheme.dimensions.categoryIconSize)
                             .background(TravelMonkTheme.colors.primary.copy(alpha = 0.1f), RoundedCornerShape(TravelMonkTheme.radius.medium)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(painter = painterResource(category.icon), contentDescription = null, tint = TravelMonkTheme.colors.primary)
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.small))
                     Text(text = category.label, style = TravelMonkTheme.typography.labelMedium)
                 }
             }
@@ -214,19 +218,19 @@ fun CategorySection(categories: List<HomeCategory>) {
 fun PromoSection() {
     Card(
         modifier = Modifier
-            .padding(24.dp)
+            .padding(TravelMonkTheme.spacing.large)
             .fillMaxWidth(),
         shape = RoundedCornerShape(TravelMonkTheme.radius.medium),
         colors = CardDefaults.cardColors(containerColor = TravelMonkTheme.colors.tertiary.copy(alpha = 0.1f))
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(TravelMonkTheme.spacing.medium),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(painter = painterResource(TravelMonkIcons.CardGiftCard), contentDescription = null, tint = TravelMonkTheme.colors.primary, modifier = Modifier.size(40.dp))
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.medium))
             Column {
-                Text(text = "Refer & Earn", fontWeight = FontWeight.Bold, style = TravelMonkTheme.typography.titleLarge)
+                Text(text = "Refer & Earn", style = TravelMonkTheme.typography.titleLarge)
                 Text(text = "Invite friends and get up to $50 credit", style = TravelMonkTheme.typography.bodyLarge)
             }
         }
@@ -239,7 +243,7 @@ fun PromoSection() {
 private fun HomeContentPreview() {
     HomeContent(
         state = HomeState(
-            banners = listOf(
+            banners = persistentListOf(
                 HomeBanner("1", "Summer Sale", "Up to 40% off", ""),
                 HomeBanner("2", "Bali Getaway", "From $299", "")
             )

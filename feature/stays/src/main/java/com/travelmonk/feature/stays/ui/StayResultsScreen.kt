@@ -30,6 +30,7 @@ import com.travelmonk.feature.stays.mvi.StayResultsEffect
 import com.travelmonk.feature.stays.mvi.StayResultsIntent
 import com.travelmonk.feature.stays.mvi.StayResultsState
 import com.travelmonk.feature.staysapi.navigator.StayNavigator
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -290,7 +291,7 @@ private fun StayResultsContentPreview() {
         StayResultsContent(
             state = StayResultsState(
                 location = "Bali, Indonesia",
-                stays = listOf(sampleStay, sampleStay.copy(id = "2", title = "The Ritz-Carlton"))
+                stays = persistentListOf(sampleStay, sampleStay.copy(id = "2", title = "The Ritz-Carlton"))
             ),
             snackbarHostState = SnackbarHostState(),
             onIntent = {},

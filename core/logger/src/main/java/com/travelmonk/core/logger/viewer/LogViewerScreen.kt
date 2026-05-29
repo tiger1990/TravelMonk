@@ -12,6 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -101,7 +106,22 @@ fun LogViewerContent(
                     CircularProgressIndicator()
                 }
             } else {
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                val listState = rememberLazyListState()
+
+                // G8: trigger LoadMore when the last visible item reaches the end of the list
+                LaunchedEffect(listState) {
+                    snapshotFlow {
+                        val layoutInfo = listState.layoutInfo
+                        val totalItems = layoutInfo.totalItemsCount
+                        val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+                        totalItems > 0 && lastVisible >= totalItems - 1
+                    }
+                        .distinctUntilChanged()
+                        .filter { it }
+                        .collect { onIntent(LogViewerIntent.LoadMore) }
+                }
+
+                LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
                     items(state.entries, key = { it.id }) { entry ->
                         LogEntryRow(entry = entry)
                         HorizontalDivider(thickness = 0.5.dp)
@@ -112,9 +132,13 @@ fun LogViewerContent(
     }
 }
 
+// Single formatter shared across all LogEntryRow calls — composition runs on the
+// main thread so there is no thread-safety concern, and object allocation per row
+// per recomposition is eliminated.
+private val logTimestampFormatter = SimpleDateFormat("HH:mm:ss.SSS", Locale.ROOT)
+
 @Composable
 private fun LogEntryRow(entry: LogEntry) {
-    val formatter = SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault())
     val color = levelColor(entry.level)
 
     Row(
@@ -134,7 +158,7 @@ private fun LogEntryRow(entry: LogEntry) {
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = formatter.format(Date(entry.timestamp)),
+                    text = logTimestampFormatter.format(Date(entry.timestamp)),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

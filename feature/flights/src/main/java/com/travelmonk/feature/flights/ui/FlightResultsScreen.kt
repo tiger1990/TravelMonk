@@ -20,6 +20,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.tokens.TravelMonkIcons
@@ -74,7 +76,7 @@ fun FlightResultsScreen(
 fun FlightResultsContent(
     from: String,
     to: String,
-    flights: List<Flight>,
+    flights: ImmutableList<Flight>,
     isLoading: Boolean,
     onBack: () -> Unit,
     onBook: (String) -> Unit,
@@ -84,8 +86,8 @@ fun FlightResultsContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(TravelMonkTheme.colors.primary, RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
-                .padding(top = 48.dp, start = 20.dp, end = 20.dp, bottom = 24.dp)
+                .background(TravelMonkTheme.colors.primary, RoundedCornerShape(bottomStart = TravelMonkTheme.radius.large, bottomEnd = TravelMonkTheme.radius.large))
+                .padding(top = 48.dp, start = TravelMonkTheme.spacing.medium, end = TravelMonkTheme.spacing.medium, bottom = TravelMonkTheme.spacing.large)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBack) {
@@ -123,13 +125,13 @@ fun FlightResultsContent(
 fun FlightTicketCard(flight: Flight, onBook: (String) -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(TravelMonkTheme.radius.medium),
         colors = CardDefaults.cardColors(containerColor = TravelMonkTheme.colors.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = TravelMonkTheme.dimensions.cardElevation)
     ) {
         Column(modifier = Modifier.padding(TravelMonkTheme.spacing.medium)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(modifier = Modifier.size(32.dp).background(TravelMonkTheme.colors.onSurfaceVariant.copy(alpha = 0.2f), RoundedCornerShape(4.dp)))
+                Box(modifier = Modifier.size(32.dp).background(TravelMonkTheme.colors.onSurfaceVariant.copy(alpha = 0.2f), RoundedCornerShape(TravelMonkTheme.radius.extraSmall)))
                 Spacer(modifier = Modifier.width(TravelMonkTheme.spacing.medium))
                 Text(text = flight.airline, style = TravelMonkTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
                 Spacer(modifier = Modifier.weight(1f))
@@ -162,7 +164,7 @@ fun FlightTicketCard(flight: Flight, onBook: (String) -> Unit) {
                 onClick = { onBook(flight.airline) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = TravelMonkTheme.colors.primary.copy(alpha = 0.1f), contentColor = TravelMonkTheme.colors.primary),
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(TravelMonkTheme.radius.small)
             ) {
                 Text("Select Flight", style = TravelMonkTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
             }
@@ -178,7 +180,7 @@ private fun FlightResultsContentPreview() {
         FlightResultsContent(
             from = "San Francisco",
             to = "New York",
-            flights = listOf(
+            flights = persistentListOf(
                 Flight("1", "Air Indigo",   "08:30", "11:45", "3h 15m", "$120", "SFO", "JFK"),
                 Flight("2", "Sky Jet",      "10:15", "13:30", "3h 15m", "$145", "SFO", "JFK"),
                 Flight("3", "Star Airways", "14:00", "17:15", "3h 15m", "$110", "SFO", "JFK")

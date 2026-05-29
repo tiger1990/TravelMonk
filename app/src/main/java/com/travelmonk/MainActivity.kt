@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
 
                     // Track custom splash completion separately from auth resolution
                     var splashComplete by rememberSaveable { mutableStateOf(false) }
-                    var isSystemSplashMoving by remember { mutableStateOf(true) }
+                    var isSystemSplashMoving by rememberSaveable { mutableStateOf(true) }
 
                     // Keep system splash until both auth has resolved AND our Lottie animation is done
                     splashScreen.setKeepOnScreenCondition {

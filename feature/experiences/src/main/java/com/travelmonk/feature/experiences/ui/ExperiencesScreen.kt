@@ -31,6 +31,7 @@ import com.travelmonk.feature.experiences.mvi.ExperienceEffect
 import com.travelmonk.feature.experiences.mvi.ExperienceIntent
 import com.travelmonk.feature.experiences.mvi.ExperienceState
 import com.travelmonk.feature.experiencesapi.navigator.ExperienceNavigator
+import kotlinx.collections.immutable.persistentListOf
 
 /**
  * Stateful entry point for the Experiences Screen.
@@ -278,7 +279,7 @@ private fun ExperiencesScreenPreview() {
     TravelMonkTheme {
         ExperiencesScreenContent(
             state = ExperienceState(
-                items = listOf(
+                items = persistentListOf(
                     Experience(
                         id = "1",
                         title = "Bali Yoga Retreat",

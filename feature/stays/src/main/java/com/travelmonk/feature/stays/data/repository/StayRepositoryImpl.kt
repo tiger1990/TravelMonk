@@ -8,6 +8,9 @@ import com.travelmonk.feature.stays.data.mapper.toDomain
 import com.travelmonk.feature.stays.domain.model.Stay
 import com.travelmonk.feature.stays.domain.repository.StayRepository
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -22,15 +25,17 @@ class StayRepositoryImpl @Inject constructor(
             DataResult.Success(fakeStays(location))
         }
 
-    override suspend fun getStayById(id: String): DataResult<Stay> =
-        withContext(ioDispatcher) {
-            val stay = fakeStays("Ubud, Bali").find { it.id == id }
-            if (stay != null) {
-                DataResult.Success(stay)
-            } else {
-                DataResult.Error(Exception("Stay not found"))
-            }
+    override fun getStayById(id: String): Flow<DataResult<Stay>> = flow {
+        emit(DataResult.Loading)
+        // TODO: Replace with real API call when backend is integrated:
+        // emit(DataResult.Success(staysApi.getStayById(id).toDomain()))
+        val stay = fakeStays("Ubud, Bali").find { it.id == id }
+        if (stay != null) {
+            emit(DataResult.Success(stay))
+        } else {
+            emit(DataResult.Error(Exception("Stay not found")))
         }
+    }.flowOn(ioDispatcher)
 
     private fun fakeStays(location: String): List<Stay> = listOf(
         StayDto("1", "The Grand Oberoi", location, "$240", "4.9", "https://images.unsplash.com/photo-1566073771259-6a8506099945").toDomain(),

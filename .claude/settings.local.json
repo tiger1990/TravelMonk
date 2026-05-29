@@ -35,7 +35,14 @@
       "Bash(./gradlew :core:logger:testDebugUnitTest --rerun-tasks)",
       "mcp__plugin_everything-claude-code_exa__web_fetch_exa",
       "mcp__ide__getDiagnostics",
-      "Bash(./gradlew :feature:onboarding:compileDebugKotlin)"
+      "Bash(./gradlew :feature:onboarding:compileDebugKotlin)",
+      "Bash(./gradlew :feature:home:compileDebugKotlin :feature:services:compileDebugKotlin :feature:bookings:compileDebugKotlin :feature:experiences:compileDebugKotlin :core:common:compileDebugKotlin)",
+      "Bash(./gradlew :feature:services:compileDebugKotlin :feature:bookings:compileDebugKotlin :feature:experiences:compileDebugKotlin)",
+      "Bash(./gradlew :feature:bookings:compileDebugKotlin)",
+      "Bash(./gradlew :core:common:compileDebugKotlin)",
+      "Bash(./gradlew :feature:experiences:compileDebugKotlin)",
+      "Bash(./gradlew :feature:flights:compileDebugKotlin :feature:stays:compileDebugKotlin :feature:experiences:compileDebugKotlin :feature:bookings:compileDebugKotlin)",
+      "Bash(./gradlew :feature:bookings:compileDebugKotlin :feature:stays:compileDebugKotlin :feature:onboarding:compileDebugKotlin)"
     ],
     "deny": [
       "Bash(rm -rf:*)",

@@ -7,6 +7,8 @@ import com.travelmonk.core.common.result.DataResult
 import com.travelmonk.feature.flights.domain.usecase.SearchFlightsUseCase
 import com.travelmonk.feature.flights.mvi.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,6 +30,10 @@ class FlightViewModel @Inject constructor(
     )
 ) {
 
+    // G4: single job reference cancelled before each new search — prevents double-tap from
+    // launching two concurrent use-case calls and firing NavigateToResults twice.
+    private var searchJob: Job? = null
+
     override fun handleIntent(intent: FlightIntent) {
         when (intent) {
             is FlightIntent.ChangeTripType -> {
@@ -48,30 +54,34 @@ class FlightViewModel @Inject constructor(
             is FlightIntent.SearchFlights -> {
                 val from = currentState.fromCity
                 val to = currentState.toCity
-                viewModelScope.launch {
+                searchJob?.cancel()
+                searchJob = viewModelScope.launch {
                     setState { copy(isLoading = true, error = null) }
                     when (val result = searchFlightsUseCase(from, to)) {
                         is DataResult.Success -> {
-                            setState { copy(flights = result.data, isLoading = false) }
+                            setState { copy(flights = result.data.toImmutableList(), isLoading = false) }
                             setEffect(FlightEffect.NavigateToResults(from, to))
                         }
                         is DataResult.Error -> {
                             setState { copy(error = result.exception.message, isLoading = false) }
                             setEffect(FlightEffect.ShowError(result.exception.message ?: "Unknown error"))
                         }
+                        // suspend use case — Loading is not a terminal value; isLoading was set before this call.
                         is DataResult.Loading -> Unit
                     }
                 }
             }
             is FlightIntent.LoadResults -> {
-                viewModelScope.launch {
+                searchJob?.cancel()
+                searchJob = viewModelScope.launch {
                     setState { copy(isLoading = true, error = null) }
                     when (val result = searchFlightsUseCase(intent.from, intent.to)) {
-                        is DataResult.Success -> setState { copy(flights = result.data, isLoading = false) }
+                        is DataResult.Success -> setState { copy(flights = result.data.toImmutableList(), isLoading = false) }
                         is DataResult.Error -> {
                             setState { copy(error = result.exception.message, isLoading = false) }
                             setEffect(FlightEffect.ShowError(result.exception.message ?: "Failed to load flights"))
                         }
+                        // suspend use case — Loading is not a terminal value; isLoading was set before this call.
                         is DataResult.Loading -> Unit
                     }
                 }

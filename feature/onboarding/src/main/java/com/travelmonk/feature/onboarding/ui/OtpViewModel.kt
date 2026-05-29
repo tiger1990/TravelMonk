@@ -12,6 +12,7 @@ import com.travelmonk.feature.onboarding.mvi.OtpEffect
 import com.travelmonk.feature.onboarding.mvi.OtpIntent
 import com.travelmonk.feature.onboarding.mvi.OtpState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,6 +30,10 @@ class OtpViewModel @Inject constructor(
         resendCooldownSeconds = savedStateHandle.get<Int>(KEY_RESEND_COOLDOWN) ?: 0
     )
 ) {
+
+    private var verifyJob: Job? = null
+    private var resendJob: Job? = null
+    private var cooldownJob: Job? = null
 
     init {
         // Resume countdown after process death (SavedStateHandle persists across process death)
@@ -50,7 +55,8 @@ class OtpViewModel @Inject constructor(
     }
 
     private fun verifyOtp() {
-        viewModelScope.launch {
+        verifyJob?.cancel()
+        verifyJob = viewModelScope.launch {
             setState { copy(isLoading = true, error = null) }
             when (val result = verifyOtpUseCase(currentState.phone, currentState.otp)) {
                 is DataResult.Success -> {
@@ -64,6 +70,7 @@ class OtpViewModel @Inject constructor(
                             ?: UiText.Res(R.string.feature_onboarding_error_otp_verification_failed)
                     )
                 }
+                // suspend mutation — Loading is not a terminal value; required for exhaustive when.
                 is DataResult.Loading -> Unit
             }
         }
@@ -71,7 +78,8 @@ class OtpViewModel @Inject constructor(
 
     private fun resendOtp() {
         if (currentState.resendCooldownSeconds > 0) return
-        viewModelScope.launch {
+        resendJob?.cancel()
+        resendJob = viewModelScope.launch {
             when (val result = sendOtpUseCase(currentState.phone)) {
                 is DataResult.Success -> {
                     savedStateHandle[KEY_RESEND_COOLDOWN] = RESEND_COOLDOWN_SECONDS
@@ -84,13 +92,15 @@ class OtpViewModel @Inject constructor(
                             ?: UiText.Res(R.string.feature_onboarding_error_resend_failed)
                     )
                 }
+                // suspend mutation — Loading is not a terminal value; required for exhaustive when.
                 is DataResult.Loading -> Unit
             }
         }
     }
 
     private fun runCooldown(from: Int) {
-        viewModelScope.launch {
+        cooldownJob?.cancel()
+        cooldownJob = viewModelScope.launch {
             repeat(from) {
                 delay(1_000)
                 val remaining = currentState.resendCooldownSeconds - 1

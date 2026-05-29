@@ -47,6 +47,7 @@ class PhoneEntryViewModel @Inject constructor(
                             ?: UiText.Res(R.string.feature_onboarding_error_send_otp_failed)
                     )
                 }
+                // suspend mutation — Loading is not a terminal value; required for exhaustive when.
                 is DataResult.Loading -> Unit
             }
         }
