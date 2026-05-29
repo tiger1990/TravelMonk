@@ -23,6 +23,7 @@ import com.travelmonk.core.design.system.color.WarningAmber
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.model.BookingType
 import com.travelmonk.core.tokens.TravelMonkIcons
+import com.travelmonk.core.ui.LocalNavContentPadding
 import com.travelmonk.core.ui.TravelMonkTopBar
 import com.travelmonk.core.ui.utils.LogScreenLifecycle
 import com.travelmonk.feature.bookings.domain.model.BookingItem
@@ -70,9 +71,15 @@ fun MyBookingsContent(
                 CircularProgressIndicator(color = TravelMonkTheme.colors.primary)
             }
         } else {
+            val bottomPadding = LocalNavContentPadding.current
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(TravelMonkTheme.spacing.medium),
+                contentPadding = PaddingValues(
+                    start = TravelMonkTheme.spacing.medium,
+                    end = TravelMonkTheme.spacing.medium,
+                    top = TravelMonkTheme.spacing.medium,
+                    bottom = TravelMonkTheme.spacing.medium + bottomPadding
+                ),
                 verticalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)
             ) {
                 items(state.bookings, key = { it.id }) { booking ->

@@ -22,6 +22,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.core.model.BookingType
 import com.travelmonk.core.tokens.TravelMonkIcons
+import com.travelmonk.core.ui.LocalNavContentPadding
 import com.travelmonk.core.ui.TravelMonkTopBar
 import com.travelmonk.core.ui.utils.LogScreenLifecycle
 import com.travelmonk.feature.services.R
@@ -79,12 +80,18 @@ fun ServicesContent(
     onIntent: (ServicesIntent) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val bottomPadding = LocalNavContentPadding.current
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = modifier
             .fillMaxSize()
             .background(TravelMonkTheme.colors.background),
-        contentPadding = PaddingValues(TravelMonkTheme.spacing.medium),
+        contentPadding = PaddingValues(
+            start = TravelMonkTheme.spacing.medium,
+            end = TravelMonkTheme.spacing.medium,
+            top = TravelMonkTheme.spacing.medium,
+            bottom = TravelMonkTheme.spacing.medium + bottomPadding
+        ),
         horizontalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium),
         verticalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)
     ) {

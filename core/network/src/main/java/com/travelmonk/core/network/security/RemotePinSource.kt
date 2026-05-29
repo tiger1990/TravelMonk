@@ -1,5 +1,6 @@
 package com.travelmonk.core.network.security
 
+import com.travelmonk.core.logger.TravelMonkLogger
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -33,12 +34,28 @@ class RemotePinSource @Inject constructor(
     // TODO: fetch signed manifest, verify signature, parse pin set.
     private fun fetchVerifiedRemotePins(): PinningConfig? = null
 
+    // Remote data is untrusted. A misconfigured backend payload (or an attacker who bypasses
+    // signature verification) could supply a single-pin host and crash all pinned requests —
+    // a self-inflicted DoS on the payment/booking flow. runCatching skips invalid entries
+    // instead of crashing, so the baseline pins for other hosts remain active.
     private fun mergeAdditive(baseline: PinningConfig, remote: PinningConfig): PinningConfig {
         val byHost = LinkedHashMap<String, MutableList<String>>()
         (baseline.hostPins + remote.hostPins).forEach { host ->
             byHost.getOrPut(host.hostPattern) { mutableListOf() }
                 .apply { host.pins.forEach { pin -> if (pin !in this) add(pin) } }
         }
-        return PinningConfig(byHost.map { (pattern, pins) -> HostPins(pattern, pins) })
+        return PinningConfig(
+            byHost.mapNotNull { (pattern, pins) ->
+                runCatching { HostPins(pattern, pins) }
+                    .onFailure { e ->
+                        TravelMonkLogger.e(
+                            tag = "RemotePinSource",
+                            msg = "Skipping invalid remote pin entry for host '$pattern' — ${e.message}",
+                            throwable = e
+                        )
+                    }
+                    .getOrNull()
+            }
+        )
     }
 }

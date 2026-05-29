@@ -39,8 +39,9 @@ A fingerprint pin would break on every renewal. OkHttp only supports SPKI for ex
 ┌────────────────────────────────────────────────────────────────────────┐
 │ Layer 1 — OS      network_security_config.xml                          │
 │   Declarative backstop. Blocks cleartext traffic everywhere.           │
-│   Pins production host. Fails-open after expiry (degrades to system    │
-│   trust — a forgotten update does not brick the app).                  │
+│   Pins production and staging hosts per flavor. Fails-open after       │
+│   expiry (degrades to system trust — a forgotten update does not       │
+│   brick the app).                                                       │
 ├────────────────────────────────────────────────────────────────────────┤
 │ Layer 2 — Transport   OkHttp CertificatePinner                         │
 │   The enforcing control. Fails-closed on mismatch (no expiry).         │
@@ -83,15 +84,20 @@ core/network/src/main/java/com/travelmonk/core/network/
     ├── CertificatePinnerFactory.kt   ← NEW
     ├── PinSource.kt                  ← NEW
     ├── StaticPinSource.kt            ← NEW
-    ├── RemotePinSource.kt            ← NEW (stub — remote rotation)
+    ├── RemotePinSource.kt            ← NEW (stub — remote rotation; additive merge with safe fallback)
     ├── PinningFailure.kt             ← NEW
     └── PinFailureInterceptor.kt      ← NEW
 
-core/network/src/main/res/xml/
-└── network_security_config.xml       ← NEW (Layer 1 backstop + cleartext block)
+core/network/build.gradle.kts         ← MODIFIED (add :core:logger for RemotePinSource logging)
+
+app/src/main/res/xml/
+└── network_security_config.xml       ← NEW (Layer 1 backstop + cleartext block — production)
 
 app/src/dev/res/xml/
 └── network_security_config.xml       ← NEW (dev flavor override — allows user CAs for Charles)
+
+app/src/staging/res/xml/
+└── network_security_config.xml       ← NEW (staging flavor override — pins staging-api.travelmonk.com)
 
 app/src/main/AndroidManifest.xml      ← MODIFIED (add android:networkSecurityConfig attribute)
 feature/bookings/.../di/BookingModule.kt  ← MODIFIED (@PinnedRetrofit instead of bare Retrofit)
@@ -202,14 +208,21 @@ class StaticPinSource @Inject constructor(private val appConfig: AppConfig) : Pi
 
 ---
 
-### `RemotePinSource.kt` (stub — remote rotation)
+### `RemotePinSource.kt`
 
-Emergency rotation without an app update. Until the backend is built, returns `null` and
-the static baseline is used. Merge rule: additive only — remote can never remove shipped pins.
+Emergency rotation without an app update. Until the backend is built, `fetchVerifiedRemotePins()`
+returns `null` and the static baseline is the sole source of truth.
+
+**Merge rule:** additive only — remote can never remove shipped baseline pins. If a remote entry
+fails `HostPins` validation (e.g. a new host with only 1 pin), it is skipped and logged rather
+than crashing. Remote data is untrusted; the baseline hosts are always structurally valid.
+
+Requires `implementation(project(":core:logger"))` in `core/network/build.gradle.kts`.
 
 ```kotlin
 package com.travelmonk.core.network.security
 
+import com.travelmonk.core.logger.TravelMonkLogger
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -228,16 +241,36 @@ class RemotePinSource @Inject constructor(private val staticSource: StaticPinSou
     private fun fetchVerifiedRemotePins(): PinningConfig? = null
 
     // Union merge: remote can only widen the accepted set, never shrink it.
+    // Invalid remote entries (e.g. single-pin hosts) are skipped and reported.
     private fun mergeAdditive(baseline: PinningConfig, remote: PinningConfig): PinningConfig {
         val byHost = LinkedHashMap<String, MutableList<String>>()
         (baseline.hostPins + remote.hostPins).forEach { host ->
             byHost.getOrPut(host.hostPattern) { mutableListOf() }
                 .apply { host.pins.forEach { if (it !in this) add(it) } }
         }
-        return PinningConfig(byHost.map { (host, pins) -> HostPins(host, pins) })
+        return PinningConfig(
+            byHost.mapNotNull { (pattern, pins) ->
+                runCatching { HostPins(pattern, pins) }
+                    .onFailure { e ->
+                        TravelMonkLogger.e(
+                            tag = "RemotePinSource",
+                            msg = "Skipping invalid remote pin entry for host '$pattern' — ${e.message}",
+                            throwable = e
+                        )
+                    }
+                    .getOrNull()
+            }
+        )
     }
 }
 ```
+
+**What the logger does when `runCatching` catches a bad remote entry:**
+- `TravelMonkLogger.e(...)` writes to the local log file via `LogProcessor`
+- Because it is `LogLevel.ERROR`, it is also forwarded to `CriticalEventUploader` automatically
+  (see `TravelMonkLogger` line 151) — the event reaches your remote crash reporter (Datadog /
+  Firebase, whichever `RemoteLogSender` is wired in `LoggerModule`)
+- The full throwable stacktrace is captured via `LogEvent.formatThrowable(throwable)`
 
 ---
 
@@ -286,16 +319,19 @@ class PinningFailure(val host: String, cause: Throwable) :
 ### `PinFailureInterceptor.kt`
 
 Added **only** to `@PinnedClient`. Catches `SSLPeerUnverifiedException`, wraps as `PinningFailure`.
-`CancellationException` is never caught — coroutine safety is preserved.
+`CancellationException` is never caught — coroutine safety is preserved. `@Singleton` scopes the
+interceptor to match the `@Singleton` `OkHttpClient` that holds it.
 
 ```kotlin
 package com.travelmonk.core.network.security
 
 import okhttp3.Interceptor
 import okhttp3.Response
-import javax.net.ssl.SSLPeerUnverifiedException
 import javax.inject.Inject
+import javax.inject.Singleton
+import javax.net.ssl.SSLPeerUnverifiedException
 
+@Singleton
 class PinFailureInterceptor @Inject constructor() : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
@@ -313,7 +349,6 @@ class PinFailureInterceptor @Inject constructor() : Interceptor {
 ### `NetworkModule.kt` (modified — key diffs)
 
 `object` → `abstract class` (Hilt requires this to combine `@Binds` + `@Provides`).
-Unqualified `Retrofit` provider removed — every feature must explicitly choose pinned vs default.
 
 ```kotlin
 @Module
@@ -327,8 +362,8 @@ abstract class NetworkModule {
 
         // ... provideMoshi(), provideLoggingInterceptor() unchanged ...
 
-        @Provides @Singleton @DefaultClient
-        fun provideDefaultOkHttpClient(logging: HttpLoggingInterceptor, appConfig: AppConfig): OkHttpClient {
+        @Provides @Singleton
+        fun provideOkHttpClient(logging: HttpLoggingInterceptor, appConfig: AppConfig): OkHttpClient {
             val t = appConfig.apiTimeoutSeconds.toLong()
             return OkHttpClient.Builder()
                 .connectTimeout(t, TimeUnit.SECONDS).readTimeout(t, TimeUnit.SECONDS)
@@ -351,8 +386,8 @@ abstract class NetworkModule {
                 .addInterceptor(logging).build()
         }
 
-        @Provides @Singleton @DefaultRetrofit
-        fun provideDefaultRetrofit(@DefaultClient client: OkHttpClient, moshi: Moshi, appConfig: AppConfig): Retrofit =
+        @Provides @Singleton
+        fun provideRetrofit(client: OkHttpClient, moshi: Moshi, appConfig: AppConfig): Retrofit =
             Retrofit.Builder().baseUrl(appConfig.baseUrl).client(client)
                 .addConverterFactory(MoshiConverterFactory.create(moshi)).build()
 
@@ -378,7 +413,11 @@ fun provideBookingsApi(@PinnedRetrofit retrofit: Retrofit): BookingsApi
 
 ---
 
-### `network_security_config.xml`
+### Network Security Config files
+
+#### Production — `app/src/main/res/xml/network_security_config.xml`
+
+Layer 1 backstop for production builds. Keep pin digests in sync with `PinningConfig.kt`.
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -386,7 +425,7 @@ fun provideBookingsApi(@PinnedRetrofit retrofit: Retrofit): BookingsApi
     <base-config cleartextTrafficPermitted="false">
         <trust-anchors><certificates src="system" /></trust-anchors>
     </base-config>
-    <!-- Layer 1 backstop — keep in sync with OkHttp pins. Fails-open after expiration. -->
+    <!-- Fails-open after expiration (degrades to system trust, not a hard block). -->
     <domain-config cleartextTrafficPermitted="false">
         <domain includeSubdomains="false">api.travelmonk.com</domain>
         <pin-set expiration="2027-01-01">
@@ -398,7 +437,34 @@ fun provideBookingsApi(@PinnedRetrofit retrofit: Retrofit): BookingsApi
 </network-security-config>
 ```
 
-**Dev flavor override** (`app/src/dev/res/xml/network_security_config.xml`):
+#### Staging — `app/src/staging/res/xml/network_security_config.xml`
+
+Overrides the main NSC for staging builds. Completes Layer 1 for the staging host — without this,
+staging builds used the production NSC which has no pin for `staging-api.travelmonk.com`, leaving
+the two-layer defense incomplete for staging. Keep pin digests in sync with `STAGING_PRIMARY` /
+`STAGING_BACKUP` in `PinningConfig.kt`.
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors><certificates src="system" /></trust-anchors>
+    </base-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="false">staging-api.travelmonk.com</domain>
+        <pin-set expiration="2027-01-01">
+            <pin digest="SHA-256">DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD=</pin> <!-- ⚠️ staging primary -->
+            <pin digest="SHA-256">EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE=</pin> <!-- ⚠️ staging backup -->
+        </pin-set>
+    </domain-config>
+</network-security-config>
+```
+
+#### Dev — `app/src/dev/res/xml/network_security_config.xml`
+
+Allows user-installed CA certificates so Charles Proxy and mitmproxy work locally.
+OkHttp `CertificatePinner` is also a no-op in DEV (`PinningConfig` returns empty config).
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
@@ -431,15 +497,18 @@ Rotation day:  server switches to key B         →  app still accepts (B matche
 Next release:  pins = [leafKeyB, newBackupKeyC]  invariant restored
 ```
 
-Shipping with one pin = guaranteed brick on cert rotation. The `HostPins.init {}` check
-prevents this from compiling without the backup.
+Shipping with one pin = guaranteed brick on cert rotation. The `HostPins.init {}` check prevents
+a single-pin entry from being accepted at runtime. The `mergeAdditive` safe-skip with
+`runCatching` + `mapNotNull` ensures a misconfigured remote payload cannot crash the app even if
+the backend sends a single-pin host — it is silently dropped and reported.
 
 ### Emergency path — `RemotePinSource`
 
 1. Backend publishes a signed JSON pin manifest
 2. App verifies with a baked-in signing public key (this key is **never** remotely changed)
 3. New pins are union-merged with the static baseline (additive only — never removes shipped pins)
-4. Until built: `fetchVerifiedRemotePins()` returns `null`, static baseline is sole source of truth
+4. Invalid remote entries are skipped and reported to the crash reporter, not thrown
+5. Until built: `fetchVerifiedRemotePins()` returns `null`, static baseline is sole source of truth
 
 ---
 
@@ -466,6 +535,8 @@ openssl s_client -servername api.travelmonk.com -connect api.travelmonk.com:443 
 # — OkHttp prints the expected pin values in the exception message.
 ```
 
+Repeat for `staging-api.travelmonk.com` to extract the staging SPKI values (D/E slots).
+
 ---
 
 ## Repository Error Handling
@@ -489,10 +560,11 @@ When backend is live, catch `PinningFailure` in `BookingRepositoryImpl`:
 
 | | DEV | STAGING | PRODUCTION |
 |---|---|---|---|
-| OkHttp pinning | None (`DEFAULT`) | Enforced (2 staging pins) | Enforced (3 pins: leaf + backup + CA) |
-| network_security_config | user CAs allowed (Charles works) | strict + staging pin-set | strict + prod pin-set |
-| Cleartext | localhost only | blocked | blocked |
+| OkHttp pinning (Layer 2) | None (`DEFAULT`) | Enforced (2 staging pins) | Enforced (3 pins: leaf + backup + CA) |
+| NSC Layer 1 | User CAs allowed (Charles works) | Strict + staging pin-set | Strict + prod pin-set |
+| Cleartext | Localhost only | Blocked | Blocked |
 | Pin failure | Never triggers | Hard fail → `PinningFailure` | Hard fail → `PinningFailure` |
+| Invalid remote pin entry | N/A | Skipped + logged to crash reporter | Skipped + logged to crash reporter |
 
 ---
 
@@ -504,57 +576,31 @@ When backend is live, catch `PinningFailure` in `BookingRepositoryImpl`:
 - [ ] Unit: `CertificatePinnerFactory` returns `DEFAULT` for DEV, real pinner for STAGING/PROD
 - [ ] Unit: `PinFailureInterceptor` maps `SSLPeerUnverifiedException` → `PinningFailure` with correct host
 - [ ] Unit: `RemotePinSource.mergeAdditive` — remote can add pins, never remove baseline pins
+- [ ] Unit: `RemotePinSource.mergeAdditive` — single-pin remote host is skipped, not crashed
 - [ ] Unit: `HostPins` init throws on single pin
 - [ ] DEV build: Charles proxy intercepts booking requests (no-op pinning confirmed)
 - [ ] STAGING: wrong placeholder hash → logcat shows expected SPKI → confirms correct extraction
-- [ ] Replace all ⚠️ placeholder hashes with real `openssl` output before production release
+- [ ] STAGING: `app/src/staging/res/xml/network_security_config.xml` resolves `staging-api.travelmonk.com`
+- [ ] Replace all ⚠️ placeholder hashes in `PinningConfig.kt` and all three `network_security_config.xml` files with real `openssl` output before production release
 
 ---
 
 ## Completion Status
 
-| Step | Description | Status |
+| File | Description | Status |
 |------|-------------|--------|
-| Design + documentation | Architecture, rotation strategy, threat model | DONE |
-| `NetworkQualifiers.kt` | Typed qualifier annotations | — |
-| `PinningConfig.kt` | Env-aware pin config with ≥ 2 pin enforcement | — |
-| `PinSource.kt` + `StaticPinSource.kt` + `RemotePinSource.kt` | Pin source abstraction | — |
-| `CertificatePinnerFactory.kt` | Builds pinner from active `PinSource` | — |
-| `PinningFailure.kt` + `PinFailureInterceptor.kt` | Typed failure mapping | — |
-| `NetworkModule.kt` | Two clients, two Retrofits, `@Binds PinSource` | — |
-| `BookingModule.kt` | `@PinnedRetrofit` qualifier | — |
-| `network_security_config.xml` | Layer 1 backstop + cleartext block | — |
-| `AndroidManifest.xml` | Wire `networkSecurityConfig` | — |
-| Replace ⚠️ SPKI placeholders | Real `openssl` output per environment | — |
-| Unit tests | All new security classes covered | — |
-
-
-What was implemented:
-
-┌──────────────────────────────────────────┬────────────────────────────────────────────────┐
-│                   File                   │                     Status                     │
-├──────────────────────────────────────────┼────────────────────────────────────────────────┤
-│ core/network/security/PinningConfig.kt   │ New — env-aware SPKI pin map, enforces ≥2 pins │
-├───────────────────────────────────────────────────┼────────────────────────────────────────────────┤
-│ core/network/security/PinSource.kt                │ New — interface for pin delivery               │
-├───────────────────────────────────────────────────┼────────────────────────────────────────────────┤
-│ core/network/security/StaticPinSource.kt          │ New — binary-baked pins (active default)       │
-├───────────────────────────────────────────────────┼────────────────────────────────────────────────┤
-│ core/network/security/RemotePinSource.kt          │ New — rotation stub (additive merge only)      │
-├───────────────────────────────────────────────────┼─────────────────────────────────────────────────┤
-│ core/network/security/CertificatePinnerFactory.kt │ New — builds CertificatePinner; no-op in DEV    │
-├───────────────────────────────────────────────────┼──────────────────────────────────────────────────────────────┤
-│ core/network/security/PinningFailure.kt           │ New — typed exception for MITM/stale pin                     │
-├───────────────────────────────────────────────────┼──────────────────────────────────────────────────────────────┤
-│ core/network/security/PinFailureInterceptor.kt    │ New — SSLPeerUnverified → PinningFailure                     │
-├───────────────────────────────────────────────────┼──────────────────────────────────────────────────────────────┤
-│ core/network/di/NetworkQualifiers.kt              │ New — @PinnedClient, @PinnedRetrofit qualifiers              │
-├───────────────────────────────────────────────────┼──────────────────────────────────────────────────────────────┤
-│ core/network/di/NetworkModule.kt                  │ Modified — object → abstract class; pinned + default clients │
-├───────────────────────────────────────────────────┼──────────────────────────────────────────────────────────────┤
-│ feature/bookings/di/BookingModule.kt              │ Modified — @PinnedRetrofit retrofit                          │
-│ app/src/main/AndroidManifest.xml                  │ Modified — android:networkSecurityConfig wired               │
-└───────────────────────────────────────────────────┴──────────────────────────────────────────────────────────────┘
-
-One remaining action before production: Replace the ⚠️ placeholder SPKI hashes in PinningConfig.kt and network_security_config.xml with real values extracted via the
-openssl commands in documents/certificate_pinning.md.
+| `NetworkQualifiers.kt` | Typed qualifier annotations | DONE |
+| `PinningConfig.kt` | Env-aware pin config with ≥ 2 pin enforcement | DONE |
+| `PinSource.kt` + `StaticPinSource.kt` | Pin source abstraction and static impl | DONE |
+| `RemotePinSource.kt` | Rotation stub — `@Singleton`, additive merge, safe skip on invalid remote entries | DONE |
+| `CertificatePinnerFactory.kt` | Builds `CertificatePinner`; no-op in DEV | DONE |
+| `PinningFailure.kt` + `PinFailureInterceptor.kt` | Typed failure mapping; `@Singleton` scoped | DONE |
+| `NetworkModule.kt` | Two clients, two Retrofits, `@Binds PinSource` | DONE |
+| `BookingModule.kt` | `@PinnedRetrofit` qualifier | DONE |
+| `app/src/main/res/xml/network_security_config.xml` | Layer 1 backstop + cleartext block (production) | DONE |
+| `app/src/staging/res/xml/network_security_config.xml` | Layer 1 backstop for staging host | DONE |
+| `app/src/dev/res/xml/network_security_config.xml` | Dev override — user CAs for Charles Proxy | DONE |
+| `app/src/main/AndroidManifest.xml` | `android:networkSecurityConfig` wired | DONE |
+| `core/network/build.gradle.kts` | Add `:core:logger` dependency | DONE |
+| Replace ⚠️ SPKI placeholders | Real `openssl` output per environment | **PENDING** |
+| Unit tests | All new security classes covered | **PENDING** |

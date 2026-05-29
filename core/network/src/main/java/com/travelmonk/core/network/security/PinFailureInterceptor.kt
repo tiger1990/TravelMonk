@@ -3,6 +3,7 @@ package com.travelmonk.core.network.security
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
+import javax.inject.Singleton
 import javax.net.ssl.SSLPeerUnverifiedException
 
 /**
@@ -12,6 +13,7 @@ import javax.net.ssl.SSLPeerUnverifiedException
  * Coroutine safety is preserved — only the specific SSL exception is caught;
  * [kotlinx.coroutines.CancellationException] is never intercepted.
  */
+@Singleton
 class PinFailureInterceptor @Inject constructor() : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {

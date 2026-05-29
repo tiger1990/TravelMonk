@@ -21,6 +21,7 @@ import coil3.compose.AsyncImage
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
 import com.travelmonk.feature.home.R
 import com.travelmonk.core.tokens.TravelMonkIcons
+import com.travelmonk.core.ui.LocalNavContentPadding
 import com.travelmonk.core.ui.TravelMonkTopBar
 import com.travelmonk.core.ui.utils.LogScreenLifecycle
 import com.travelmonk.core.design.system.theme.TravelMonkThemeWrapper
@@ -126,14 +127,20 @@ fun HomeContent(
         },
         containerColor = TravelMonkTheme.colors.background
     ) { padding ->
+        val bottomPadding = LocalNavContentPadding.current
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(TravelMonkTheme.colors.background)
+                .background(TravelMonkTheme.colors.background),
+            contentPadding = PaddingValues(
+                start = TravelMonkTheme.spacing.large,
+                end = TravelMonkTheme.spacing.large,
+                top = TravelMonkTheme.spacing.medium,
+                bottom = TravelMonkTheme.spacing.medium + bottomPadding
+            )
         ) {
             item {
-                Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
                 BannerSection(banners = state.banners) { bannerId ->
                     onIntent(HomeIntent.OnBannerClick(bannerId))
                 }
@@ -150,11 +157,9 @@ fun BannerSection(banners: ImmutableList<HomeBanner>, onBannerClick: (String) ->
         Text(
             text = stringResource(R.string.feature_home_special_offers),
             style = TravelMonkTheme.typography.titleLarge,
-            modifier = Modifier.padding(horizontal = TravelMonkTheme.spacing.large)
         )
         Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
         LazyRow(
-            contentPadding = PaddingValues(horizontal = TravelMonkTheme.spacing.large),
             horizontalArrangement = Arrangement.spacedBy(TravelMonkTheme.spacing.medium)
         ) {
             items(banners, key = { it.id }) { banner ->
@@ -194,7 +199,7 @@ fun BannerSection(banners: ImmutableList<HomeBanner>, onBannerClick: (String) ->
 
 @Composable
 fun CategorySection(categories: ImmutableList<HomeCategory>) {
-    Column(modifier = Modifier.padding(TravelMonkTheme.spacing.large)) {
+    Column(modifier = Modifier.padding(vertical = TravelMonkTheme.spacing.large)) {
         Text(text = stringResource(R.string.feature_home_categories), style = TravelMonkTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(TravelMonkTheme.spacing.medium))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -220,7 +225,7 @@ fun CategorySection(categories: ImmutableList<HomeCategory>) {
 fun PromoSection() {
     Card(
         modifier = Modifier
-            .padding(TravelMonkTheme.spacing.large)
+            .padding(vertical = TravelMonkTheme.spacing.large)
             .fillMaxWidth(),
         shape = RoundedCornerShape(TravelMonkTheme.radius.medium),
         colors = CardDefaults.cardColors(containerColor = TravelMonkTheme.colors.tertiary.copy(alpha = 0.1f))

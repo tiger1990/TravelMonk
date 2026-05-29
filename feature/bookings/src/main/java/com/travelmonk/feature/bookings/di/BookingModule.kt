@@ -28,6 +28,12 @@ internal abstract class BookingModule {
     ): BookingRepository
 
     companion object {
+        /**
+         * Uses [@PinnedRetrofit] so all booking API calls go through the OkHttpClient
+         * with SPKI certificate pinning enforced. This prevents MITM attacks on booking
+         * confirmation, cancellation, and future payment endpoints on this host.
+         * Any feature module targeting sensitive data must also use [@PinnedRetrofit].
+         */
         @Provides
         @Singleton
         fun provideBookingsApi(@PinnedRetrofit retrofit: Retrofit): BookingsApi {

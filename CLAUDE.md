@@ -116,6 +116,13 @@ Documented in `ArchitectureGaps.md`. Key rules:
 - **No** hardcoded strings — use string resources
 - **No** mutable state casts (e.g. `as SnapshotStateList`) — use proper state holders
 
+## Reference Documents (Do Not Analyze)
+
+Files under `documents/` and `tasks/` are architecture notes, implementation guides, and planning docs for human reference only.
+- Do **not** lint, review, or flag issues in `documents/*.md` or `tasks/*.md`
+- Do **not** treat them as code artifacts — they are not subject to code quality checks
+- Read them when they provide relevant context, but never produce warnings or suggestions about their content
+
 ## Build
 ```bash
 ./gradlew assembleDebug          # Build debug APK

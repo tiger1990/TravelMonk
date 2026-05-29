@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Network Security Configuration — STAGING flavor.
+  Overrides app/src/main/res/xml/network_security_config.xml for staging builds.
+
+  Mirrors the production NSC structure but targets the staging API host and its
+  dedicated SPKI pins. Provides Layer 1 (OS-level) pinning for staging-api.travelmonk.com,
+  completing the two-layer defense that production builds already have.
+
+  Keep the pin digests here in sync with PinningConfig.kt (STAGING_PRIMARY / STAGING_BACKUP).
+  ⚠️  PLACEHOLDER digests — replace with real openssl SPKI output before shipping.
+      See documents/certificate_pinning.md for extraction commands.
+-->
+<network-security-config>
+
+    <!-- Block cleartext HTTP everywhere by default. Trust only system CAs. -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!--
+      Staging API host — declarative SPKI pin backstop.
+      Expiration degrades to system trust (not a hard block) so a missed rotation
+      does not prevent app updates or emergency access.
+    -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="false">staging-api.travelmonk.com</domain>
+        <pin-set expiration="2027-01-01">
+            <!-- ⚠️ staging leaf primary SPKI — run: openssl s_client ... | openssl x509 -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64 -->
+            <pin digest="SHA-256">DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD=</pin>
+            <!-- ⚠️ staging backup key SPKI (held in reserve for zero-downtime rotation) -->
+            <pin digest="SHA-256">EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE=</pin>
+        </pin-set>
+    </domain-config>
+
+</network-security-config>
