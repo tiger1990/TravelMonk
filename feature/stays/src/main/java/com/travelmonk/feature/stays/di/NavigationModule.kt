@@ -1,6 +1,7 @@
 package com.travelmonk.feature.stays.di
 
 import com.travelmonk.core.navigation.NavEntryInstaller
+import com.travelmonk.feature.stays.ui.StayDetailsScreen
 import com.travelmonk.feature.stays.ui.StayResultsScreen
 import com.travelmonk.feature.stays.ui.StaySearchScreen
 import com.travelmonk.feature.staysapi.navigation.StayNavKey
@@ -27,6 +28,9 @@ object NavigationModule {
         }
         entry<StayNavKey.Results> { key ->
             StayResultsScreen(location = key.location, navigator = navigator)
+        }
+        entry<StayNavKey.Details> { key ->
+            StayDetailsScreen(stayId = key.stayId, navigator = navigator)
         }
     }
 }

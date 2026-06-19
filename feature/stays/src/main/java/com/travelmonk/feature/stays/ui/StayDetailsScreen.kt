@@ -1,6 +1,5 @@
 package com.travelmonk.feature.stays.ui
 
-import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -18,11 +17,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.travelmonk.feature.stays.R
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.travelmonk.core.design.system.theme.TravelMonkComponentPreviews
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
+import com.travelmonk.core.design.system.theme.TravelMonkThemeWrapper
 import com.travelmonk.core.model.BookingType
 import com.travelmonk.core.tokens.TravelMonkIcons
 import com.travelmonk.core.ui.TravelMonkButton
@@ -306,29 +307,47 @@ private fun StayDetailsBottomBar(
     }
 }
 
-@Preview(name = "Stay Details – Light Full", showSystemUi = true)
-@Preview(
-    name = "Stay Details – Dark Full",
-    showSystemUi = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+private val previewStay = Stay(
+    id = "1",
+    title = "Grand Hyatt Bali",
+    location = "Nusa Dua, Bali",
+    price = "$240",
+    rating = "4.8",
+    imageUrl = ""
 )
+
+@TravelMonkComponentPreviews
+@PreviewWrapper(TravelMonkThemeWrapper::class)
 @Composable
-private fun StayDetailsContentPreview() {
-    val sampleStay = Stay(
-        id = "1",
-        title = "Grand Hyatt Bali",
-        location = "Nusa Dua, Bali",
-        price = "$240",
-        rating = "4.8",
-        imageUrl = ""
+private fun StayDetailsContentSuccessPreview() {
+    StayDetailsContent(
+        state = StayDetailsState(stay = previewStay),
+        snackbarHostState = SnackbarHostState(),
+        onIntent = {},
+        onBackClick = {}
     )
-    
-    TravelMonkTheme {
-        StayDetailsContent(
-            state = StayDetailsState(stay = sampleStay),
-            snackbarHostState = SnackbarHostState(),
-            onIntent = {},
-            onBackClick = {}
-        )
-    }
+}
+
+@TravelMonkComponentPreviews
+@PreviewWrapper(TravelMonkThemeWrapper::class)
+@Composable
+private fun StayDetailsContentLoadingPreview() {
+    StayDetailsContent(
+        state = StayDetailsState(isLoading = true),
+        snackbarHostState = SnackbarHostState(),
+        onIntent = {},
+        onBackClick = {}
+    )
+}
+
+@TravelMonkComponentPreviews
+@PreviewWrapper(TravelMonkThemeWrapper::class)
+@Composable
+private fun StayDetailsContentErrorPreview() {
+    StayDetailsContent(
+        state = StayDetailsState(error = stringResource(R.string.feature_stays_error_loading_details)),
+        snackbarHostState = SnackbarHostState(),
+        onIntent = {},
+        onBackClick = {}
+    )
 }
