@@ -156,6 +156,7 @@ dependencies {
 
     // --- LIBRARIES ---
     implementation(libs.androidx.core.splashscreen)
+    // Retained for a future Lottie-based splash; current splash is code-driven (no asset).
     implementation(libs.lottie.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
