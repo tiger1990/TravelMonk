@@ -1,37 +1,37 @@
 package com.travelmonk.ui
 
 import android.content.res.Configuration
-import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.EaseOutCubic
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalInspectionMode
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieComposition
 import com.travelmonk.R
 import com.travelmonk.core.design.system.theme.TravelMonkTheme
+import kotlinx.coroutines.delay
+
+// How long the branded splash is shown before handing off to the app.
+private const val SPLASH_DISPLAY_MILLIS = 1200L
 
 @Composable
 fun TravelMonkSplashScreen(
@@ -40,39 +40,30 @@ fun TravelMonkSplashScreen(
 ) {
     val isDark = isSystemInDarkTheme()
     val isPreview = LocalInspectionMode.current
-    val composition by rememberLottieComposition(
-        LottieCompositionSpec.RawRes(R.raw.travel_splash)
-    )
-    val lottieState = animateLottieCompositionAsState(
-        composition = composition,
-        iterations = 1
-    )
 
-    // Fade in text quickly. In preview, show immediately (alpha 1f).
-    val textAlpha by animateFloatAsState(
-        targetValue = if (isPreview || composition != null) 1f else 0f,
+    // Drive the reveal animation off a single flag instead of a Lottie composition.
+    var started by remember { mutableStateOf(isPreview) }
+
+    val contentAlpha by animateFloatAsState(
+        targetValue = if (started) 1f else 0f,
         animationSpec = tween(durationMillis = 500),
-        label = "text_fade_in"
+        label = "splash_content_alpha"
     )
 
-    // Multi-layer effect: Slight scale in for the whole content
     val contentScale by animateFloatAsState(
-        targetValue = if (composition != null) 1f else 0.95f,
-        animationSpec = tween(durationMillis = 1000, easing = LinearOutSlowInEasing),
+        targetValue = if (started) 1f else 0.92f,
+        animationSpec = tween(durationMillis = 700, easing = EaseOutCubic),
         label = "splash_content_scale"
     )
 
-    // Signal ready to hide system splash as soon as the Lottie composition is loaded
-    LaunchedEffect(composition) {
-        if (composition != null) {
-            onReady()
-        }
-    }
-
-    LaunchedEffect(lottieState.isAtEnd) {
-        if (lottieState.isAtEnd) {
-            onAnimationComplete()
-        }
+    // No external asset to load — signal ready immediately so the system splash hands off,
+    // start the reveal, then complete after the branded splash has been shown.
+    LaunchedEffect(Unit) {
+        if (isPreview) return@LaunchedEffect
+        onReady()
+        started = true
+        delay(SPLASH_DISPLAY_MILLIS)
+        onAnimationComplete()
     }
 
     Box(
@@ -80,26 +71,17 @@ fun TravelMonkSplashScreen(
             .fillMaxSize()
             .background(if (isDark) TravelMonkTheme.colors.background else TravelMonkTheme.colors.secondary)
     ) {
-        // Full-screen Lottie Animation (Immersive)
-        LottieAnimation(
-            composition = composition,
-            progress = { lottieState.progress },
+        // Centered brand mark
+        Column(
             modifier = Modifier
-                .fillMaxSize()
+                .align(Alignment.Center)
                 .graphicsLayer {
+                    alpha = contentAlpha
                     scaleX = contentScale
                     scaleY = contentScale
                 },
-            contentScale = ContentScale.FillBounds
-        )
-
-        // Bottom Branding Information
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = TravelMonkTheme.spacing.extraLarge)
-                .graphicsLayer { alpha = textAlpha },
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Text(
                 text = stringResource(R.string.app_name).uppercase(),
@@ -109,7 +91,16 @@ fun TravelMonkSplashScreen(
                     fontWeight = FontWeight.ExtraBold
                 )
             )
+        }
 
+        // Bottom branding information
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = TravelMonkTheme.spacing.extraLarge)
+                .graphicsLayer { alpha = contentAlpha },
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Text(
                 text = "YOUR JOURNEY STARTS HERE",
                 style = TravelMonkTheme.typography.labelMedium.copy(

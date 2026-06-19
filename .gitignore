@@ -46,3 +46,6 @@ src/*/google-services.json
 .env
 .claude-gemini
 .claude-gemini/*
+
+# Local, machine-specific Claude Code settings (shared rules/hooks/skills stay tracked)
+.claude/settings.local.json

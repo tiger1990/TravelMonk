@@ -38,16 +38,24 @@ import kotlinx.coroutines.flow.collectLatest
 fun ExperienceDetailsScreen(
     experienceId: String,
     navigator: ExperienceNavigator,
-    viewModel: ExperienceDetailsViewModel = hiltViewModel()
+    // Migrated to @AssistedInject: experienceId is supplied at construction and seeds the load in
+    // the ViewModel's init{}. Survives process death with the nav key; no per-rotation re-fetch.
+    viewModel: ExperienceDetailsViewModel =
+        hiltViewModel<ExperienceDetailsViewModel, ExperienceDetailsViewModel.Factory> { factory ->
+            factory.create(experienceId)
+        }
+    // Previous wiring, retired — kept for reference:
+    // viewModel: ExperienceDetailsViewModel = hiltViewModel()
 ) {
     LogScreenLifecycle("ExperienceDetailsScreen")
 
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(experienceId) {
-        viewModel.onIntent(ExperienceDetailsIntent.LoadDetails(experienceId))
-    }
+    // Retired — load now seeded in the ViewModel init{} from the assisted experienceId:
+    // LaunchedEffect(experienceId) {
+    //     viewModel.onIntent(ExperienceDetailsIntent.LoadDetails(experienceId))
+    // }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->

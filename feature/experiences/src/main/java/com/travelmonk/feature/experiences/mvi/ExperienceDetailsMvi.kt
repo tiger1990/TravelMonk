@@ -14,7 +14,9 @@ data class ExperienceDetailsState(
 ) : UiState
 
 sealed interface ExperienceDetailsIntent : UiIntent {
-    data class LoadDetails(val id: String) : ExperienceDetailsIntent
+    // Retired: id now arrives via @AssistedInject; initial load is seeded in the ViewModel's init{}.
+    // data class LoadDetails(val id: String) : ExperienceDetailsIntent
+    data object Retry : ExperienceDetailsIntent
     data object BookNow : ExperienceDetailsIntent
 }
 

@@ -31,10 +31,21 @@ class OtpViewModelTest {
     private val sendOtpUseCase: SendOtpUseCase = mockk()
 
     private fun buildViewModel(savedCooldown: Int = 0): OtpViewModel {
+        // phone now arrives via @AssistedInject (nav key), not SavedStateHandle.
+        // SavedStateHandle is retained only for process-death state (cooldown).
         val savedState = androidx.lifecycle.SavedStateHandle(
-            mapOf("phone" to PHONE, "resend_cooldown" to savedCooldown)
+            mapOf("resend_cooldown" to savedCooldown)
         )
-        return OtpViewModel(savedState, verifyOtpUseCase, sendOtpUseCase)
+        return OtpViewModel(PHONE, savedState, verifyOtpUseCase, sendOtpUseCase)
+    }
+
+    // ── Assisted nav arg ──────────────────────────────────────────────────────
+
+    @Test
+    fun `assisted phone arg seeds initial state`() = runTest {
+        val vm = buildViewModel()
+
+        assertEquals(PHONE, vm.uiState.value.phone)
     }
 
     // ── Digits-only guard ─────────────────────────────────────────────────────
