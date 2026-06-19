@@ -32,10 +32,11 @@ class TravelMonkApplication : Application() {
     lateinit var okHttpClient: Lazy<OkHttpClient>
 
     override fun onCreate() {
+        super.onCreate()
+        // comment below when run in actual device
         if (BuildConfig.DEBUG) {
             setupStrictMode()
         }
-        super.onCreate()
 
         // Pre-warm OkHttpClient on IO so SSL context initialization never runs on the main thread.
         CoroutineScope(ioDispatcher).launch { okHttpClient.get() }
