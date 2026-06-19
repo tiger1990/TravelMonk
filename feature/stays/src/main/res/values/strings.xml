@@ -18,4 +18,5 @@
     <string name="feature_stays_facility_spa">Spa</string>
     <string name="feature_stays_price_per_night_label">Price per night</string>
     <string name="feature_stays_book_now">Book Now</string>
+    <string name="feature_stays_error_loading_details">Couldn\'t load stay details. Please try again.</string>
 </resources>

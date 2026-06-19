@@ -258,25 +258,45 @@ Text(text = "Book Now", fontSize = 16.sp, color = Color(0xFF1A73E8))
 
 ## 10. Previews — Mandatory for Every Composable
 
-Every `*Content` composable must have both Light and Dark previews.
+Every `*Content` composable must have Light and Dark previews.
+
+### Use the project multipreview annotations — do NOT hand-roll `@Preview` pairs
+
+This project ships reusable multipreview annotations and a theme wrapper in
+`core/design-system` (`TravelMonkPreviews.kt`, `TravelMonkThemeWrapper.kt`). Always
+prefer these over manually stacking `@Preview(...)` + wrapping in `TravelMonkTheme { }`:
+
+- `@TravelMonkComponentPreviews` — Light + Dark × Phone + Tablet in one annotation
+- `@TravelMonkThemePreviews` — Light + Dark only (no device variants)
+- `@PreviewWrapper(TravelMonkThemeWrapper::class)` — applies `TravelMonkTheme` + a
+  background `Surface` automatically, so the preview function body stays clean
 
 ```kotlin
+@TravelMonkComponentPreviews
+@PreviewWrapper(TravelMonkThemeWrapper::class)
+@Composable
+private fun BookingContentSuccessPreview() {
+    BookingContent(
+        state = BookingState(/* realistic fake data */),
+        onIntent = {}
+    )
+}
+```
+
+```kotlin
+// ❌ Do NOT do this — manual @Preview pairs + manual TravelMonkTheme wrapping
 @Preview(name = "Light", showBackground = true)
 @Preview(name = "Dark", showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
 private fun BookingContentPreview() {
-    TravelMonkTheme {
-        BookingContent(
-            state = BookingState(/* realistic fake data */),
-            onIntent = {}
-        )
-    }
+    TravelMonkTheme { BookingContent(state = BookingState(), onIntent = {}) }
 }
 ```
 
-- **Never** skip the Dark preview
+- **Never** skip the Dark preview (the multipreview annotation gives it for free)
 - Use realistic fake data — not empty states only
-- Cover all meaningful states: Loading, Success, Empty, Error
+- **Cover every meaningful state with its own preview function**: Loading, Success, Empty, Error
+- Hoist shared fake data into a private top-level `val` so each state preview reuses it
 
 ---
 
@@ -292,7 +312,8 @@ Before marking any Composable done, verify:
 - [ ] No mutable collections passed as params — use `ImmutableList`
 - [ ] Lambdas that cause instability wrapped in `remember`
 - [ ] `collectAsStateWithLifecycle()` used — not `collectAsState()`
-- [ ] Both Light + Dark `@Preview` present on every `*Content` composable
+- [ ] Previews use `@TravelMonkComponentPreviews` + `@PreviewWrapper(TravelMonkThemeWrapper::class)` — not hand-rolled `@Preview` pairs
+- [ ] A separate preview exists for each meaningful state (Loading, Success, Empty, Error)
 - [ ] No hardcoded colors, strings, or dimensions
 - [ ] State is hoisted to the appropriate level
 - [ ] Side effects use the correct Effect API for the use case
