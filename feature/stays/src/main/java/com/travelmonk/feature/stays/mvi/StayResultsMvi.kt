@@ -17,7 +17,9 @@ data class StayResultsState(
 ) : UiState
 
 sealed interface StayResultsIntent : UiIntent {
-    data class LoadStays(val location: String) : StayResultsIntent
+    // Retired: location now arrives via @AssistedInject; initial load is seeded in the ViewModel's init{}.
+    // data class LoadStays(val location: String) : StayResultsIntent
+    data object Retry : StayResultsIntent
     data class ToggleFavorite(val stayId: String) : StayResultsIntent
     data class SelectStay(val stay: Stay) : StayResultsIntent
 }

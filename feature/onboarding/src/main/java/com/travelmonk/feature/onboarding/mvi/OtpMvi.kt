@@ -16,7 +16,8 @@ data class OtpState(
 ) : UiState
 
 sealed interface OtpIntent : UiIntent {
-    data class SetPhone(val phone: String) : OtpIntent
+    // Retired: phone now flows via @AssistedInject from the nav key (see OtpViewModel).
+    // data class SetPhone(val phone: String) : OtpIntent
     data class OtpChanged(val otp: String) : OtpIntent
     data object Submit : OtpIntent
     data object ResendOtp : OtpIntent

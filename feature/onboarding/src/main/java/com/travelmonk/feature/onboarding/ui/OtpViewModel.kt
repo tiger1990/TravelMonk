@@ -11,25 +11,34 @@ import com.travelmonk.feature.onboarding.domain.usecase.VerifyOtpUseCase
 import com.travelmonk.feature.onboarding.mvi.OtpEffect
 import com.travelmonk.feature.onboarding.mvi.OtpIntent
 import com.travelmonk.feature.onboarding.mvi.OtpState
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 private const val RESEND_COOLDOWN_SECONDS = 30
 private const val KEY_RESEND_COOLDOWN = "resend_cooldown"
 
-@HiltViewModel
-class OtpViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = OtpViewModel.Factory::class)
+class OtpViewModel @AssistedInject constructor(
+    @Assisted private val phone: String,
     private val savedStateHandle: SavedStateHandle,
     private val verifyOtpUseCase: VerifyOtpUseCase,
     private val sendOtpUseCase: SendOtpUseCase,
 ) : BaseViewModel<OtpState, OtpIntent, OtpEffect>(
     OtpState(
+        phone = phone,
         resendCooldownSeconds = savedStateHandle.get<Int>(KEY_RESEND_COOLDOWN) ?: 0
     )
 ) {
+
+    @AssistedFactory
+    interface Factory {
+        fun create(phone: String): OtpViewModel
+    }
 
     private var verifyJob: Job? = null
     private var resendJob: Job? = null
@@ -42,7 +51,9 @@ class OtpViewModel @Inject constructor(
 
     override fun handleIntent(intent: OtpIntent) {
         when (intent) {
-            is OtpIntent.SetPhone -> setState { copy(phone = intent.phone) }
+            // Migrated to @AssistedInject: `phone` now arrives as a constructor arg from the
+            // nav key and seeds the initial state. SetPhone intent retired — kept for reference.
+            // is OtpIntent.SetPhone -> setState { copy(phone = intent.phone) }
             is OtpIntent.OtpChanged -> {
                 // Enforce digits-only in the ViewModel — keyboard type is a hint, not a guarantee
                 if (intent.otp.all { it.isDigit() }) {

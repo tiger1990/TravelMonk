@@ -39,16 +39,24 @@ import kotlinx.coroutines.flow.collectLatest
 fun StayDetailsScreen(
     stayId: String,
     navigator: StayNavigator,
-    viewModel: StayDetailsViewModel = hiltViewModel()
+    // Migrated to @AssistedInject: stayId is supplied at construction and seeds the load in the
+    // ViewModel's init{}. Survives process death with the nav key; no per-rotation re-fetch.
+    viewModel: StayDetailsViewModel =
+        hiltViewModel<StayDetailsViewModel, StayDetailsViewModel.Factory> { factory ->
+            factory.create(stayId)
+        }
+    // Previous wiring, retired — kept for reference:
+    // viewModel: StayDetailsViewModel = hiltViewModel()
 ) {
     LogScreenLifecycle("StayDetailsScreen")
 
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(stayId) {
-        viewModel.onIntent(StayDetailsIntent.LoadDetails(stayId))
-    }
+    // Retired — load now seeded in the ViewModel init{} from the assisted stayId:
+    // LaunchedEffect(stayId) {
+    //     viewModel.onIntent(StayDetailsIntent.LoadDetails(stayId))
+    // }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->

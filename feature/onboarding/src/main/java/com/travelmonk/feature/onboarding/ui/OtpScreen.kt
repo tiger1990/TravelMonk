@@ -62,14 +62,19 @@ import kotlinx.coroutines.flow.collectLatest
 fun OtpScreen(
     navigator: OnboardingNavigator,
     phone: String,
-    viewModel: OtpViewModel = hiltViewModel(),
+    // Migrated to @AssistedInject: `phone` is supplied to the ViewModel at construction and is
+    // part of the initial state from frame one. It survives process death with the nav key.
+    viewModel: OtpViewModel = hiltViewModel<OtpViewModel, OtpViewModel.Factory> { factory ->
+        factory.create(phone)
+    },
+    // Previous (intent-delivery) wiring, retired — kept for reference:
+    // viewModel: OtpViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    // Deliver the phone from the nav key to the ViewModel on first composition.
-    // LaunchedEffect(phone) re-fires if phone changes (e.g. deep-link re-entry).
-    LaunchedEffect(phone) {
-        viewModel.onIntent(OtpIntent.SetPhone(phone))
-    }
+    // Retired — phone now arrives via @AssistedInject, no first-composition delivery needed:
+    // LaunchedEffect(phone) {
+    //     viewModel.onIntent(OtpIntent.SetPhone(phone))
+    // }
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
