@@ -128,3 +128,6 @@ Files under `documents/` and `tasks/` are architecture notes, implementation gui
 ./gradlew assembleDebug          # Build debug APK
 ./gradlew :<module>:compileDebugKotlin  # Compile a single module
 ```
+
+## First-Time Setup
+After cloning, run `./scripts/setup-agent-skills.sh` once to restore the `.agent/skills` symlinks — they point at an out-of-repo source and break on fresh clones.
